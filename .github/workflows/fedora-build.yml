@@ -1,0 +1,46 @@
+name: fedora-build
+
+# Validates that the Fedora package manifests and resolver produce a coherent,
+# parseable set. A real RPM/environment-group build requires a Fedora container
+# and is wired separately (see integration-test).
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  static:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install PyYAML
+        run: pip install pyyaml
+      - name: Run static test suite
+        run: bash fedora/tests/static.sh
+
+  manifest-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install PyYAML
+        run: pip install pyyaml
+      - name: Validate every upstream package is classified
+        run: |
+          set -e
+          while IFS= read -r pkg; do
+            pkg="${pkg%%#*}"; pkg="${pkg//[[:space:]]/}"
+            [ -z "$pkg" ] && continue
+            python3 fedora/scripts/lib/resolve.py --package "$pkg" >/dev/null || {
+              echo "Unmapped upstream package: $pkg"; exit 1
+            }
+          done < upstream/install/omarchy-base.packages
+          echo "All upstream base packages are mapped."

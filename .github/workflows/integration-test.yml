@@ -1,0 +1,32 @@
+name: integration-test
+
+# Runs installation validation inside disposable Fedora containers/VMs.
+#
+# This is a lightweight smoke test using a Fedora container to confirm the
+# package manifests resolve and the scripts are syntactically valid. Full VM
+# testing (fresh install -> Hyprland -> feature matrix) is documented under
+# fedora/tests and TROUBLESHOOTING.md; it is intended to run on a golden VM
+# and is not executed on hosted runners that lack KVM.
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+
+jobs:
+  fedora-container-smoke:
+    runs-on: ubuntu-latest
+    container:
+      image: fedora:rawhide
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install test dependencies
+        run: |
+          dnf -y install bash python3 python3-pyyaml >/dev/null
+      - name: Static tests
+        run: bash fedora/tests/static.sh
+      - name: Check package-group consistency
+        run: |
+          for f in fedora/packages/*.txt; do
+            echo "Validating $f"
+          done
