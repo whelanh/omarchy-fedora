@@ -104,15 +104,12 @@ omarchy_fedora_install_list() {
   return 0
 }
 
-# Install base system packages from the resolver mapping (source=fedora).
+# Install base system packages from the curated Fedora base manifest
+# (fedora/packages/base.txt). base.txt is the authoritative install list; the
+# resolver mapping (packages.yaml) is used for upstream-sync classification
+# and is not the runtime install manifest.
 omarchy_fedora_install_base() {
-  local -a base=()
-  while IFS= read -r p; do [ -n "$p" ] && base+=("$p"); done \
-    < <(python3 "$RESOLVE" --source fedora)
-  if (( ${#base[@]} > 0 )); then
-    omarchy_pkg_install "${base[@]}" || return 1
-  fi
-  return 0
+  omarchy_fedora_install_list "$PACKAGES_DIR/base.txt" || return 1
 }
 
 # Install the Hyprland/Omarchy desktop packages.

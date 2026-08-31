@@ -60,6 +60,25 @@ mkinitcpio are replaced by Fedora's GRUB2/systemd-boot and dracut.
 `omarchy-nvim`, `tensaku`, `tobi-try`, `ttfx`, `usage`) must be rebuilt as
 Fedora RPMs from their upstream sources. This is a discrete packaging effort.
 
+## Omarchy CLI / plugin commands on Fedora
+
+The `omarchy` CLI (including `omarchy plugin add/enable/list/update`, `omarchy
+theme`, `omarchy capture`, etc.) is **distro-neutral**: the `omarchy-*` scripts
+depend only on `git`, `jq`, `gum`, `git-delta` (pager) and the live Quickshell
+session — no package manager. The installer wires them onto PATH by symlinking
+`bin/omarchy-*` → `/usr/bin/omarchy-*` and installing
+`/etc/profile.d/omarchy.sh` (which sources the upstream env-bootstrap to set
+`OMARCHY_PATH=/usr/share/omarchy`).
+
+Caveats:
+- `omarchy plugin enable/disable` talk to the running shell via
+  `omarchy-shell shell enablePlugin`, so Quickshell must be running.
+- The 13 first-party binary packages remain `BUILD_FROM_SOURCE` (not yet
+  packaged), so commands backed by those binaries are unavailable until that
+  RPM effort lands.
+- `gum` and `git-delta` were added to `fedora/packages/base.txt` as
+  dependencies of the CLI layer.
+
 ## Known incompatibilities / open work
 
 1. **First-party RPM packaging** — 13 Omarchy binaries not yet packaged for

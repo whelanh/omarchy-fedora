@@ -260,6 +260,59 @@ install_omarchy_tree() {
        "be built as Fedora RPMs (see fedora/packages and BUILD_FROM_SOURCE)."
 }
 
+# Import omarchy-* commands onto PATH, mirroring the upstream architecture's
+# package map: bin/omarchy-* -> /usr/bin/omarchy-* (with symlinks kept under
+# /usr/share/omarchy/bin). This is what makes `omarchy plugin`, `omarchy theme`,
+# etc. callable on Fedora.
+install_omarchy_bin() {
+  [ "$COPY_OMARCHY" = 1 ] || return 0
+  local tree=/usr/share/omarchy/bin
+  [ -d "$tree" ] || { warn "no bin dir at $tree; skipping CLI wiring"; return 0; }
+
+  log "== Wiring omarchy-* commands onto PATH =="
+  local cmd
+  for cmd in "$tree"/omarchy-*; do
+    [ -e "$cmd" ] || continue
+    local base
+    base="$(basename "$cmd")"
+    # Replace any pre-existing symlink, never a real file.
+    if [ -L "/usr/bin/$base" ]; then
+      if (( EUID == 0 )); then rm -f "/usr/bin/$base"; else sudo rm -f "/usr/bin/$base"; fi
+    fi
+    if [ ! -e "/usr/bin/$base" ]; then
+      if (( EUID == 0 )); then ln -s "$cmd" "/usr/bin/$base"; else sudo ln -s "$cmd" "/usr/bin/$base"; fi
+    fi
+  done
+}
+
+# Set OMARCHY_PATH for login shells by sourcing the upstream env-bootstrap from
+# /etc/profile.d (system-wide), mirroring upstream's /etc/profile.d/omarchy.sh.
+install_omarchy_profile() {
+  [ "$COPY_OMARCHY" = 1 ] || return 0
+  local bootstrap=/usr/share/omarchy/default/bash/env-bootstrap
+  [ -f "$bootstrap" ] || { warn "no env-bootstrap at $bootstrap; skipping profile wiring"; return 0; }
+
+  log "== Installing /etc/profile.d/omarchy.sh =="
+  local live_dest=/etc/profile.d/omarchy.sh
+  if (( EUID == 0 )); then
+    cat > "$live_dest" <<EOF
+# Omarchy Quattro (Fedora) - shell environment. Sources the upstream
+# env-bootstrap which defines OMARCHY_PATH and PATH adjustments.
+if [ -f "$bootstrap" ]; then
+  . "$bootstrap"
+fi
+EOF
+  else
+    sudo tee "$live_dest" >/dev/null <<EOF
+# Omarchy Quattro (Fedora) - shell environment. Sources the upstream
+# env-bootstrap which defines OMARCHY_PATH and PATH adjustments.
+if [ -f "$bootstrap" ]; then
+  . "$bootstrap"
+fi
+EOF
+  fi
+}
+
 # ---------------------------------------------------------------------------
 # Phase F - User configuration
 # ---------------------------------------------------------------------------
@@ -299,7 +352,7 @@ configure_user() {
 
 validate_install() {
   log "== Validating installation =="
-  local -a required=(hyprland quickshell foot fzf git ripgrep)
+  local -a required=(hyprland quickshell foot fzf git ripgrep gum git-delta)
   local missing=()
   for p in "${required[@]}"; do
     omarchy_pkg_is_installed "$p" || missing+=("$p")
@@ -308,6 +361,21 @@ validate_install() {
     warn "validation: missing packages: ${missing[*]}"
   else
     log "validation: required packages present"
+  fi
+
+  # Validate the Omarchy CLI wiring: the omarchy-* commands should be on PATH
+  # and OMARCHY_PATH should resolve to a real tree.
+  if [ "$COPY_OMARCHY" = 1 ]; then
+    if [ -x /usr/bin/omarchy ] || [ -L /usr/bin/omarchy ]; then
+      log "validation: omarchy CLI is on PATH"
+    else
+      warn "validation: /usr/bin/omarchy not found (CLI wiring may be incomplete)"
+    fi
+    if [ -e /usr/share/omarchy/version ]; then
+      local v
+      v="$(cat /usr/share/omarchy/version 2>/dev/null || echo '?')"
+      log "validation: Omarchy tree present (version $v)"
+    fi
   fi
 }
 
@@ -330,6 +398,8 @@ main() {
   install_dracut
   enable_services
   install_omarchy_tree
+  install_omarchy_bin
+  install_omarchy_profile
   configure_user
   validate_install
 

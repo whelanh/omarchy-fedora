@@ -18,6 +18,7 @@ cups
 cups-filters
 cups-pk-helper
 ddcutil
+git-delta
 docker
 docker-buildx
 docker-compose
@@ -45,7 +46,6 @@ lazygit
 less
 libsecret
 libyaml
-libvips
 man-db
 mpv
 mpv-mpris
@@ -74,13 +74,13 @@ tzupdate
 udiskie
 ufw
 unzip
+vips
 whois
 wireless-regdb
 wireplumber
 wl-clipboard
 wtype
 xdg-desktop-portal-gtk
-xdg-terminal-exec
 yt-dlp
 zbar
 zoxide
@@ -99,6 +99,5 @@ llvm
 lua
 luarocks
 neovim
-compat-lua
 gcc
 make
