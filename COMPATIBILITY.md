@@ -58,10 +58,26 @@ mkinitcpio are replaced by Fedora's GRUB2/systemd-boot and dracut.
 13 Omarchy packages (`aether`, `asdcontrol`, `cliamp`, `herdr`,
 `hyprland-preview-share-picker`, `omacalc`, `omacut`, `omawrite`,
 `omarchy-nvim`, `tensaku`, `tobi-try`, `ttfx`, `usage`) must be rebuilt or
-repacked as Fedora RPMs. A scaffold lives in `fedora/rpm/`: one SPEC + entry
-per package, plus `build-rpm.sh` and a `manifest.yaml` recording each repo,
-build system, license, and build readiness. The SPECs are **PENDING-VERIFY** —
-none has been built in a Fedora mock chroot yet; see `fedora/rpm/README.md`.
+repacked as Fedora RPMs. Scaffolding lives in `fedora/rpm/`: one SPEC per
+package plus a `manifest.yaml` (repo, build system, license, status) and build
+helpers.
+
+**Status — 5 verified, 8 blocked.** Five packages now build successfully in a
+Fedora Rawhide container and are auto-built by CI:
+
+| Package | Version | Notes |
+|---------|---------|-------|
+| omacalc | v0.2.2 | Qt6/qmake6 |
+| omacut  | v0.4.0 | Qt6/qmake6 + ffmpeg |
+| omawrite| v0.5.0 | Qt6/qmake6 |
+| ttfx    | v0.3.2 | pure Rust/cargo |
+| try (tobi-try) | v1.10.1 | Ruby gem |
+
+The remaining 8 are `blocked` in `fedora/rpm/manifest.yaml`: `omarchy-nvim` and
+`usage` need in-tree source assembly (LazyVim cache / monorepo files, not a
+standalone repo), and `aether`, `herdr`, `hyprland-preview-share-picker`,
+`tensaku`, `cliamp`, `asdcontrol` need extra toolchain or repack work (pinned
+Zig, nightly Rust, archived upstream, etc.). See `fedora/rpm/README.md`.
 
 ## Omarchy CLI / plugin commands on Fedora
 
@@ -76,19 +92,19 @@ session — no package manager. The installer wires them onto PATH by symlinking
 Caveats:
 - `omarchy plugin enable/disable` talk to the running shell via
   `omarchy-shell shell enablePlugin`, so Quickshell must be running.
-- The 13 first-party binary packages are scaffolded as Fedora RPMs in
-  `fedora/rpm/` but are not yet **built/installed** by default, so commands
-  backed by those binaries are unavailable until the RPM builds land.
+- The 13 first-party binary packages are scaffolded under `fedora/rpm/`; 5 are
+  `verified` (built in CI) and 8 are `blocked`. None are installed by the
+  default installer yet, so commands backed by those binaries are unavailable
+  until the RPMs are built and installed.
 - `gum` and `git-delta` were added to `fedora/packages/base.txt` as
   dependencies of the CLI layer.
 
 ## Known incompatibilities / open work
 
-1. **First-party RPM packaging (in progress)** — the 13 Omarchy binaries are
-   scaffolded under `fedora/rpm/` (SPECs + manifest + build helper), but the
-   SPECs are PENDING-VERIFY: they must be built in a Fedora mock chroot, and a
-   few (aether, herdr, share-picker, tensaku, cliamp, asdcontrol) need extra
-   toolchain/archive work before they'll build. Not yet installed by default.
+1. **First-party RPM packaging (in progress)** — 13 Omarchy binaries scaffolded
+   under `fedora/rpm/`; 5 `verified` (omacalc, omacut, omawrite, ttfx, try),
+   8 `blocked` (see above). A CI job builds the verified set in a Fedora
+   Rawhide container. Not yet installed by the default installer.
 2. **libalpm hooks / "update guard"** — Arch's pacman PreTransaction guard that
    forces updates through `omarchy update` has no dnf equivalent; dropped.
 3. **UFW vs firewalld** — upstream default firewall is UFW. Fedora defaults to
