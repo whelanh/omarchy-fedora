@@ -1,0 +1,123 @@
+# Machine-readable record of the 13 "first-party" Omarchy binaries for Fedora
+# RPM packaging. Grounded in the upstream omacom/omarchy-pkgs PKGBUILDs and
+# each project's own build docs. status: ready = plausible build; blocked =
+# needs prebuilt/toolchain/verification work first. Treat all as PENDING-VERIFY.
+
+packages:
+  aether:
+    repo: https://github.com/omacom/aether
+    language: go
+    build: wails-build (or vendor prebuilt release binary, matching upstream PKGBUILD)
+    binary: aether
+    license: MIT
+    deps: [webkit2gtk4.1, gtk3]
+    status: blocked
+    note: Omarchy PKGBUILD installs prebuilt release binary, does not compile; needs Wails toolchain or repackage the release.
+  asdcontrol:
+    repo: https://github.com/nikosdion/asdcontrol
+    language: cpp
+    build: make
+    binary: asdcontrol
+    license: GPL-2.0
+    deps: [libusb, hidapi]
+    status: blocked
+    note: upstream archived Aug 2025, Apple Studio Display only; installs /usr/local/bin + udev rule.
+  cliamp:
+    repo: https://github.com/bjarneo/cliamp
+    language: go
+    build: go-build (CGO, alsa+flac+libvorbis+libogg+mpg123)
+    binary: cliamp
+    license: MIT
+    deps: [alsa-lib, flac, libvorbis, libogg, mpg123]
+    status: blocked
+    note: CGO audio deps; verify Fedora -devel package names.
+  herdr:
+    repo: https://github.com/omacom-io/herdr
+    language: rust
+    build: cargo-frozen-release (requires pinned Zig 0.15 linker)
+    binary: herdr
+    license: Apache-2.0
+    deps: [gcc-libs, glibc]
+    status: blocked
+    note: needs Zig 0.15.2 toolchain (not packaged in Fedora); vendor fetch or prebuilt.
+  hyprland-preview-share-picker:
+    repo: https://github.com/WhySoBad/hyprland-preview-share-picker
+    language: rust
+    build: cargo-frozen-release (nightly toolchain)
+    binary: hyprland-preview-share-picker
+    license: MIT
+    deps: [gtk4, gtk4-layer-shell, xdg-desktop-portal-hyprland, hyprland, slurp]
+    status: blocked
+    note: requires nightly Rust + vendored hyprland-protocols submodule.
+  omacalc:
+    repo: https://github.com/omacom/omacalc
+    language: cpp
+    build: qmake6
+    binary: omacalc
+    license: MIT
+    deps: [qt6-base, qt6-declarative, xdg-desktop-portal]
+    status: ready
+    note: Qt6 qmake6; build via ./bin/build or qmake6 + make.
+  omacut:
+    repo: https://github.com/omacom/omacut
+    language: cpp
+    build: qmake6
+    binary: omacut
+    license: MIT
+    deps: [qt6-base, qt6-declarative, qt6-multimedia, ffmpeg, ffprobe]
+    status: ready
+    note: Qt6 video length trimmer; needs qt6-qtmultimedia-devel.
+  omarchy-nvim:
+    repo: https://github.com/omacom/omarchy-pkgs (pkgbuilds/omarchy-nvim)
+    language: config
+    build: headless nvim + LazyVim sync (npm/nodejs/tree-sitter-cli)
+    binary: omarchy-nvim-setup, omarchy-nvim-refresh
+    license: MIT
+    deps: [neovim >= 0.9, git, nodejs, npm, tree-sitter-cli]
+    status: ready
+    note: seeds /etc/skel (.config/nvim); largest package (~116 MiB).
+  omawrite:
+    repo: https://github.com/omacom/omawrite
+    language: cpp
+    build: qmake6
+    binary: omawrite
+    license: MIT
+    deps: [qt6-base, qt6-declarative, qt6-quickcontrols2, xdg-desktop-portal]
+    status: ready
+    note: Qt6 markdown editor; needs qt6-qtquickcontrols2-devel.
+  tensaku:
+    repo: https://github.com/jondkinney/tensaku
+    language: rust
+    build: cargo-release (GTK4/libadwaita/relm4/gtk4-layer-shell)
+    binary: tensaku
+    license: MPL-2.0
+    deps: [gtk4, libadwaita, gtk4-layer-shell]
+    status: blocked
+    note: verify gtk4-layer-shell-devel availability; Satty fork.
+  tobi-try:
+    repo: https://github.com/tobi/try
+    language: ruby
+    build: gem (try-cli)
+    binary: try
+    license: MIT
+    deps: [ruby]
+    status: ready
+    note: Ruby gem; Fedora path is `gem install try-cli` / gem2rpm.
+  ttfx:
+    repo: https://github.com/omacom/ttfx
+    language: rust
+    build: cargo-release
+    binary: ttfx
+    license: MIT
+    deps: []
+    status: ready
+    note: pure Rust, static musl in upstream but plain cargo works for Fedora.
+  usage:
+    repo: https://github.com/omacom/omarchy (in-tree, shell/plugins/agents)
+    language: python
+    build: copy-tree (no compile)
+    binary: omarchy-agent-usage-*
+    license: MIT
+    deps: [python3, jq]
+    status: ready
+    note: QML widget + Python collectors; ship as a shell-config package.
