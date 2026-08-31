@@ -76,6 +76,7 @@ The installer is **idempotent** — running it again is safe.
 - [UPSTREAM.md](UPSTREAM.md) — how upstream stays authoritative
 - [COMPATIBILITY.md](COMPATIBILITY.md) — complete package/dependency status
 - [INSTALLATION.md](INSTALLATION.md)
+- [TESTING.md](TESTING.md) — how to validate on a Fedora VirtManager VM
 - [UPDATING.md](UPDATING.md)
 - [TROUBLESHOOTING.md](TROUBLESHOOTING.md)
 - [QUATTRO_FEATURES.md](QUATTRO_FEATURES.md)
