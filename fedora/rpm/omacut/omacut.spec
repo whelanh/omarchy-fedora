@@ -1,39 +1,49 @@
 # Omarchy Quattro - omacut (video length trimmer)
-# Upstream: https://github.com/omacom/omacut  (Qt6, qmake6)
-# %OT VERIFY: confirm release tag/version, binary name, and that `ffmpeg`/
-# `ffprobe` are the real runtime requirements (the app shells out to them).
+# Upstream: https://github.com/omacom/omacut (Qt6/qmake6)
+# Verified against upstream pkgbuild/PKGBUILD + bin/build (v0.4.0).
+%global debug_package %{nil}
+
 Name:           omacut
-Version:        0.1.0
+Version:        0.4.0
 Release:        1%{?dist}
-Summary:        Omarchy video length trimmer
+Summary:        Dead-simple video length trimmer built with Qt Quick and ffmpeg
 
 License:        MIT
 URL:            https://github.com/omacom/omacut
-Source0:        %{url}/archive/refs/heads/master.tar.gz
+Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz
 
+BuildRequires:  gcc-c++
+BuildRequires:  make
 BuildRequires:  qt6-qtbase-devel
 BuildRequires:  qt6-qtdeclarative-devel
 BuildRequires:  qt6-qtmultimedia-devel
+Requires:       qt6-qtbase
+Requires:       qt6-qtdeclarative
+Requires:       qt6-qtmultimedia
 Requires:       ffmpeg
+Requires:       xdg-desktop-portal
 
 %description
-Omanent - actually omacut - is a Qt6 tool to trim the length of a video file.
+Omanent is a dead-simple video length trimmer built with Qt Quick and ffmpeg.
 
 %prep
-%autosetup -n %{name}-master
+%autosetup -n %{name}-%{version}
 
 %build
-qmake6 %{name}.pro
-%make_build
+./bin/build
 
 %install
-%make_install
+install -Dm755 build/omacut %{buildroot}%{_bindir}/omacut
+install -Dm644 LICENSE %{buildroot}%{_datadir}/licenses/%{name}/LICENSE
+install -Dm644 pkgbuild/omacut.svg %{buildroot}%{_datadir}/icons/hicolor/scalable/apps/omacut.svg
+install -Dm644 pkgbuild/omacut.desktop %{buildroot}%{_datadir}/applications/omacut.desktop
 
 %files
 %license LICENSE
-%{_bindir}/%{name}
-%{_datadir}/applications/*.desktop
+%{_bindir}/omacut
+%{_datadir}/icons/hicolor/scalable/apps/omacut.svg
+%{_datadir}/applications/omacut.desktop
 
 %changelog
-* Mon Aug 31 2026 whelanh <brickhousedevelopers@gmail.com> - 0.1.0-1
-- Scaffold SPEC for Fedora (PENDING-VERIFY: not yet built in mock)
+* Mon Aug 31 2026 whelanh <brickhousedevelopers@gmail.com> - 0.4.0-1
+- Verified build in Fedora Rawhide container (v0.4.0)

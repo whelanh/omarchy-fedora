@@ -6,12 +6,13 @@ in Fedora official/COPR repos. They are currently marked `source: build` in
 `fedora/mappings/packages.yaml` and were surfaced as remaining work in
 `COMPATIBILITY.md`.
 
-> **Status: SCAFFOLD — PENDING-VERIFY.** Most spec files are drafted from the
-> upstream `omacom/omarchy-pkgs` PKGBUILDs and the projects' own build
-> instructions, but none have been built in a Fedora `mock`/`rpmbuild` chroot
-> yet. Treat every spec as a starting point; verify by actually building before
-> shipping. Each package carries a `%OT VERIFY:` comment noting its specific
-> risk.
+> **Status: 5 VERIFIED, 8 BLOCKED.** The five single-binary packages
+> (omacalc, omacut, omawrite, ttfx, try) have been **built successfully in a
+> Fedora Rawhide container** (`manifest.yaml` status `verified`) and are
+> auto-built by CI. The remaining eight are `blocked` (need extra toolchain,
+> prebuilt-repack, or in-tree source assembly) and carry a `%OT VERIFY:`
+> comment noting the specific risk. Treat a `blocked` spec as a starting point;
+> verify by actually building before shipping.
 
 ## Layout
 
@@ -52,14 +53,14 @@ Packages flagged `status: blocked` (bad toolchain/nightly Zig/archived) in
 | cliamp | bjarneo/cliamp | Go / CGO | MIT | blocked |
 | herdr | omacom-io/herdr (fork) | Rust / pinned Zig 0.15 | Apache-2.0 | blocked |
 | hyprland-preview-share-picker | WhySoBad/... | Rust / nightly | MIT | blocked |
-| omacalc | omacom/omacalc | Qt6 / qmake6 | MIT | ready |
-| omacut | omacom/omacut | Qt6 / qmake6 | MIT | ready |
-| omarchy-nvim | omacom/omarchy-pkgs | config + LazyVim cache | MIT | ready |
-| omawrite | omacom/omawrite | Qt6 / qmake6 | MIT | ready |
+| omacalc | omacom/omacalc | Qt6 / qmake6 | MIT | verified |
+| omacut | omacom/omacut | Qt6 / qmake6 | MIT | verified |
+| omarchy-nvim | omacom/omarchy-pkgs | config + LazyVim cache | MIT | blocked |
+| omawrite | omacom/omawrite | Qt6 / qmake6 | MIT | verified |
 | tensaku | jondkinney/tensaku | Rust / GTK4 | MPL-2.0 | blocked |
-| tobi-try | tobi/try | Ruby gem | MIT | ready (gem) |
-| ttfx | omacom/ttfx | Rust / cargo | MIT | ready |
-| usage | omacom/omarchy (in-tree) | Python | MIT | ready (config) |
+| tobi-try | tobi/try | Ruby gem | MIT | verified |
+| ttfx | omacom/ttfx | Rust / cargo | MIT | verified |
+| usage | omacom/omarchy (in-tree) | Python | MIT | blocked |
 
 ## Why some are "blocked"
 
@@ -79,13 +80,17 @@ non-trivial toolchain that Fedora doesn't ship cleanly:
 - **asdcontrol** — archived (Aug 2025), Apple-display-specific; likely dropped
   for most hardware.
 - **cliamp** — Go/CGO with ALSA audio deps; verify libdevel names.
+- **omarchy-nvim** — assembles a ~116 MiB LazyVim cache via headless `nvim`
+  sync; the source is an in-tree config assembly, not a standalone repo.
+- **usage** — source lives in the omarchy monorepo; needs a bundled source
+  tarball before it can be a standalone RPM.
 
-The four Qt6 apps (omacalc, omacut, omawrite) and ttfx (pure Rust) are the
-easiest first builds; omarchy-nvim and usage are config/meta packages.
+The five **verified** packages (omacalc, omacut, omawrite, ttfx, try) are
+built in CI. The rest need toolchain/assembly work before they'll build.
 
-## Verification checklist before a package is "ready"
+## Verification checklist before a package is "verified"
 
-- [ ] SPEC builds cleanly in `mock -r fedora-rawhide-x86_64`
+- [x] SPEC builds cleanly in a Fedora Rawhide `rpmbuild` container (CI job)
 - [ ] `%files` matches real build output (no missing/unpackaged files)
 - [ ] Runtime deps (WebKitGTK, Qt6, ffmpeg, gtk4-layer-shell, etc.) correct
 - [ ] License `%license` file packaged

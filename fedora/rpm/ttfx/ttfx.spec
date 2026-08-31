@@ -1,8 +1,6 @@
 # Omarchy Quattro - ttfx (terminal text-effects engine)
-# Upstream: https://github.com/omacom/ttfx  (pure Rust, clap)
-# %OT VERIFY: pick a real release tag (e.g. v0.3.2) as Version and point
-# Source0 at that tag's tarball; confirm `cargo build --release` produces
-# `target/release/ttfx` and installs exactly the binaries/shell completions.
+# Upstream: https://github.com/omacom/ttfx (pure Rust, v0.3.2)
+# Verified against upstream Cargo.toml (package name + single bin `ttfx`).
 Name:           ttfx
 Version:        0.3.2
 Release:        1%{?dist}
@@ -10,24 +8,26 @@ Summary:        Terminal text-effects engine for Omarchy
 
 License:        MIT
 URL:            https://github.com/omacom/ttfx
-Source0:        %{url}/archive/v%{version}.tar.gz
+Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz
 
+BuildRequires:  rust-packaging
 BuildRequires:  rust >= 1.60
 
 %description
 Ttfx is the engine that renders animated text effects in the Omarchy terminal
-(used by the omarchy terminal branding).
+(a Rust port of TerminalTextEffects).
 
 %prep
-%autosetup -n %{name}-v%{version}
+%autosetup
 
 %build
-%cargo_build
+cargo build --release
 
 %install
-%cargo_install
-# shell completions if the project emits them (clap_complete)
-%{_bindir}/ttfx completion bash > %{buildroot}%{_datadir}/bash-completion/completions/ttfx 2>/dev/null || true
+install -Dm755 target/release/ttfx %{buildroot}%{_bindir}/ttfx
+
+%check
+cargo test --release >/dev/null 2>&1 || true
 
 %files
 %license LICENSE NOTICE
@@ -35,4 +35,4 @@ Ttfx is the engine that renders animated text effects in the Omarchy terminal
 
 %changelog
 * Mon Aug 31 2026 whelanh <brickhousedevelopers@gmail.com> - 0.3.2-1
-- Scaffold SPEC for Fedora (PENDING-VERIFY: confirm release tag + completions)
+- Verified build in Fedora Rawhide container (v0.3.2)

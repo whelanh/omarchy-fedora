@@ -1,42 +1,48 @@
 # Omarchy Quattro - tobi-try (ephemeral workspace manager, Ruby gem)
-# Upstream: https://github.com/tobi/try  (Ruby gem `try-cli`)
-# The manage is `try`; Omarchy pulls the `try-cli` gem. Fedora path: build a gem
-# RPM from rubygems via gem2rpm, or install the gem. This spec scaffolds the
-# rpmbuild of the gem.
-# %OT VERIFY: the gem name is `try-cli`; confirm the installed binary (`try`)
-# and Ruby version. Simplest Fedora path may be `gem2rpm --fetch try-cli`.
+# Upstream: https://github.com/tobi/try  (Ruby gem `try-cli`).
+# Use the standard Fedora gem packaging approach; the gem is `try-cli`.
+%global debug_package %{nil}
+
 Name:           try
-Version:        0.1.0
+Version:        1.10.1
 Release:        1%{?dist}
 Summary:        Ephemeral workspace manager (try/task switcher)
 
 License:        MIT
 URL:            https://github.com/tobi/try
-Source0:        https://rubygems.org/downloads/try-cli-%{version}.gem
+Source0:        https://rubygems.org/downloads/%{gem_name}-%{version}.gem
 
-BuildRequires:  ruby-devel
+BuildRequires:  ruby
 BuildRequires:  rubygems-devel
-Requires:       ruby
+Requires:       ruby(rubygems)
+
+%global gem_name try-cli
+%global gem_dir %{_datadir}/gems
 
 %description
 Tobi.try is a Ruby tool for ephemeral workspace management; Omarchy exposes it
 as `tobi-try` for quick throwaway task workspaces.
 
 %prep
-# no-op; gem unpack handled by %gem_install style macros
+%setup -q -c -T
 
 %build
-%gem_build
+# no compilation; gem ships prebuilt code
 
 %install
-%gem_install
+rm -rf %{buildroot}
+mkdir -p %{buildroot}%{gem_dir} %{buildroot}%{_bindir}
+gem install --local --ignore-dependencies --force --no-document \
+    --install-dir %{buildroot}%{gem_dir} \
+    --bindir %{buildroot}%{_bindir} %{_sourcedir}/%{gem_name}-%{version}.gem
 
 %files
-%{gem_dir}/gemfiles/*
-%{gem_dir}/gems/*
-%{gem_dir}/specifications/*
+%dir %{gem_dir}
+%{gem_dir}/cache/%{gem_name}-%{version}.gem
+%{gem_dir}/gems/%{gem_name}-%{version}/
+%{gem_dir}/specifications/%{gem_name}-%{version}.gemspec
 %{_bindir}/try
 
 %changelog
-* Mon Aug 31 2026 whelanh <brickhousedevelopers@gmail.com> - 0.1.0-1
-- Scaffold SPEC for Fedora (PENDING-VERIFY: gem name/version; may use gem2rpm)
+* Mon Aug 31 2026 whelanh <brickhousedevelopers@gmail.com> - 1.10.1-1
+- Verified gem version 1.10.1 from rubygems

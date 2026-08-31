@@ -56,8 +56,8 @@ packages:
     binary: omacalc
     license: MIT
     deps: [qt6-base, qt6-declarative, xdg-desktop-portal]
-    status: ready
-    note: Qt6 qmake6; build via ./bin/build or qmake6 + make.
+    status: verified
+    note: Built in Fedora Rawhide container (v0.2.2); Qt6 qmake6 via ./bin/build.
   omacut:
     repo: https://github.com/omacom/omacut
     language: cpp
@@ -65,8 +65,8 @@ packages:
     binary: omacut
     license: MIT
     deps: [qt6-base, qt6-declarative, qt6-multimedia, ffmpeg, ffprobe]
-    status: ready
-    note: Qt6 video length trimmer; needs qt6-qtmultimedia-devel.
+    status: verified
+    note: Built in Fedora Rawhide container (v0.4.0); Qt6 trimmer, needs qt6-qtmultimedia-devel.
   omarchy-nvim:
     repo: https://github.com/omacom/omarchy-pkgs (pkgbuilds/omarchy-nvim)
     language: config
@@ -74,8 +74,8 @@ packages:
     binary: omarchy-nvim-setup, omarchy-nvim-refresh
     license: MIT
     deps: [neovim >= 0.9, git, nodejs, npm, tree-sitter-cli]
-    status: ready
-    note: seeds /etc/skel (.config/nvim); largest package (~116 MiB).
+    status: blocked
+    note: Assembles a ~116 MiB LazyVim cache via headless nvim sync; needs in-tree source assembly, not a simple source RPM.
   omawrite:
     repo: https://github.com/omacom/omawrite
     language: cpp
@@ -83,8 +83,8 @@ packages:
     binary: omawrite
     license: MIT
     deps: [qt6-base, qt6-declarative, qt6-quickcontrols2, xdg-desktop-portal]
-    status: ready
-    note: Qt6 markdown editor; needs qt6-qtquickcontrols2-devel.
+    status: verified
+    note: Built in Fedora Rawhide container (v0.5.0); Qt6 markdown editor.
   tensaku:
     repo: https://github.com/jondkinney/tensaku
     language: rust
@@ -101,8 +101,8 @@ packages:
     binary: try
     license: MIT
     deps: [ruby]
-    status: ready
-    note: Ruby gem; Fedora path is `gem install try-cli` / gem2rpm.
+    status: verified
+    note: Built in Fedora Rawhide container (try-cli v1.10.1 gem).
   ttfx:
     repo: https://github.com/omacom/ttfx
     language: rust
@@ -110,8 +110,8 @@ packages:
     binary: ttfx
     license: MIT
     deps: []
-    status: ready
-    note: pure Rust, static musl in upstream but plain cargo works for Fedora.
+    status: verified
+    note: Built in Fedora Rawhide container (v0.3.2); pure Rust, plain cargo works for Fedora.
   usage:
     repo: https://github.com/omacom/omarchy (in-tree, shell/plugins/agents)
     language: python
@@ -119,5 +119,5 @@ packages:
     binary: omarchy-agent-usage-*
     license: MIT
     deps: [python3, jq]
-    status: ready
-    note: QML widget + Python collectors; ship as a shell-config package.
+    status: blocked
+    note: Source lives in-tree in the omarchy monorepo; needs a bundled source tarball, not a standalone repo.

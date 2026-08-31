@@ -65,6 +65,22 @@ jobs:
           assert len(d['packages']) == 13
           for name, p in d['packages'].items():
               assert os.path.isfile(f"{name}/{name}.spec"), f"missing spec {name}"
-              assert p['status'] in ('ready', 'blocked'), name
+              assert p['status'] in ('verified', 'blocked'), name
           print(f"OK: {len(d['packages'])} specs validated")
           PY
+
+  rpm-build:
+    # Builds the 'verified' first-party RPMs inside a Fedora Rawhide container
+    # to confirm each SPEC actually produces a package. Runs on push to main
+    # and on demand (not per-PR, since it downloads build deps from the network
+    # and takes minutes).
+    runs-on: ubuntu-latest
+    container:
+      image: fedora:rawhide
+    if: github.event_name != 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install build tools
+        run: dnf -y install rpm-build dnf-plugins-core python3-pyyaml
+      - name: Build each verified first-party RPM
+        run: bash fedora/rpm/build-rpm-in-ci.sh

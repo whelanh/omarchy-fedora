@@ -30,8 +30,8 @@ build_one() {
   [ -f "$SELF/$pkg/$pkg.spec" ] || die "no spec for package: $pkg"
   local status
   status="$(manifest_field "$pkg" status)"
-  if [ "$status" = "blocked" ]; then
-    echo "skipping $pkg: status=blocked (see fedora/rpm/README.md)"
+  if [ "$status" != "verified" ]; then
+    echo "skipping $pkg: status=$status (only 'verified' packages are auto-built; see fedora/rpm/README.md)"
     return 0
   fi
 
