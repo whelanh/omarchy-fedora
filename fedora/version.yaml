@@ -1,0 +1,14 @@
+# Omarchy Fedora - version/state tracking
+#
+# See spec section 21. The installer/updater should report this.
+
+upstream:
+  repository: https://github.com/omacom/omarchy.git
+  branch: quattro
+  commit: b686ed89
+  version: 4.0.0.alpha
+
+fedora:
+  compatibility_version: 0.1.0
+  target_release: rawhide
+  architecture: x86_64

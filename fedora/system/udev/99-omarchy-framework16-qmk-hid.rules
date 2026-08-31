@@ -1,0 +1,3 @@
+# Omarchy Quattro - Framework 16 QMK keyboard uaccess rule (Fedora)
+# Mirrors upstream default/udev/framework16-qmk-hid.rules
+SUBSYSTEM=="usb", ATTRS{idVendor}=="32ac", ATTRS{idProduct}=="0002", TAG+="uaccess"
