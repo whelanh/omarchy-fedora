@@ -49,6 +49,32 @@ while IFS= read -r pkg; do
   t "mapped: $pkg" python3 fedora/scripts/lib/resolve.py --package "$pkg"
 done < upstream/install/omarchy-base.packages
 
+echo "== First-party RPM scaffold: manifest + spec + build helper =="
+t "fedora/rpm/manifest.yaml parses" python3 -c "
+import yaml
+d = yaml.safe_load(open('fedora/rpm/manifest.yaml'))
+assert 'packages' in d
+assert len(d['packages']) == 13, len(d['packages'])
+for name, p in d['packages'].items():
+    for k in ('repo','language','build','binary','license','status'):
+        assert k in p, (name, k)
+"
+# Every manifest package must have a matching <pkg>/<pkg>.spec.
+t "build-rpm.sh bash -n" bash -n fedora/rpm/build-rpm.sh
+for pkg in $(python3 -c "
+import yaml; d=yaml.safe_load(open('fedora/rpm/manifest.yaml'))
+print(' '.join(sorted(d['packages'].keys())))
+"); do
+  t "spec: $pkg" test -f "fedora/rpm/$pkg/$pkg.spec"
+  # every spec must declare Name equal to the dir name and a valid changelog
+  t "spec name/date: $pkg" python3 -c "
+import re
+spec = open('fedora/rpm/$pkg/$pkg.spec').read()
+assert re.search(r'^Name:\\s+\\S+', spec, re.M), 'missing Name'
+assert re.search(r'^\\* [A-Z][a-z]{2} [A-Z][a-z]{2} [0-9]{2} [0-9]{4} whelanh', spec, re.M), 'bad changelog date'
+"
+done
+
 echo
 echo "== Result: $PASS passed, $FAIL failed =="
 [ "$FAIL" -eq 0 ] || exit 1

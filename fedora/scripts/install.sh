@@ -255,9 +255,10 @@ install_omarchy_tree() {
     sudo cp -a "$UPSTREAM"/* "$dest/"
   fi
   log "Omarchy tree installed to $dest"
-  log "NOTE: first-party binary packages (aether, asdcontrol, cliamp, herdr," \
-       "omacalc, omacut, omawrite, omarchy-nvim, tensaku, ttfx, usage) must still" \
-       "be built as Fedora RPMs (see fedora/packages and BUILD_FROM_SOURCE)."
+  log "NOTE: the 13 first-party command binaries (aether, asdcontrol, cliamp," \
+       "herdr, share-picker, omacalc, omacut, omarchy-nvim, omawrite, tensaku," \
+       "tobi-try, ttfx, usage) are scaffolded as Fedora RPMs under fedora/rpm" \
+       "(see fedora/rpm/README.md); build and install them before those appear."
 }
 
 # Import omarchy-* commands onto PATH, mirroring the upstream architecture's

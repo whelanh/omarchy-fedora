@@ -57,8 +57,11 @@ mkinitcpio are replaced by Fedora's GRUB2/systemd-boot and dracut.
 ### First-party Omarchy binaries (BUILD_FROM_SOURCE)
 13 Omarchy packages (`aether`, `asdcontrol`, `cliamp`, `herdr`,
 `hyprland-preview-share-picker`, `omacalc`, `omacut`, `omawrite`,
-`omarchy-nvim`, `tensaku`, `tobi-try`, `ttfx`, `usage`) must be rebuilt as
-Fedora RPMs from their upstream sources. This is a discrete packaging effort.
+`omarchy-nvim`, `tensaku`, `tobi-try`, `ttfx`, `usage`) must be rebuilt or
+repacked as Fedora RPMs. A scaffold lives in `fedora/rpm/`: one SPEC + entry
+per package, plus `build-rpm.sh` and a `manifest.yaml` recording each repo,
+build system, license, and build readiness. The SPECs are **PENDING-VERIFY** —
+none has been built in a Fedora mock chroot yet; see `fedora/rpm/README.md`.
 
 ## Omarchy CLI / plugin commands on Fedora
 
@@ -73,17 +76,19 @@ session — no package manager. The installer wires them onto PATH by symlinking
 Caveats:
 - `omarchy plugin enable/disable` talk to the running shell via
   `omarchy-shell shell enablePlugin`, so Quickshell must be running.
-- The 13 first-party binary packages remain `BUILD_FROM_SOURCE` (not yet
-  packaged), so commands backed by those binaries are unavailable until that
-  RPM effort lands.
+- The 13 first-party binary packages are scaffolded as Fedora RPMs in
+  `fedora/rpm/` but are not yet **built/installed** by default, so commands
+  backed by those binaries are unavailable until the RPM builds land.
 - `gum` and `git-delta` were added to `fedora/packages/base.txt` as
   dependencies of the CLI layer.
 
 ## Known incompatibilities / open work
 
-1. **First-party RPM packaging** — 13 Omarchy binaries not yet packaged for
-   Fedora. The installer copies the desktop/config tree but can't yet provide
-   these binaries.
+1. **First-party RPM packaging (in progress)** — the 13 Omarchy binaries are
+   scaffolded under `fedora/rpm/` (SPECs + manifest + build helper), but the
+   SPECs are PENDING-VERIFY: they must be built in a Fedora mock chroot, and a
+   few (aether, herdr, share-picker, tensaku, cliamp, asdcontrol) need extra
+   toolchain/archive work before they'll build. Not yet installed by default.
 2. **libalpm hooks / "update guard"** — Arch's pacman PreTransaction guard that
    forces updates through `omarchy update` has no dnf equivalent; dropped.
 3. **UFW vs firewalld** — upstream default firewall is UFW. Fedora defaults to

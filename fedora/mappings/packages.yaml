@@ -19,59 +19,74 @@
 # commented with the compatibility rationale.
 
 packages:
-  # --- Omarchy first-party packages (rebuilt from source as Fedora RPMs) ---
+  # --- Omarchy "first-party" runtimes rebuilt/repacked as Fedora RPMs ---
+  # Each maps to a scaffold spec under fedora/rpm/. status in
+  # fedora/rpm/manifest.yaml reflects build feasibility (PENDING-VERIFY).
   aether:
     package: aether
     source: build
-    note: Omarchy first-party Hyprland GUI utility; build RPM from upstream source
+    rpm: fedora/rpm/aether/aether.spec
+    note: Desktop theming (wallpaper colour); Go/Wails, best repacked as prebuilt release binary.
   asdcontrol:
     package: asdcontrol
     source: build
-    note: Omarchy service control package; build from source
+    rpm: fedora/rpm/asdcontrol/asdcontrol.spec
+    note: Apple display brightness (archived upstream); likely drop on Fedora.
   cliamp:
     package: cliamp
     source: build
-    note: Omarchy terminal emulator wrapper; build from source
+    rpm: fedora/rpm/cliamp/cliamp.spec
+    note: Terminal music player; Go/CGO with ALSA deps.
   herdr:
     package: herdr
     source: build
-    note: Omarchy notification/reminder daemon; build from source
+    rpm: fedora/rpm/herdr/herdr.spec
+    note: AI-agent workspace manager; Rust needs pinned Zig toolchain.
   hyprland-preview-share-picker:
     package: hyprland-preview-share-picker
     source: build
-    note: Rust GTK4 share picker; not in any Fedora/COPR repo; build from source
+    rpm: fedora/rpm/hyprland-preview-share-picker/hyprland-preview-share-picker.spec
+    note: Rust GTK4 share picker; needs nightly Rust + vendored hyprland-protocols.
   omacalc:
     package: omacalc
     source: build
-    note: Omarchy calculator; build from source
+    rpm: fedora/rpm/omacalc/omacalc.spec
+    note: Calculator; Qt6/qmake6, easiest build of the set.
   omacut:
     package: omacut
     source: build
-    note: Omarchy clipboard utility; build from source
+    rpm: fedora/rpm/omacut/omacut.spec
+    note: Video length trimmer; Qt6/qmake6, needs qt6-multimedia + ffmpeg.
   omarchy-nvim:
     package: omarchy-nvim
     source: build
-    note: Omarchy Neovim config/meta package; build from source
+    rpm: fedora/rpm/omarchy-nvim/omarchy-nvim.spec
+    note: Neovim config + LazyVim cache; seeds /etc/skel, largest package.
   omawrite:
     package: omawrite
     source: build
-    note: Omarchy text editor; build from source
+    rpm: fedora/rpm/omawrite/omawrite.spec
+    note: Markdown editor; Qt6/qmake6 with quickcontrols2.
   tensaku:
     package: tensaku
     source: build
-    note: Omarchy task manager; build from source
+    rpm: fedora/rpm/tensaku/tensaku.spec
+    note: Screenshot annotator (Satty fork); Rust/GTK4 layer-shell.
   tobi-try:
     package: tobi-try
     source: build
-    note: Omarchy package; build from source
+    rpm: fedora/rpm/tobi-try/tobi-try.spec
+    note: Ephemeral workspace manager; Ruby gem (try-cli).
   ttfx:
     package: ttfx
     source: build
-    note: Omarchy package; build from source
+    rpm: fedora/rpm/ttfx/ttfx.spec
+    note: Terminal text-effects engine; pure Rust/cargo, easy build.
   usage:
     package: usage
     source: build
-    note: Omarchy usage tracker; build from source
+    rpm: fedora/rpm/usage/usage.spec
+    note: Model-usage bar widget + Python collectors (in-tree in omarchy).
 
   # --- Fedora official (same or near-identical name) ---
   alsa-utils:            { package: alsa-utils, source: fedora }
