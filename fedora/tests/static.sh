@@ -61,6 +61,9 @@ for name, p in d['packages'].items():
 "
 # Every manifest package must have a matching <pkg>/<pkg>.spec.
 t "build-rpm.sh bash -n" bash -n fedora/rpm/build-rpm.sh
+t "build-in-container.sh bash -n" bash -n fedora/rpm/build-in-container.sh
+t "build-rpm-in-ci.sh bash -n" bash -n fedora/rpm/build-rpm-in-ci.sh
+t "install-rpms.sh bash -n" bash -n fedora/rpm/install-rpms.sh
 for pkg in $(python3 -c "
 import yaml; d=yaml.safe_load(open('fedora/rpm/manifest.yaml'))
 print(' '.join(sorted(d['packages'].keys())))

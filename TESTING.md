@@ -144,6 +144,20 @@ omacalc --help
 (Repeat with `omacut`, `omawrite`, `ttfx`, `try` — adjust the RPM path per
 package; `try` installs as `/usr/bin/try`.)
 
+### Install all five at once
+
+After building with `build-rpm-in-ci.sh` (step 5a), install every verified RPM
+in one shot:
+
+```sh
+sudo bash fedora/rpm/install-rpms.sh
+```
+
+It locates each `status: verified` package's built `.rpm` under
+`/tmp/rpmbuild-<pkg>` (or a base dir you pass as the first argument), installs
+them via `dnf`, and prints a smoke-test pass/fail for each binary. Packages
+whose RPM is missing are skipped with a warning.
+
 ---
 
 ## 6. Cleanup / uninstall
