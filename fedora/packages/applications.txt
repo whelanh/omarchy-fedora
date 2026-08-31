@@ -1,0 +1,14 @@
+# Fedora GUI application packages for Omarchy Quattro
+# Graphically-installed user applications (Fedora names).
+
+chromium
+evince
+gnome-disk-utility
+kdenlive
+libreoffice-core
+nautilus
+nautilus-python
+obs-studio
+pinta
+sushi
+xournalpp

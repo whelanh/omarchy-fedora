@@ -1,0 +1,23 @@
+# Fedora desktop packages for Omarchy Quattro (Hyprland + Omarchy shell)
+#
+# NOTE: entries that must come from COPR are split out into
+# fedora/packages/install -- see fedora/scripts/lib/deps.sh which installs
+# COPR repos first, then installs these via dnf.
+#
+# The Hyprland desktop core:
+hyprland
+quickshell
+hyprpicker
+hyprsunset
+hyprland-guiutils
+uwsm
+xdg-desktop-portal-hyprland
+gtk4-layer-shell
+sddm
+qt6-qtwayland
+gpu-screen-recorder-git
+
+# IME
+fcitx5
+fcitx5-gtk
+fcitx5-qt

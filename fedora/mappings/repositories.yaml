@@ -1,0 +1,98 @@
+# Fedora repository (COPR / RPM Fusion) management for Omarchy Quattro
+#
+# Each external repository used by this project is documented here:
+#   - owner / id
+#   - packages supplied
+#   - why Fedora official is insufficient
+#   - trust / security considerations
+#   - mandatory vs optional
+#
+# We prefer Fedora official packages whenever functionally adequate. Only
+# enable repositories listed here; never add arbitrary repos.
+#
+# To enable on a live system:
+#   dnf install -y 'dnf-command(copr)' dnf-plugins-core
+#   dnf copr enable -y <owner>/<name>
+#
+# RPM Fusion (for NVIDIA / nonfree codecs) is enabled via its upstream RPM:
+#   dnf install -y https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
+#   dnf install -y https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+
+repositories:
+  nett00n/hyprland:
+    kind: copr
+    mandatory: true
+    packages:
+      - hyprland-guiutils
+      - hyprpicker
+      - hyprsunset
+      - quickshell
+      - uwsm
+      - xdg-desktop-portal-hyprland
+      - gtk4-layer-shell
+    why_not_official: >
+      Fedora official repos ship hyprland and quickshell (Rawhide), but the
+      surrounding Hyprland ecosystem (hyprpicker, hyprsunset, uwsm,
+      hyprland-guiutils, xdg-desktop-portal-hyprland, gtk4-layer-shell) is not
+      in official Fedora repos. nett00n/hyprland is the actively-maintained COPR
+      for the full ecosystem as of 2026.
+    trust: >
+      Community-maintained COPR. Packages built on Fedora's COPR infra from
+      upstream sources; verified with COPR GPG key and gpgcheck=1. Review the
+      source specs before trusting.
+    optional: false
+
+  brycensranch/gpu-screen-recorder-git:
+    kind: copr
+    mandatory: false
+    packages:
+      - gpu-screen-recorder-git
+    why_not_official: >
+      gpu-screen-recorder (NVIDIA/AMD screen recorder used by Omarchy
+      screenshots) is not in official Fedora repos.
+    trust: Community COPR; gpgcheck on.
+    optional: true
+
+  ferdiu/moonlight:
+    kind: copr
+    mandatory: false
+    packages:
+      - moonlight-qt
+    why_not_official: moonlight-qt (game streaming) not in official Fedora.
+    trust: Community COPR; gpgcheck on.
+    optional: true
+
+  kmf/Obsidian:
+    kind: copr
+    mandatory: false
+    packages:
+      - obsidian
+    why_not_official: Obsidian not in official Fedora; alternative is Flathub.
+    trust: Community COPR; gpgcheck on.
+    optional: true
+
+  lukenukem/asus-linux:
+    kind: copr
+    mandatory: false
+    packages:
+      - asusctl
+    why_not_official: asusctl (ASUS ROG) not in official Fedora.
+    trust: Community COPR from the asus-linux project.
+    optional: true
+
+  rpmfusion-nonfree-updates:
+    kind: rpmfusion
+    mandatory: false
+    packages:
+      - akmod-nvidia
+      - xorg-x11-drv-nvidia
+      - libva-nvidia-driver
+      - broadcom-wl
+    why_not_official: >
+      NVIDIA proprietary drivers and Broadcom wireless firmware are legally
+      redistributed via RPM Fusion nonfree, not official Fedora.
+    trust: >
+      RPM Fusion is the established community third-party repo for Fedora.
+      Enabled by installing the official rpmfusion-release RPM (signed).
+    optional: true
+    note: Nonfree NVIDIA/Broadcom support is optional; base install does not require it.

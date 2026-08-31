@@ -1,0 +1,15 @@
+# Optional Fedora packages for Omarchy Quattro
+# Installed only when an option / hardware feature is requested.
+
+# Gaming
+moonlight-qt
+
+# Notes
+obsidian
+
+# ASUS ROG
+asusctl
+
+# -- Optional / hardware-dependent, installed conditionally --
+# NVIDIA (RPM Fusion nonfree): akmod-nvidia xorg-x11-drv-nvidia libva-nvidia-driver
+# Broadcom wireless (RPM Fusion nonfree): broadcom-wl

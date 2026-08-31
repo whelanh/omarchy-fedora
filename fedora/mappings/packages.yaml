@@ -1,0 +1,471 @@
+# Fedora package mapping for Omarchy Quattro
+#
+# Target: Fedora Rawhide (~43+), x86_64, Wayland-capable hardware.
+#
+# Each Arch/upstream package (from install/omarchy-base.packages and
+# install/omarchy-other.packages) maps to a Fedora package name and a source.
+#
+# source classification:
+#   fedora          Fedora official repositories (fedora / updates / rawhide)
+#   copr            COPR repository (repository key names a repo in repositories.yaml)
+#   rpmfusion       RPM Fusion free/nonfree (repository key names a repo)
+#   flatpak         Flathub flatpak (installed via flatpak, not dnf)
+#   substitute      functionally equivalent, different source/package
+#   build           must be built from source as an RPM (Omarchy first-party)
+#   drop            Arch-only tooling not needed on Fedora
+#   unavailable     no reasonable Fedora equivalent (hardware/kernel specific)
+#
+# NOTE: never silently substitute unrelated software. Every substitute is
+# commented with the compatibility rationale.
+
+packages:
+  # --- Omarchy first-party packages (rebuilt from source as Fedora RPMs) ---
+  aether:
+    package: aether
+    source: build
+    note: Omarchy first-party Hyprland GUI utility; build RPM from upstream source
+  asdcontrol:
+    package: asdcontrol
+    source: build
+    note: Omarchy service control package; build from source
+  cliamp:
+    package: cliamp
+    source: build
+    note: Omarchy terminal emulator wrapper; build from source
+  herdr:
+    package: herdr
+    source: build
+    note: Omarchy notification/reminder daemon; build from source
+  hyprland-preview-share-picker:
+    package: hyprland-preview-share-picker
+    source: build
+    note: Rust GTK4 share picker; not in any Fedora/COPR repo; build from source
+  omacalc:
+    package: omacalc
+    source: build
+    note: Omarchy calculator; build from source
+  omacut:
+    package: omacut
+    source: build
+    note: Omarchy clipboard utility; build from source
+  omarchy-nvim:
+    package: omarchy-nvim
+    source: build
+    note: Omarchy Neovim config/meta package; build from source
+  omawrite:
+    package: omawrite
+    source: build
+    note: Omarchy text editor; build from source
+  tensaku:
+    package: tensaku
+    source: build
+    note: Omarchy task manager; build from source
+  tobi-try:
+    package: tobi-try
+    source: build
+    note: Omarchy package; build from source
+  ttfx:
+    package: ttfx
+    source: build
+    note: Omarchy package; build from source
+  usage:
+    package: usage
+    source: build
+    note: Omarchy usage tracker; build from source
+
+  # --- Fedora official (same or near-identical name) ---
+  alsa-utils:            { package: alsa-utils, source: fedora }
+  avahi:                 { package: avahi, source: fedora }
+  bash-completion:       { package: bash-completion, source: fedora }
+  bat:                   { package: bat, source: fedora }
+  bluez:                 { package: bluez, source: fedora }
+  bluez-tools:           { package: bluez-tools, source: fedora }
+  bluez-utils:           { package: bluez-utils, source: fedora }
+  bolt:                  { package: bolt, source: fedora }
+  brightnessctl:         { package: brightnessctl, source: fedora }
+  btop:                  { package: btop, source: fedora }
+  chromium:              { package: chromium, source: fedora }
+  clang:                 { package: clang, source: fedora }
+  cups:                  { package: cups, source: fedora }
+  cups-filters:          { package: cups-filters, source: fedora }
+  cups-pk-helper:        { package: cups-pk-helper, source: fedora }
+  ddcutil:               { package: ddcutil, source: fedora }
+  docker:                { package: docker, source: fedora }
+  docker-buildx:         { package: docker-buildx, source: fedora }
+  docker-compose:        { package: docker-compose, source: fedora }
+  dosfstools:            { package: dosfstools, source: fedora }
+  dotnet-runtime:        { package: dotnet-runtime-10.0, source: fedora }
+  dua-cli:
+    package: dua
+    source: substitute
+    note: binary `dua` is the same tool; Fedora packages it as `dua`
+  evince:                { package: evince, source: fedora }
+  exfatprogs:            { package: exfatprogs, source: fedora }
+  eza:                   { package: eza, source: fedora }
+  fakeroot:              { package: fakeroot, source: fedora }
+  fastfetch:             { package: fastfetch, source: fedora }
+  fcitx5:                { package: fcitx5, source: fedora }
+  fcitx5-gtk:            { package: fcitx5-gtk, source: fedora }
+  fcitx5-qt:             { package: fcitx5-qt, source: fedora }
+  fd:
+    package: fd-find
+    source: substitute
+    note: same tool; Fedora names the package fd-find
+  ffmpegthumbnailer:     { package: ffmpegthumbnailer, source: fedora }
+  fontconfig:            { package: fontconfig, source: fedora }
+  foot:                  { package: foot, source: fedora }
+  fzf:                   { package: fzf, source: fedora }
+  git:                   { package: git, source: fedora }
+  gnome-disk-utility:    { package: gnome-disk-utility, source: fedora }
+  gnome-keyring:         { package: gnome-keyring, source: fedora }
+  gnome-themes-extra:    { package: gnome-themes-extra, source: fedora }
+  grim:                  { package: grim, source: fedora }
+  gum:                   { package: gum, source: fedora }
+  gvfs-mtp:              { package: gvfs-mtp, source: fedora }
+  gvfs-nfs:              { package: gvfs-nfs, source: fedora }
+  gvfs-smb:              { package: gvfs-smb, source: fedora }
+  hyprland:              { package: hyprland, source: fedora, note: official in Rawhide (F42+) }
+  imagemagick:
+    package: ImageMagick
+    source: substitute
+    note: same tool; Fedora package name capitalization
+  imv:                   { package: imv, source: fedora }
+  inetutils:             { package: inetutils, source: fedora }
+  inotify-tools:         { package: inotify-tools, source: fedora }
+  inxi:                  { package: inxi, source: fedora }
+  jq:                    { package: jq, source: fedora }
+  kdenlive:              { package: kdenlive, source: fedora }
+  lazydocker:            { package: lazydocker, source: fedora }
+  lazygit:               { package: lazygit, source: fedora }
+  less:                  { package: less, source: fedora }
+  libreoffice-fresh:
+    package: libreoffice-core
+    source: substitute
+    note: Fedora packages LibreOffice core; add libreoffice-* as needed
+  libsecret:             { package: libsecret, source: fedora }
+  libyaml:               { package: libyaml, source: fedora }
+  llvm:                  { package: llvm, source: fedora }
+  lua51:
+    package: compat-lua
+    source: substitute
+    note: Fedora ships lua 5.4; use compat-lua for 5.1 if strict version needed
+  luarocks:              { package: luarocks, source: fedora }
+  man-db:                { package: man-db, source: fedora }
+  mariadb-libs:
+    package: mariadb-connector-c
+    source: substitute
+    note: Fedora names the client library mariadb-connector-c
+  mise-bin:
+    package: mise
+    source: fedora
+    note: mise is packaged in Fedora; no separate -bin needed
+  mpv:                   { package: mpv, source: fedora }
+  mpv-mpris:             { package: mpv-mpris, source: fedora }
+  nautilus:              { package: nautilus, source: fedora }
+  nautilus-python:       { package: nautilus-python, source: fedora }
+  networkmanager:
+    package: NetworkManager
+    source: substitute
+    note: same service; Fedora package name capitalization
+  nvim:
+    package: neovim
+    source: substitute
+    note: Omarchy uses nvim (Neovim); Fedora package is neovim
+  nss-mdns:              { package: nss-mdns, source: fedora }
+  obs-studio:            { package: obs-studio, source: fedora }
+  pamixer:               { package: pamixer, source: fedora }
+  pinta:                 { package: pinta, source: fedora }
+  plocate:               { package: plocate, source: fedora }
+  plymouth:              { package: plymouth, source: fedora }
+  power-profiles-daemon: { package: power-profiles-daemon, source: fedora }
+  python-gobject:
+    package: python3-gobject
+    source: substitute
+    note: Fedora uses python3-* naming
+  python-poetry-core:
+    package: python3-poetry-core
+    source: substitute
+    note: Fedora uses python3-* naming
+  qemu-user-static-binfmt: { package: qemu-user-static-binfmt, source: fedora }
+  qrencode:              { package: qrencode, source: fedora }
+  qt6-imageformats:
+    package: qt6-qtimageformats
+    source: substitute
+    note: Fedora uses qt6-qt* prefix
+  ripgrep:               { package: ripgrep, source: fedora }
+  ruby:                  { package: ruby, source: fedora }
+  sddm:                  { package: sddm, source: fedora }
+  slurp:                 { package: slurp, source: fedora }
+  socat:                 { package: socat, source: fedora }
+  starship:              { package: starship, source: fedora }
+  sushi:                 { package: sushi, source: fedora }
+  system-config-printer: { package: system-config-printer, source: fedora }
+  tesseract:             { package: tesseract, source: fedora }
+  tesseract-data-eng:
+    package: tesseract-langpack-eng
+    source: substitute
+    note: Fedora names langpack tesseract-langpack-eng
+  tldr:                  { package: tldr, source: fedora }
+  tmux:                  { package: tmux, source: fedora }
+  tree-sitter-cli:       { package: tree-sitter-cli, source: fedora }
+  tzupdate:              { package: tzupdate, source: fedora }
+  udiskie:               { package: udiskie, source: fedora }
+  ufw:                   { package: ufw, source: fedora }
+  unzip:                 { package: unzip, source: fedora }
+  whois:                 { package: whois, source: fedora }
+  wireless-regdb:        { package: wireless-regdb, source: fedora }
+  wireplumber:           { package: wireplumber, source: fedora }
+  wl-clipboard:          { package: wl-clipboard, source: fedora }
+  wtype:                 { package: wtype, source: fedora }
+  xdg-desktop-portal-gtk: { package: xdg-desktop-portal-gtk, source: fedora }
+  xournalpp:             { package: xournalpp, source: fedora }
+  yt-dlp:                { package: yt-dlp, source: fedora }
+  zbar:                  { package: zbar, source: fedora }
+  zoxide:                { package: zoxide, source: fedora }
+
+  # --- Fedora official, name-only font/icon differences ---
+  noto-fonts:
+    package: google-noto-sans-fonts
+    source: substitute
+    note: Noto Sans; Fedora package name
+  noto-fonts-cjk:
+    package: google-noto-sans-cjk-fonts
+    source: substitute
+    note: Fedora CJK font package name
+  noto-fonts-emoji:
+    package: google-noto-emoji-color-fonts
+    source: substitute
+    note: Fedora emoji font package name
+  ttf-jetbrains-mono-nerd-basic:
+    package: jetbrains-mono-fonts
+    source: substitute
+    note: Fedora packages JetBrains Mono; Nerd Fonts variant may need a nerd-fonts COPR/fonts package
+  woff2-font-awesome:
+    package: fontawesome-fonts
+    source: substitute
+    note: Font Awesome; Fedora package name fontawesome-fonts
+  yaru-icon-theme:       { package: yaru-icon-theme, source: fedora }
+
+  # --- libvips / postgresql-libs name differences ---
+  libvips:
+    package: vips
+    source: substitute
+    note: libvips is packaged as vips on Fedora
+  postgresql-libs:
+    package: libpq
+    source: substitute
+    note: postgresql client library is libpq on Fedora
+
+  # --- COPR (Hyprland ecosystem) ---
+  hyprland-guiutils:
+    package: hyprland-guiutils
+    source: copr
+    repository: nett00n/hyprland
+  hyprpicker:
+    package: hyprpicker
+    source: copr
+    repository: nett00n/hyprland
+  hyprsunset:
+    package: hyprsunset
+    source: copr
+    repository: nett00n/hyprland
+  quickshell:
+    package: quickshell
+    source: copr
+    repository: nett00n/hyprland
+    note: quickshell now official in Rawhide (F44+); fall back to COPR if absent
+  uwsm:
+    package: uwsm
+    source: copr
+    repository: nett00n/hyprland
+  xdg-desktop-portal-hyprland:
+    package: xdg-desktop-portal-hyprland
+    source: copr
+    repository: nett00n/hyprland
+  gtk4-layer-shell:
+    package: gtk4-layer-shell
+    source: copr
+    repository: nett00n/hyprland
+
+  # --- COPR (generic apps) ---
+  gpu-screen-recorder:
+    package: gpu-screen-recorder-git
+    source: copr
+    repository: brycensranch/gpu-screen-recorder-git
+  moonlight-qt:
+    package: moonlight-qt
+    source: copr
+    repository: ferdiu/moonlight
+  obsidian:
+    package: obsidian
+    source: copr
+    repository: kmf/Obsidian
+    note: "alternative: Flathub md.obsidian.Obsidian"
+  asusctl:
+    package: asusctl
+    source: copr
+    repository: lukenukem/asus-linux
+
+  # --- Flatpak (GUI apps best via Flathub) ---
+  localsend:
+    package: org.localsend.localsend_app
+    source: flatpak
+
+  # --- RPM Fusion ---
+  broadcom-wl:
+    package: broadcom-wl
+    source: rpmfusion
+    repository: rpmfusion-nonfree-updates
+  libva-nvidia-driver:
+    package: libva-nvidia-driver
+    source: rpmfusion
+    repository: rpmfusion-nonfree-updates
+  nvidia-dkms:
+    package: akmod-nvidia
+    source: rpmfusion
+    repository: rpmfusion-nonfree-updates
+    note: Fedora uses akmods for NVIDIA; not arch dkms
+  nvidia-open-dkms:
+    package: akmod-nvidia
+    source: rpmfusion
+    repository: rpmfusion-nonfree-updates
+    note: use akmod-nvidia (open driver variant) on Fedora
+  nvidia-utils:
+    package: xorg-x11-drv-nvidia
+    source: rpmfusion
+    repository: rpmfusion-nonfree-updates
+  nvidia-580xx-dkms:
+    package: akmod-nvidia
+    source: rpmfusion
+    repository: rpmfusion-nonfree-updates
+    note: legacy 580.xx handled via akmod-nvidia on Fedora
+  nvidia-580xx-utils:
+    package: xorg-x11-drv-nvidia
+    source: rpmfusion
+    repository: rpmfusion-nonfree-updates
+
+  # --- Fedora substitute for kernel / audio / gstreamer plumbing ---
+  gst-plugin-pipewire:
+    package: gstreamer1-plugin-pipewire
+    source: substitute
+    note: Fedora package name
+  pipewire-jack:
+    package: pipewire-jack-audio-connection-kit
+    source: substitute
+    note: Fedora package name
+  pipewire-pulse:
+    package: pipewire-pulseaudio
+    source: substitute
+    note: Fedora package name
+  qt6-wayland:
+    package: qt6-qtwayland
+    source: substitute
+    note: Fedora package name
+  egl-wayland:
+    package: egl-wayland
+    source: fedora
+  libpulse:
+    package: pulseaudio-libs
+    source: substitute
+    note: Fedora names libpulse pulseaudio-libs
+  sof-firmware:
+    package: alsa-sof-firmware
+    source: substitute
+    note: Fedora package name
+  vpl-gpu-rt:
+    package: oneVPL-intel-gpu
+    source: substitute
+    note: Fedora package name for Intel VPL runtime
+  zram-generator:
+    package: zram-generator-defaults
+    source: fedora
+  lsp-plugins-lv2:
+    package: lsp-plugins
+    source: fedora
+
+  # --- Fedora official infra (secondary) ---
+  autoconf-archive:      { package: autoconf-archive, source: fedora }
+  btrfs-progs:           { package: btrfs-progs, source: fedora }
+  dkms:                  { package: dkms, source: fedora }
+  intel-lpmd:            { package: intel-lpmd, source: fedora }
+  intel-media-driver:    { package: intel-media-driver, source: fedora }
+  libva-intel-driver:    { package: libva-intel-driver, source: fedora }
+  linux-firmware:        { package: linux-firmware, source: fedora }
+  linux-firmware-marvell: { package: linux-firmware-marvell, source: fedora }
+  libvpl:                { package: libvpl, source: fedora }
+  pipewire:              { package: pipewire, source: fedora }
+  pipewire-alsa:         { package: pipewire-alsa, source: fedora }
+  snapper:               { package: snapper, source: fedora }
+  thermald:              { package: thermald, source: fedora }
+  webp-pixbuf-loader:    { package: webp-pixbuf-loader, source: fedora }
+  qmk-hid:
+    package: qmk-hid
+    source: fedora
+  vulkan-intel:
+    package: mesa-vulkan-drivers-intel
+    source: fedora
+    note: Fedora ships Vulkan drivers in mesa-vulkan-drivers-*
+  vulkan-radeon:
+    package: mesa-vulkan-drivers-amd
+    source: fedora
+
+  # --- Fedora substitute for boot/kernel primitives ---
+  linux:
+    package: kernel
+    source: substitute
+    note: Fedora package is kernel
+  linux-headers:
+    package: kernel-devel
+    source: substitute
+    note: Fedora package for kernel headers/symlinks is kernel-devel
+  base:
+    package: "@base"
+    source: fedora
+    note: Fedora environment group
+  base-devel:
+    package: "@development-tools"
+    source: substitute
+    note: Fedora equivalent group to Arch base-devel
+
+  # --- Drop (Arch-only tooling) ---
+  expac:                 { package: null, source: drop, note: pacman query tool; use dnf repoquery }
+  pacman-contrib:        { package: null, source: drop, note: pacman tooling; not needed }
+  yay:                   { package: null, source: drop, note: AUR helper; not on Fedora }
+  yay-debug:             { package: null, source: drop, note: AUR helper debug; not needed }
+  kernel-modules-hook:   { package: null, source: drop, note: Arch DKMS cleanup; use akmods }
+  limine-mkinitcpio-hook: { package: null, source: drop, note: mkinitcpio is Arch-specific; dracut on Fedora }
+  limine-snapper-sync:   { package: null, source: drop, note: Arch-specific snapper boot sync; use GRUB plugin }
+  limine:
+    package: null
+    source: drop
+    note: Fedora defaults to GRUB2/systemd-boot; keep Fedora bootloader for reduced divergence
+
+  # --- Unavailable / hardware-specific (not applicable to x86_64 Fedora) ---
+  ttf-ia-writer:
+    package: null
+    source: unavailable
+    note: niche font; install TTF manually if needed
+  ufw-docker:
+    package: null
+    source: unavailable
+    note: no Fedora package; prefer firewalld + docker integration
+  xdg-terminal-exec:
+    package: null
+    source: unavailable
+    note: no package; configure via alternatives/xdg-terminal-exec shim
+  intel-ipu7-camera:     { package: null, source: unavailable, note: Intel IPU7 camera, very niche }
+  linux-ptl:             { package: null, source: unavailable, note: patched kernel; use stock Fedora kernel }
+  linux-ptl-headers:     { package: null, source: unavailable, note: patched kernel headers }
+  macbook12-spi-driver-dkms: { package: null, source: unavailable, note: Apple Mac specific }
+  lib32-nvidia-580xx-utils:  { package: null, source: unavailable, note: 32-bit compat not standard on Fedora }
+  lib32-nvidia-utils: { package: null, source: unavailable, note: 32-bit compat not standard on Fedora }
+  tuxedo-drivers-nocompatcheck-dkms: { package: null, source: unavailable, note: Tuxedo hardware specific }
+  yt6801-dkms: { package: null, source: unavailable, note: Yotonics NIC specific }
+  vulkan-asahi: { package: null, source: unavailable, note: Asahi Linux (ARM) only }
+  dell-xps-touchpad-haptics: { package: null, source: unavailable, note: Dell XPS specific }
+  dell-xps13-sidecar-amps: { package: null, source: unavailable, note: Dell XPS13 specific }
+  apple-bcm-firmware:    { package: null, source: unavailable, note: Apple T2 hardware }
+  apple-t2-audio-config: { package: null, source: unavailable, note: Apple T2 hardware }
+  linux-t2:              { package: null, source: unavailable, note: Apple T2 kernel }
+  linux-t2-headers:      { package: null, source: unavailable, note: Apple T2 kernel headers }
+  t2fanrd:               { package: null, source: unavailable, note: Apple T2 fan daemon }
