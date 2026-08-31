@@ -1,0 +1,15 @@
+# Fedora package/build artifacts
+fedora/scripts/*.log
+*.rpm
+*.srpm
+
+# Local state
+/etc/
+/tmp/
+
+# Editor
+*.swp
+*~
+
+# OS junk
+.DS_Store
