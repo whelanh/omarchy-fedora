@@ -14,8 +14,12 @@ via `fedora/rpm/build-rpm-in-ci.sh`.
 ## Prereqs (run once, on the maintainer machine)
 
 ```sh
-sudo dnf install -y copr-cli rpm-build python3-pyyaml
+sudo dnf install -y copr-cli rpm-build python3-pyyaml cargo
 ```
+
+`cargo` is required because the Rust packages (`ttfx`,
+`hyprland-preview-share-picker`) vendor their crates.io dependencies at SRPM
+time (see `fedora/rpm/vendor-rust.sh`) so COPR can build them offline.
 
 Create an API token at **https://copr.fedorainfracloud.org/api/** (Scope:
 `Create and build projects`). Then:
@@ -85,6 +89,17 @@ sudo dnf install aether cliamp herdr hyprland-preview-share-picker \
 - **Full refresh**: `bash fedora/rpm/copr/submit-builds.sh` after any spec,
   manifest, or mapping change. CI (`fedora-build.yml`) re-verifies the specs,
   then the COPR build is the release step.
+
+## Checking for upstream updates
+
+```sh
+bash fedora/rpm/copr/check-updates.sh
+```
+
+Queries each package's upstream GitHub repo (releases + tags, pre-releases
+filtered) and reports any whose version is newer than the packaged one, e.g.
+`cliamp 1.63.2 -> v2.0.0 OUTDATED`. Exit status is 1 when something is stale.
+Uses unauthenticated GitHub API (~2 calls/package, well under rate limits).
 
 ## Why COPR and not official Fedora
 

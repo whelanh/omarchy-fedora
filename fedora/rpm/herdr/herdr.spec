@@ -7,7 +7,7 @@
 # vendored Zig toolchain.
 Name:           herdr
 Version:        0.8.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Herdr terminal workspace manager for AI coding agents
 
 License:        Apache-2.0
@@ -16,9 +16,6 @@ Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz
 Source1:        %{url}/releases/download/v%{version}/herdr-linux-x86_64
 
 BuildArch:      x86_64
-
-Requires:       gcc-libs
-Requires:       glibc
 
 Provides:       omarchy-herdr
 Obsoletes:      omarchy-herdr
@@ -38,5 +35,8 @@ install -Dm644 LICENSE %{buildroot}%{_datadir}/licenses/%{name}/LICENSE
 %{_bindir}/herdr
 
 %changelog
+* Tue Sep 01 2026 whelanh <brickhousedevelopers@gmail.com> - 0.8.2-2
+- Drop bogus Requires (gcc-libs is Arch-only; glibc/libgcc auto-detected)
+
 * Mon Aug 31 2026 whelanh <brickhousedevelopers@gmail.com> - 0.8.2-1
 - Repack of upstream prebuilt release (v0.8.2); avoids the pinned Zig 0.15.2 toolchain

@@ -216,7 +216,7 @@ packages:
   nss-mdns:              { package: nss-mdns, source: fedora }
   obs-studio:            { package: obs-studio, source: fedora }
   pamixer:               { package: pamixer, source: fedora }
-  pinta:                 { package: pinta, source: fedora }
+  pinta:                 { package: com.github.PintaProject.Pinta, source: flatpak, note: not in Fedora official; Flathub app }
   plocate:               { package: plocate, source: fedora }
   plymouth:              { package: plymouth, source: fedora }
   power-profiles-daemon: { package: power-profiles-daemon, source: fedora }

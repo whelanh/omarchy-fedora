@@ -28,7 +28,7 @@ packages:
     license: MIT
     deps: [alsa-lib, flac, libvorbis, libogg, ffmpeg, yt-dlp]
     status: verified
-    version: 1.63.2
+    version: 2.0.0
     note: Repack of cliamp-linux-amd64; desktop + Cliamp.png. Container-built OK.
   herdr:
     repo: https://github.com/herdrdev/herdr
@@ -49,7 +49,7 @@ packages:
     deps: [gtk4, gtk4-layer-shell, xdg-desktop-portal-hyprland, hyprland, slurp]
     status: verified
     version: 0.2.1
-    note: Spec cds the pinned hyprland-protocols in (Source from hyprwm), builds on stable Fedora Rust; needs gtk4-layer-shell-devel from nett00n/hyprland COPR. Container-built OK.
+    note: Spec cds the pinned hyprland-protocols in (Source from hyprwm), builds on stable Fedora Rust with crates.io deps vendored for offline COPR build; needs gtk4-layer-shell-devel from nett00n/hyprland COPR. Container-built OK.
   omacalc:
     repo: https://github.com/omacom/omacalc
     language: cpp
@@ -103,10 +103,10 @@ packages:
   ttfx:
     repo: https://github.com/omacom/ttfx
     language: rust
-    build: cargo-release
+    build: cargo-release (crates.io deps vendored for offline COPR build)
     binary: ttfx
     license: MIT
     deps: []
     status: verified
     version: 0.3.2
-    note: Built in Fedora Rawhide container (v0.3.2); pure Rust, plain cargo works for Fedora.
+    note: Built in Fedora Rawhide container (v0.3.2); pure Rust. Crates vendored via fedora/rpm/vendor-rust.sh; cargo build --offline --locked.

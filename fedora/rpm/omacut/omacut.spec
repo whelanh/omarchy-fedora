@@ -5,7 +5,7 @@
 
 Name:           omacut
 Version:        0.4.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Dead-simple video length trimmer built with Qt Quick and ffmpeg
 
 License:        MIT
@@ -21,7 +21,7 @@ Requires:       qt6-qtbase
 Requires:       qt6-qtdeclarative
 Requires:       qt6-qtmultimedia
 Requires:       hicolor-icon-theme
-Requires:       ffmpeg
+Requires:       ffmpeg-free
 Requires:       xdg-desktop-portal
 
 %description
@@ -46,5 +46,8 @@ install -Dm644 pkgbuild/omacut.desktop %{buildroot}%{_datadir}/applications/omac
 %{_datadir}/applications/omacut.desktop
 
 %changelog
+* Tue Sep 01 2026 whelanh <brickhousedevelopers@gmail.com> - 0.4.0-2
+- Require ffmpeg-free (ffmpeg is RPM Fusion-only; not available on stock Fedora)
+
 * Mon Aug 31 2026 whelanh <brickhousedevelopers@gmail.com> - 0.4.0-1
 - Verified build in Fedora Rawhide container (v0.4.0)

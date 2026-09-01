@@ -31,12 +31,14 @@ DRY_RUN=0
 TARGET_USER=""
 NVIDIA=0
 INSTALL_FIRSTPARTY=1
+UPDATE_MODE=0
 
 for arg in "$@"; do
   case "$arg" in
     --no-omarchy)    COPY_OMARCHY=0 ;;
     --dry-run)       DRY_RUN=1 ;;
     --no-firstparty) INSTALL_FIRSTPARTY=0 ;;
+    --update)        UPDATE_MODE=1 ;;
     --user)          TARGET_USER="__NEXT__" ;;
     --nvidia)        NVIDIA=1 ;;
     *)
@@ -272,9 +274,9 @@ install_omarchy_tree() {
     sudo cp -a "$UPSTREAM"/* "$dest/"
   fi
   log "Omarchy tree installed to $dest"
-  log "NOTE: the 10 first-party command binaries (aether, cliamp, herdr,"
-       "hyprland-preview-share-picker, omacalc, omacut, omawrite, tensaku, try,"
-       "ttfx) are packaged under fedora/rpm and ship from the whelanh/omarchy"
+  log "NOTE: the 10 first-party command binaries (aether, cliamp, herdr," \
+       "hyprland-preview-share-picker, omacalc, omacut, omawrite, tensaku, try," \
+       "ttfx) are packaged under fedora/rpm and ship from the whelanh/omarchy" \
        "COPR (see fedora/rpm/copr/README.md)."
 }
 
@@ -312,17 +314,20 @@ install_omarchy_session() {
 }
 
 # Import omarchy-* commands onto PATH, mirroring the upstream architecture's
-# package map: bin/omarchy-* -> /usr/bin/omarchy-* (with symlinks kept under
-# /usr/share/omarchy/bin). This is what makes `omarchy plugin`, `omarchy theme`,
-# etc. callable on Fedora.
+# package map: bin/omarchy + bin/omarchy-* -> /usr/bin/omarchy* (with symlinks
+# kept under /usr/share/omarchy/bin). This is what makes `omarchy`, `omarchy
+# plugin`, `omarchy theme`, etc. callable on Fedora. The main `omarchy`
+# dispatcher has no hyphen, so it must be linked explicitly alongside the
+# `omarchy-*` subcommands (upstream's env-bootstrap expects /usr/bin/omarchy on
+# production installs and does not add /usr/share/omarchy/bin to PATH).
 install_omarchy_bin() {
   [ "$COPY_OMARCHY" = 1 ] || return 0
   local tree=/usr/share/omarchy/bin
   [ -d "$tree" ] || { warn "no bin dir at $tree; skipping CLI wiring"; return 0; }
 
-  log "== Wiring omarchy-* commands onto PATH =="
+  log "== Wiring omarchy + omarchy-* commands onto PATH =="
   local cmd
-  for cmd in "$tree"/omarchy-*; do
+  for cmd in "$tree/omarchy" "$tree"/omarchy-*; do
     [ -e "$cmd" ] || continue
     local base
     base="$(basename "$cmd")"
@@ -396,11 +401,153 @@ EOF
   fi
 }
 
+# Fedora renames Chromium vs what upstream Omarchy hardcodes:
+#   - binary        Arch `chromium`       vs Fedora `chromium-browser`
+#   - desktop entry Arch `chromium.desktop` vs Fedora `chromium-browser.desktop`
+# Omarchy's `omarchy-launch-webapp` (SUPER+SHIFT+A webapps) falls back to
+# `chromium.desktop`, and `omarchy-default-browser` uses `chromium.desktop` +
+# `command="chromium"`. Rather than patch Omarchy code, present what it expects
+# via a compat shim (same philosophy as the uwsm-app shim):
+#   - a NoDisplay chromium.desktop stub (hidden from app menus, but resolvable
+#     by omarchy-launch-webapp / omarchy-default-browser and usable as the
+#     xdg default handler)
+#   - a chromium -> chromium-browser binary link
+# Never overwrite a real file; idempotent.
+install_omarchy_chromium_compat() {
+  [ "$COPY_OMARCHY" = 1 ] || return 0
+  log "== Aligning chromium naming with upstream Omarchy (compat shim) =="
+
+  local -a made=()
+  # desktop entry stub: hidden from menus (NoDisplay) but a valid browser handler
+  if [ -f /usr/share/applications/chromium-browser.desktop ] \
+     && [ ! -e /usr/share/applications/chromium.desktop ]; then
+    if (( EUID == 0 )); then
+      cat > /usr/share/applications/chromium.desktop <<'EOF'
+[Desktop Entry]
+Type=Application
+Name=Chromium
+GenericName=Web Browser
+Comment=Omarchy compatibility alias for Fedora's chromium-browser
+Exec=/usr/bin/chromium-browser %U
+Terminal=false
+NoDisplay=true
+MimeType=text/html;text/xml;application/xhtml+xml;x-scheme-handler/http;x-scheme-handler/https;
+Categories=Network;WebBrowser;
+EOF
+    else
+      sudo tee /usr/share/applications/chromium.desktop >/dev/null <<'EOF'
+[Desktop Entry]
+Type=Application
+Name=Chromium
+GenericName=Web Browser
+Comment=Omarchy compatibility alias for Fedora's chromium-browser
+Exec=/usr/bin/chromium-browser %U
+Terminal=false
+NoDisplay=true
+MimeType=text/html;text/xml;application/xhtml+xml;x-scheme-handler/http;x-scheme-handler/https;
+Categories=Network;WebBrowser;
+EOF
+    fi
+    made+=(chromium.desktop)
+  fi
+  # binary: /usr/bin/chromium -> chromium-browser
+  if command -v chromium-browser >/dev/null 2>&1 && [ ! -e /usr/bin/chromium ]; then
+    if (( EUID == 0 )); then ln -s chromium-browser /usr/bin/chromium
+    else sudo ln -s chromium-browser /usr/bin/chromium; fi
+    made+=(/usr/bin/chromium)
+  fi
+
+  if [ "${#made[@]}" -gt 0 ]; then
+    log "  added chromium compat shim: ${made[*]}"
+  else
+    log "  no chromium compat shim needed (already present)"
+  fi
+}
+
+
+# The upstream omarchy-update is pacman/AUR-specific (pacman -Syu, paccache,
+# yay, pacman-key). On Fedora it would fail immediately. Replace the installed
+# omarchy-update (the file the `omarchy` dispatcher execs, at
+# /usr/share/omarchy/bin/omarchy-update) with a Fedora-native wrapper that
+# delegates to this checkout's fedora/scripts/update.sh (dnf upgrade + userspace
+# re-sync + migrations). Preserve the # omarchy:* metadata so the dispatcher
+# still recognises the command (including requires-sudo). The checkout path is
+# embedded at install time; re-run install.sh if you move the checkout.
+install_omarchy_update_shim() {
+  [ "$COPY_OMARCHY" = 1 ] || return 0
+  local update_sh="$OMARCHY_ROOT/fedora/scripts/update.sh"
+  [ -f "$update_sh" ] || { warn "no $update_sh; skipping omarchy-update shim"; return 0; }
+  local dest=/usr/share/omarchy/bin/omarchy-update
+  if [ -f "$dest" ] && grep -q "Fedora-native omarchy update" "$dest" 2>/dev/null; then
+    log "== omarchy-update already wired to the Fedora updater =="
+    return 0
+  fi
+  log "== Wiring omarchy-update to the Fedora updater =="
+  if (( EUID == 0 )); then
+    cat > "$dest" <<EOF
+#!/bin/bash
+
+# omarchy:summary=Update Omarchy and system packages (Fedora)
+# omarchy:args=[-y]
+# omarchy:examples=omarchy update | omarchy update -y
+# omarchy:requires-sudo=true
+
+# Fedora-native omarchy update (delegates to fedora/scripts/update.sh).
+# Installed by install.sh; see UPDATING.md.
+exec bash "$update_sh" "\$@"
+EOF
+    chmod +x "$dest"
+  else
+    sudo tee "$dest" >/dev/null <<EOF
+#!/bin/bash
+
+# omarchy:summary=Update Omarchy and system packages (Fedora)
+# omarchy:args=[-y]
+# omarchy:examples=omarchy update | omarchy update -y
+# omarchy:requires-sudo=true
+
+# Fedora-native omarchy update (delegates to fedora/scripts/update.sh).
+# Installed by install.sh; see UPDATING.md.
+exec bash "$update_sh" "\$@"
+EOF
+    sudo chmod +x "$dest"
+  fi
+}
+
+# Upstream's `version` file is stale (it reads 4.0.0.alpha even on the v4.0.2
+# release tag), so derive the real version from the git refs: the latest v* tag
+# plus the current quattro HEAD short sha. Written to /usr/share/omarchy/version
+# so validate_install / omarchy update report a meaningful version.
+install_omarchy_version() {
+  [ "$COPY_OMARCHY" = 1 ] || return 0
+  [ -d /usr/share/omarchy ] || return 0
+  command -v git >/dev/null 2>&1 || return 0
+
+  local sha tag ver
+  sha="$(git ls-remote https://github.com/omacom/omarchy.git refs/heads/quattro 2>/dev/null | awk '{print $1}')"
+  tag="$(git ls-remote --tags --refs https://github.com/omacom/omarchy.git 'v*' 2>/dev/null \
+         | awk '{print $2}' | sed 's#refs/tags/##' | sort -V | tail -1)"
+  if [ -n "$sha" ]; then
+    ver="${tag:-quattro}-${sha:0:10}"
+  elif [ -n "$tag" ]; then
+    ver="$tag"
+  else
+    warn "could not resolve the Omarchy version; leaving the existing version file"
+    return 0
+  fi
+
+  log "== Omarchy userspace version: $ver =="
+  if (( EUID == 0 )); then
+    printf '%s\n' "$ver" > /usr/share/omarchy/version
+  else
+    printf '%s\n' "$ver" | sudo tee /usr/share/omarchy/version >/dev/null
+  fi
+}
+
 # Upstream Omarchy grants the browser-accent helper passwordless sudo via
 # /etc/sudoers.d/omarchy-theme-browser; without it every theme switch stalls on
 # a password prompt. Ship the rule from the installed tree when present.
-install_omarchy_sudoers() {
-  [ "$COPY_OMARCHY" = 1 ] || return 0
+install_omarchy_sudoers() {  [ "$COPY_OMARCHY" = 1 ] || return 0
 
   local sudoers_src=/usr/share/omarchy/etc/sudoers.d/omarchy-theme-browser
   [ -f "$sudoers_src" ] || { warn "no sudoers rule shipped at $sudoers_src"; return 0; }
@@ -417,10 +564,8 @@ install_omarchy_sudoers() {
   log "== Installing $sudoers_dest =="
   if (( EUID == 0 )); then
     install -Dm 0440 -o root -g root "$sudoers_src" "$sudoers_dest"
-  elif [ -n "${SUDO_USER:-}" ]; then
-    sudo install -Dm 0440 -o root -g root "$sudoers_src" "$sudoers_dest"
   else
-    warn "not root and no sudo user; install $sudoers_src as $sudoers_dest (0440 root:root) manually"
+    sudo install -Dm 0440 -o root -g root "$sudoers_src" "$sudoers_dest"
   fi
 }
 
@@ -436,11 +581,8 @@ install_omarchy_fonts() {
     log "== Enabling /etc/fonts/conf.d/50-omarchy.conf =="
     if (( EUID == 0 )); then
       ln -sf "$conf_src" /etc/fonts/conf.d/50-omarchy.conf
-    elif [ -n "${SUDO_USER:-}" ]; then
-      sudo ln -sf "$conf_src" /etc/fonts/conf.d/50-omarchy.conf
     else
-      warn "skipping fontconfig alias (no /etc write access)"
-      return 0
+      sudo ln -sf "$conf_src" /etc/fonts/conf.d/50-omarchy.conf
     fi
   else
     warn "no fontconfig alias shipped at $conf_src"
@@ -470,14 +612,10 @@ install_omarchy_fonts() {
     mkdir -p "$dest"
     unzip -q -o "$tmp/JetBrainsMono.zip" -d "$tmp/out" 2>/dev/null || true
     install -m 0644 "$tmp"/out/*.ttf "$dest/"
-  elif [ -n "${SUDO_USER:-}" ]; then
+  else
     sudo mkdir -p "$dest"
     unzip -q -o "$tmp/JetBrainsMono.zip" -d "$tmp/out" 2>/dev/null || true
     sudo install -m 0644 "$tmp"/out/*.ttf "$dest/"
-  else
-    rm -rf "$tmp"
-    warn "skipping Nerd Font install (no /etc write access)"
-    return 0
   fi
   rm -rf "$tmp"
 
@@ -584,8 +722,12 @@ main() {
   verify_prereqs
   [ "$DRY_RUN" = 1 ] && { log "dry-run complete (no changes made)"; exit 0; }
 
-  install_repos
-  install_packages
+  if [ "$UPDATE_MODE" = 1 ]; then
+    log "== Update mode: skipping repository + package install (dnf upgrade handles those) =="
+  else
+    install_repos
+    install_packages
+  fi
   install_systemd_units
   install_sysctl
   install_udev
@@ -594,10 +736,13 @@ main() {
   install_omarchy_tree
   install_omarchy_session
   install_omarchy_bin
+  install_omarchy_update_shim
   install_omarchy_profile
   install_uwsm_app_shim
+  install_omarchy_chromium_compat
   install_omarchy_sudoers
   install_omarchy_fonts
+  install_omarchy_version
   configure_user
   validate_install
 

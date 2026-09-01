@@ -59,6 +59,9 @@ fi
 echo "packages: ${pkgs[*]}"
 
 mkdir -p "$TOP"/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
+# clear stale SRPMs from a prior run so the per-package glob below only matches
+# the SRPM just built (avoids resubmitting old versions).
+rm -rf "$TOP/SRPMS"/*
 SRPMS=()
 for pkg in "${pkgs[@]}"; do
   spec="$RPM_DIR/$pkg/$pkg.spec"
@@ -82,11 +85,16 @@ def expand(u):
     return u
 for m in re.finditer(r'^Source\d*:\s*(\S+)',spec,re.M):
     u=expand(m.group(1))
+    if not u.startswith(('http://','https://')):
+        continue
     fn=os.path.basename(u)
     if not os.path.exists(fn):
         print('fetching',u); urllib.request.urlretrieve(u,fn)
 PY
 )
+  # Rust packages build offline in COPR from a vendored crates.io tarball.
+  . "$RPM_DIR/vendor-rust.sh"
+  generate_rust_vendor "$spec" "$TOP/SOURCES" "/tmp/omarchy-vendor-$pkg"
   rpm_name="$(spec_name "$spec")"
   rpmbuild --define "_topdir $TOP" -bs "$spec" || { echo "SRPM build failed: $pkg" >&2; exit 1; }
   SRPMS+=("$TOP/SRPMS/${rpm_name}"*)

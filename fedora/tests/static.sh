@@ -64,8 +64,10 @@ t "build-rpm.sh bash -n" bash -n fedora/rpm/build-rpm.sh
 t "build-in-container.sh bash -n" bash -n fedora/rpm/build-in-container.sh
 t "build-rpm-in-ci.sh bash -n" bash -n fedora/rpm/build-rpm-in-ci.sh
 t "install-rpms.sh bash -n" bash -n fedora/rpm/install-rpms.sh
+t "vendor-rust.sh bash -n" bash -n fedora/rpm/vendor-rust.sh
 t "copr/create-project.sh bash -n" bash -n fedora/rpm/copr/create-project.sh
 t "copr/submit-builds.sh bash -n" bash -n fedora/rpm/copr/submit-builds.sh
+t "copr/check-updates.sh bash -n" bash -n fedora/rpm/copr/check-updates.sh
 for pkg in $(python3 -c "
 import yaml; d=yaml.safe_load(open('fedora/rpm/manifest.yaml'))
 print(' '.join(sorted(d['packages'].keys())))

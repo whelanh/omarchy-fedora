@@ -46,6 +46,8 @@ def expand(u):
     return u
 for m in re.finditer(r'^Source\d*:\s*(\S+)',spec,re.M):
     u=expand(m.group(1))
+    if not u.startswith(('http://','https://')):
+        continue
     fn=os.path.basename(u)
     if not os.path.exists(fn):
         print('fetching',u); urllib.request.urlretrieve(u,fn)
@@ -53,6 +55,10 @@ PY
   )
 
   dnf -y builddep "$topdir/SPECS/$pkg.spec" >/dev/null 2>&1 || true
+  # Rust packages build offline from a vendored crates.io tarball; generate it
+  # here (network + cargo are available in this container after builddep).
+  . "$RPM_DIR/vendor-rust.sh"
+  generate_rust_vendor "$spec" "$topdir/SOURCES" "/tmp/vendor-$pkg"
   rpmbuild --define "_topdir $topdir" -ba "$topdir/SPECS/$pkg.spec"
   echo "OK: $pkg built"
 }

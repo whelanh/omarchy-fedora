@@ -12,6 +12,7 @@ human-readable summary. Classifications:
 - `FEDORA_RPMFUSION` — via RPM Fusion
 - `FEDORA_FLATPAK` — best via Flathub
 - `FEDORA_SUBSTITUTE` — same functionality, different package name
+- `FEDORA_EXTERNAL` — via an upstream non-COPR RPM repo (e.g. mise)
 - `FIRST_PARTY` — Omarchy first-party, shipped as RPMs from `whelanh/omarchy` COPR
 - `NOT_AVAILABLE` — no reasonable Fedora equivalent
 - `NOT_REQUIRED` — Arch-only tooling to drop
@@ -29,6 +30,7 @@ mapped.
 | fedora (official) | ~120 |
 | substitute | ~30 |
 | copr | ~11 + 10 first-party |
+| external (mise) | 1 |
 | unavailable | ~19 |
 | drop (Arch-only) | ~8 |
 | rpmfusion | ~8 |
@@ -52,6 +54,16 @@ Arch's `nvidia-*-dkms` + `nvidia-utils` map to Fedora's `akmod-nvidia` +
 Arch's custom kernels (`linux-ptl`, `linux-t2`) and `linux-headers` have no
 direct analog: Fedora uses the stock `kernel` and `kernel-devel`. Limine and
 mkinitcpio are replaced by Fedora's GRUB2/systemd-boot and dracut.
+
+### mise (external RPM repo)
+Arch's `mise-bin` maps to the Fedora binary `mise`, but mise is **not** in
+Fedora official repos (a `packages.fedoraproject.org` lookup returns 404 for
+both `mise` and `mise-bin`). Omarchy's `omarchy-default-agent` (shell menu →
+"install an opening agent" like opencode/claude) and `omarchy-install-dev-env`
+both drive everything through `mise use -g`, so it must be present. It ships
+from the upstream mise RPM repo (`https://mise.jdx.dev/rpm/mise.repo`, signed,
+gpgcheck=1) enabled by the installer via `dnf config-manager --add-repo`. See
+`fedora/mappings/repositories.yaml` (entry `mise`).
 
 ### First-party Omarchy binaries (FIRST_PARTY, COPR `whelanh/omarchy`)
 10 Omarchy packages (`aether`, `cliamp`, `herdr`, `hyprland-preview-share-picker`,

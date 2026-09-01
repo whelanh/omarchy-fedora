@@ -79,9 +79,13 @@ omarchy_fedora_enable_external_repo() {
     return 1
   fi
   echo "omarchy: adding external repo: $url"
-  # --add-repo fetches the .repo, enables it, and (for a fetch) installs the
-  # repo GPG key; the URL is pinned to a trusted upstream in repositories.yaml.
-  _omarchy_dnf config-manager --add-repo "$url" || return 1
+  # dnf5 (Fedora 41+) uses `config-manager addrepo --from-repofile`; dnf4 used
+  # `config-manager --add-repo`. Detect which to run.
+  if dnf --version 2>&1 | grep -q '^dnf5'; then
+    _omarchy_dnf config-manager addrepo --from-repofile "$url" || return 1
+  else
+    _omarchy_dnf config-manager --add-repo "$url" || return 1
+  fi
   # sanity: the fetched repo file must actually contain a baseurl, so we don't
   # silently add an empty/broken repo.
   if ! grep -q '^\s*baseurl\s*=' "$repo_file"; then
