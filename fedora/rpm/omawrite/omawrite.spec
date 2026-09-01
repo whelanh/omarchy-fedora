@@ -18,6 +18,7 @@ BuildRequires:  qt6-qtbase-devel
 BuildRequires:  qt6-qtdeclarative-devel
 Requires:       qt6-qtbase
 Requires:       qt6-qtdeclarative
+Requires:       hicolor-icon-theme
 Requires:       xdg-desktop-portal
 
 %description

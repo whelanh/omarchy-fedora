@@ -20,6 +20,7 @@ BuildRequires:  qt6-qtmultimedia-devel
 Requires:       qt6-qtbase
 Requires:       qt6-qtdeclarative
 Requires:       qt6-qtmultimedia
+Requires:       hicolor-icon-theme
 Requires:       ffmpeg
 Requires:       xdg-desktop-portal
 

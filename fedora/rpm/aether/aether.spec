@@ -1,50 +1,47 @@
 # Omarchy Quattro - aether (desktop theming / wallpaper colourization)
-# Upstream: https://github.com/omacom/aether  (Go + Wails)
-# STATUS: BLOCKED (PENDING-VERIFY). Omarchy's own Arch PKGBUILD does NOT
-# compile - it installs the prebuilt release binary (aether-linux-amd64) from a
-# GitHub release. Building from source needs the Wails toolchain + WebKitGTK,
-# which is heavy and fragile in mock. The pragmatic Fedora path is to REPACK the
-# upstream release binary, exactly mirroring the PKGBUILD's strategy.
-# %OT VERIFY: point Source0 at the exact release asset (tag vX.Y.Z) and confirm
-# the asset filename + desktop entry + icon install paths.
+# Upstream: https://github.com/omacom/aether (Go + Wails)
+%global debug_package %{nil}
+# Repack mirrors the upstream Arch PKGBUILD: the release ships prebuilt
+# aether-linux-amd64, so no Wails/WebKitGTK toolchain is needed.
 Name:           aether
-Version:        0.1.0
+Version:        4.29.8
 Release:        1%{?dist}
-Summary:        Omarchy wallpaper colour extraction and theming tool
+Summary:        Desktop theming application - extract colors from wallpapers and apply cohesive themes
 
 License:        MIT
 URL:            https://github.com/omacom/aether
-# REPACK: replace with the actual release asset URL once tagged
-Source0:        %{url}/releases/download/v%{version}/aether-linux-amd64
+Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz
+Source1:        %{url}/releases/download/v%{version}/aether-linux-amd64
+
+BuildArch:      x86_64
 
 Requires:       webkit2gtk4.1
 Requires:       gtk3
 
 %description
-Aether extracts a colour palette from the current wallpaper and drives Omarchy
-theming. STATUS: BLOCKED - scaffold only; verify the release-asset repack.
+Aether is a desktop theming application. It extracts a colour palette from the
+current wallpaper and applies it as a cohesive theme across the Omarchy
+desktop.
 
 %prep
-# no source build; the release binary is installed directly.
-install -m 0755 -D %{SOURCE0} %{buildroot}%{_bindir}/aether
+%autosetup -n %{name}-%{version}
 
 %install
-# %install is handled inline above for the no-source repack case.
-%{__mkdir_p} %{buildroot}%{_datadir}/applications
-cat > %{buildroot}%{_datadir}/applications/aether.desktop <<'EOF'
-[Desktop Entry]
-Type=Application
-Name=Aether
-Exec=aether
-Terminal=false
-Categories=Utility;Settings;
-EOF
+install -Dm755 %{SOURCE1} %{buildroot}%{_bindir}/aether
+install -Dm644 build/linux/aether.desktop %{buildroot}%{_datadir}/applications/aether.desktop
+install -Dm644 li.oever.aether.url-handler.desktop %{buildroot}%{_datadir}/applications/li.oever.aether.url-handler.desktop
+install -Dm644 icon.png %{buildroot}%{_datadir}/pixmaps/aether.png
+install -Dm644 assets/aether-icon-512.png %{buildroot}%{_datadir}/icons/hicolor/512x512/apps/aether.png
+install -Dm644 README.md %{buildroot}%{_datadir}/doc/%{name}/README.md
 
 %files
-%license LICENSE
 %{_bindir}/aether
 %{_datadir}/applications/aether.desktop
+%{_datadir}/applications/li.oever.aether.url-handler.desktop
+%{_datadir}/pixmaps/aether.png
+%{_datadir}/icons/hicolor/512x512/apps/aether.png
+%{_datadir}/doc/%{name}/README.md
 
 %changelog
-* Mon Aug 31 2026 whelanh <brickhousedevelopers@gmail.com> - 0.1.0-1
-- Scaffold SPEC (BLOCKED: repack of upstream release binary, source build TBD)
+* Mon Aug 31 2026 whelanh <brickhousedevelopers@gmail.com> - 4.29.8-1
+- Repack of upstream prebuilt release (v4.29.8), mirroring the Arch PKGBUILD

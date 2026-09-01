@@ -37,11 +37,15 @@ spec=open(sys.argv[1]).read()
 def f(k):
     m=re.search(r'^%s:\s*(\S+)'%k,spec,re.M); return m.group(1) if m else ''
 url,ver,name=f('URL'),f('Version'),f('Name')
-gm=re.search(r'^%global\s+gem_name\s+(\S+)',spec,re.M); gm=gm.group(1) if gm else ''
+macros={}
+for m in re.finditer(r'^%global\s+(\S+)\s+(\S+)',spec,re.M):
+    macros[m.group(1)]=m.group(2)
+def expand(u):
+    for k,v in list(macros.items())+[('url',url),('version',ver),('name',name)]:
+        u=u.replace('%%{%s}'%k,v)
+    return u
 for m in re.finditer(r'^Source\d*:\s*(\S+)',spec,re.M):
-    u=m.group(1)
-    for a,b in (('%{url}',url),('%{version}',ver),('%{name}',name),('%{gem_name}',gm)):
-        u=u.replace(a,b)
+    u=expand(m.group(1))
     fn=os.path.basename(u)
     if not os.path.exists(fn):
         print('fetching',u); urllib.request.urlretrieve(u,fn)
@@ -56,22 +60,29 @@ PY
 main() {
   local manifest="$RPM_DIR/manifest.yaml"
   local -a verified=()
-  while IFS= read -r pkg; do
-    verified+=("$pkg")
-  done < <(python3 - "$manifest" <<'PY'
+
+  if [ -n "${1:-}" ]; then
+    # explicit package list (used with FORCE=1 to verify not-yet-verified specs)
+    verified=("$@")
+  else
+    while IFS= read -r pkg; do
+      verified+=("$pkg")
+    done < <(python3 - "$manifest" <<'PY'
 import yaml,sys
 d=yaml.safe_load(open(sys.argv[1]))
 print('\n'.join(sorted(p for p,v in d['packages'].items() if v['status']=='verified')))
 PY
 )
-  if [ "${#verified[@]}" -eq 0 ]; then
-    echo "no verified packages to build"; exit 0
   fi
-  echo "verified packages: ${verified[*]}"
+  if [ "${#verified[@]}" -eq 0 ]; then
+    echo "no packages to build"; exit 0
+  fi
+  echo "packages: ${verified[*]}"
   for pkg in "${verified[@]}"; do
+    [ -f "$RPM_DIR/$pkg/$pkg.spec" ] || { echo "no spec for $pkg; skipping"; continue; }
     build_one "$pkg" "$RPM_DIR/$pkg/$pkg.spec"
   done
-  echo "All verified first-party RPMs built successfully."
+  echo "All requested first-party RPMs built successfully."
 }
 
 main "$@"

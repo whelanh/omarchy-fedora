@@ -1,54 +1,55 @@
-# Machine-readable record of the 13 "first-party" Omarchy binaries for Fedora
+# Machine-readable record of the 10 "first-party" Omarchy binaries for Fedora
 # RPM packaging. Grounded in the upstream omacom/omarchy-pkgs PKGBUILDs and
-# each project's own build docs. status: ready = plausible build; blocked =
-# needs prebuilt/toolchain/verification work first. Treat all as PENDING-VERIFY.
+# each project's own build docs. status: verified = container-built in this
+# repo's Fedora Rawhide container; blocked = still needs work. Packages are
+# distributed via the whelanh/omarchy COPR (see fedora/rpm/README.md).
+#
+# Dropped from the original 13-package scope:
+#   - asdcontrol: upstream archived Aug 2025, Apple Studio Display hardware only
+#   - omarchy-nvim: ~116 MiB headless LazyVim cache assembly; out of RPM scope
+#   - usage: shipped in-tree by the base install (upstream/bin/omarchy-agent-usage-*)
 
 packages:
   aether:
     repo: https://github.com/omacom/aether
     language: go
-    build: wails-build (or vendor prebuilt release binary, matching upstream PKGBUILD)
+    build: repack-release (upstream ships prebuilt release binary)
     binary: aether
     license: MIT
     deps: [webkit2gtk4.1, gtk3]
-    status: blocked
-    note: Omarchy PKGBUILD installs prebuilt release binary, does not compile; needs Wails toolchain or repackage the release.
-  asdcontrol:
-    repo: https://github.com/nikosdion/asdcontrol
-    language: cpp
-    build: make
-    binary: asdcontrol
-    license: GPL-2.0
-    deps: [libusb, hidapi]
-    status: blocked
-    note: upstream archived Aug 2025, Apple Studio Display only; installs /usr/local/bin + udev rule.
+    status: verified
+    version: 4.29.8
+    note: Repack of aether-linux-amd64; desktop + aether:// url-handler + icons. Container-built OK.
   cliamp:
     repo: https://github.com/bjarneo/cliamp
     language: go
-    build: go-build (CGO, alsa+flac+libvorbis+libogg+mpg123)
+    build: repack-release (upstream ships prebuilt release binary)
     binary: cliamp
     license: MIT
-    deps: [alsa-lib, flac, libvorbis, libogg, mpg123]
-    status: blocked
-    note: CGO audio deps; verify Fedora -devel package names.
+    deps: [alsa-lib, flac, libvorbis, libogg, ffmpeg, yt-dlp]
+    status: verified
+    version: 1.63.2
+    note: Repack of cliamp-linux-amd64; desktop + Cliamp.png. Container-built OK.
   herdr:
-    repo: https://github.com/omacom-io/herdr
+    repo: https://github.com/herdrdev/herdr
     language: rust
-    build: cargo-frozen-release (requires pinned Zig 0.15 linker)
+    build: repack-release (PKGBUILD needs pinned Zig 0.15 linker; prebuilt ships)
     binary: herdr
     license: Apache-2.0
     deps: [gcc-libs, glibc]
-    status: blocked
-    note: needs Zig 0.15.2 toolchain (not packaged in Fedora); vendor fetch or prebuilt.
+    status: verified
+    version: 0.8.2
+    note: Repack of herdr-linux-x86_64 from herdrdev/herdr (the omacom-io/herdr fork has no release assets); Obsoletes/Provides omarchy-herdr.
   hyprland-preview-share-picker:
     repo: https://github.com/WhySoBad/hyprland-preview-share-picker
     language: rust
-    build: cargo-frozen-release (nightly toolchain)
+    build: cargo-frozen-release (requires nightly toolchain + pinned hyprland-protocols)
     binary: hyprland-preview-share-picker
     license: MIT
     deps: [gtk4, gtk4-layer-shell, xdg-desktop-portal-hyprland, hyprland, slurp]
     status: blocked
-    note: requires nightly Rust + vendored hyprland-protocols submodule.
+    version: 0.2.1
+    note: Spec written (nightly rustup + vendored hyprland-protocols + build.rs replacement); needs gtk4-layer-shell-devel from nett00n/hyprland COPR; not yet container-built.
   omacalc:
     repo: https://github.com/omacom/omacalc
     language: cpp
@@ -57,7 +58,8 @@ packages:
     license: MIT
     deps: [qt6-base, qt6-declarative, xdg-desktop-portal]
     status: verified
-    note: Built in Fedora Rawhide container (v0.2.2); Qt6 qmake6 via ./bin/build.
+    version: 0.2.2
+    note: Built in Fedora Rawhide container; Qt6 qmake6 via ./bin/build; desktop entry + svg icon + OFL added.
   omacut:
     repo: https://github.com/omacom/omacut
     language: cpp
@@ -66,16 +68,8 @@ packages:
     license: MIT
     deps: [qt6-base, qt6-declarative, qt6-multimedia, ffmpeg, ffprobe]
     status: verified
+    version: 0.4.0
     note: Built in Fedora Rawhide container (v0.4.0); Qt6 trimmer, needs qt6-qtmultimedia-devel.
-  omarchy-nvim:
-    repo: https://github.com/omacom/omarchy-pkgs (pkgbuilds/omarchy-nvim)
-    language: config
-    build: headless nvim + LazyVim sync (npm/nodejs/tree-sitter-cli)
-    binary: omarchy-nvim-setup, omarchy-nvim-refresh
-    license: MIT
-    deps: [neovim >= 0.9, git, nodejs, npm, tree-sitter-cli]
-    status: blocked
-    note: Assembles a ~116 MiB LazyVim cache via headless nvim sync; needs in-tree source assembly, not a simple source RPM.
   omawrite:
     repo: https://github.com/omacom/omawrite
     language: cpp
@@ -84,16 +78,18 @@ packages:
     license: MIT
     deps: [qt6-base, qt6-declarative, qt6-quickcontrols2, xdg-desktop-portal]
     status: verified
+    version: 0.5.0
     note: Built in Fedora Rawhide container (v0.5.0); Qt6 markdown editor.
   tensaku:
     repo: https://github.com/jondkinney/tensaku
     language: rust
-    build: cargo-release (GTK4/libadwaita/relm4/gtk4-layer-shell)
-    binary: tensaku
+    build: repack-release (release tarball carries full install tree, no toolchain)
+    binary: tensaku, tensaku-edit
     license: MPL-2.0
-    deps: [gtk4, libadwaita, gtk4-layer-shell]
-    status: blocked
-    note: verify gtk4-layer-shell-devel availability; Satty fork.
+    deps: [gtk4, gtk4-layer-shell, libadwaita, fontconfig]
+    status: verified
+    version: 0.28.0
+    note: Repack of tensaku-v0.28.0-x86_64.tar.gz (bin/ + share/); desktop + icon + man + completions. Container-built OK.
   tobi-try:
     repo: https://github.com/tobi/try
     language: ruby
@@ -102,6 +98,7 @@ packages:
     license: MIT
     deps: [ruby]
     status: verified
+    version: 1.10.1
     note: Built in Fedora Rawhide container (try-cli v1.10.1 gem).
   ttfx:
     repo: https://github.com/omacom/ttfx
@@ -111,13 +108,5 @@ packages:
     license: MIT
     deps: []
     status: verified
+    version: 0.3.2
     note: Built in Fedora Rawhide container (v0.3.2); pure Rust, plain cargo works for Fedora.
-  usage:
-    repo: https://github.com/omacom/omarchy (in-tree, shell/plugins/agents)
-    language: python
-    build: copy-tree (no compile)
-    binary: omarchy-agent-usage-*
-    license: MIT
-    deps: [python3, jq]
-    status: blocked
-    note: Source lives in-tree in the omarchy monorepo; needs a bundled source tarball, not a standalone repo.

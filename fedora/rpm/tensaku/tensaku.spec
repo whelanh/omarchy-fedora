@@ -1,46 +1,51 @@
 # Omarchy Quattro - tensaku (screenshot annotator, Satty fork)
-# Upstream: https://github.com/jondkinney/tensaku (crates.io tensaku)
-# Rust + GTK4/libadwaita/relm4/gtk4-layer-shell; `make build-release`,
-# `make install PREFIX=...`.
-# STATUS: BLOCKED (PENDING-VERIFY). Needs gtk4-layer-shell + a full GTK4 Rust
-# stack; verify libdevel package availability in Fedora before building.
-# %OT VERIFY: confirm gtk4-layer-shell-devel and the binary name/install target.
+# Upstream: https://github.com/jondkinney/tensaku (Rust/GTK4)
+%global debug_package %{nil}
+# Repack of the upstream release tarball, which carries the complete install
+# tree (bin/ + share/ incl. desktop entry, icon, man page, completions, and
+# licenses). No Rust/GTK toolchain needed.
 Name:           tensaku
-Version:        0.1.0
+Version:        0.28.0
 Release:        1%{?dist}
-Summary:        Screenshot annotator for Hyprland (Satty fork)
+Summary:        Modern screenshot annotation tool for Wayland
 
 License:        MPL-2.0
 URL:            https://github.com/jondkinney/tensaku
-Source0:        %{url}/archive/refs/heads/master.tar.gz
+Source0:        %{url}/releases/download/v%{version}/tensaku-v%{version}-x86_64.tar.gz
 
-BuildRequires:  rust
-BuildRequires:  gtk4-devel
-BuildRequires:  libadwaita-devel
-BuildRequires:  gtk4-layer-shell-devel
-BuildRequires:  make
+BuildArch:      x86_64
+
 Requires:       gtk4
 Requires:       gtk4-layer-shell
 Requires:       libadwaita
+Requires:       fontconfig
 
 %description
-Tensaku annotates screenshots on Hyprland, replacing Satty in Omarchy v4.
-STATUS: BLOCKED - scaffold only until the GTK4 Rust build is verified in mock.
+Tensaku is a modern screenshot annotation tool for Wayland, forked from Satty.
 
 %prep
-%autosetup -n %{name}-master
 
 %build
-make build-release %{?_smp_mflags}
-# or: cargo build --release
 
 %install
-%make_install PREFIX=%{_prefix}
+rm -rf %{buildroot}
+install -d %{buildroot}/usr
+tar -xf %{SOURCE0} -C %{buildroot}/usr --strip-components=1
 
 %files
-%license LICENSE
-%{_bindir}/tensaku
+%{_bindir}/%{name}
+%{_bindir}/tensaku-edit
+%{_datadir}/applications/dev.tensaku.Tensaku.desktop
+%{_datadir}/icons/hicolor/scalable/apps/dev.tensaku.Tensaku.svg
+%{_datadir}/licenses/%{name}/
+%{_datadir}/man/man1/tensaku.1*
+%{_datadir}/bash-completion/completions/tensaku
+%{_datadir}/fish/vendor_completions.d/tensaku.fish
+%{_datadir}/zsh/site-functions/_tensaku
+%{_datadir}/nushell/completions/tensaku.nu
+%{_datadir}/elvish/lib/tensaku.elv
+%{_datadir}/fig/autocomplete/tensaku.ts
 
 %changelog
-* Mon Aug 31 2026 whelanh <brickhousedevelopers@gmail.com> - 0.1.0-1
-- Scaffold SPEC (BLOCKED: GTK4-layer-shell Rust build TBD)
+* Mon Aug 31 2026 whelanh <brickhousedevelopers@gmail.com> - 0.28.0-1
+- Repack of upstream release tarball (v0.28.0); GPL-free MPL-2.0 tree shipped as-is

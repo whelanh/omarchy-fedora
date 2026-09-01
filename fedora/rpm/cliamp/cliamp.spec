@@ -1,46 +1,48 @@
 # Omarchy Quattro - cliamp (terminal music player)
-# Upstream: https://github.com/bjarneo/cliamp  (Go, ~3.9k stars)
-# STATUS: BLOCKED (PENDING-VERIFY). Go/CGO build with ALSA audio deps.
-# %OT VERIFY: confirm exact -devel package names on Fedora for
-# alsa-lib/flac/libvorbis/libogg/mpg123, the build command (go build ./... with
-# CGO), and the installed binary name + completion files.
+# Upstream: https://github.com/bjarneo/cliamp (Go, CGO audio deps)
+%global debug_package %{nil}
+# Repack of the upstream release binary (cliamp-linux-amd64), mirroring the
+# Arch PKGBUILD's package layout. No Go toolchain needed.
 Name:           cliamp
-Version:        0.1.0
+Version:        1.63.2
 Release:        1%{?dist}
-Summary:        Terminal music player for Omarchy
+Summary:        A retro terminal music player inspired by Winamp 2.x
 
 License:        MIT
 URL:            https://github.com/bjarneo/cliamp
-Source0:        %{url}/archive/refs/heads/master.tar.gz
+Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz
+Source1:        %{url}/releases/download/v%{version}/cliamp-linux-amd64
 
-BuildRequires:  golang
-BuildRequires:  alsa-lib-devel
-BuildRequires:  flac-devel
-BuildRequires:  libvorbis-devel
-BuildRequires:  libogg-devel
-BuildRequires:  mpg123-devel
+BuildArch:      x86_64
+
+Requires:       alsa-lib
+Requires:       flac
+Requires:       libvorbis
+Requires:       libogg
 Requires:       ffmpeg
 Requires:       yt-dlp
 
 %description
-Cliamp is a Curses-based command-line music player. STATUS: BLOCKED - scaffold
-only until the Go/CGO build and Fedora libdevel names are verified.
+Cliamp is a Curses-based command-line music player inspired by Winamp 2.x. It
+plays local audio and streams, with ffmpeg/yt-dlp handling remote sources.
 
 %prep
-%autosetup -n %{name}-master
-%goprep
-
-%build
-CGO_ENABLED=1 %gobuild -o %{_vpath_builddir}/cliamp .
+%autosetup -n %{name}-%{version}
 
 %install
-%goinstall
-install -m 0755 -D %{_vpath_builddir}/cliamp %{buildroot}%{_bindir}/cliamp
+install -Dm755 %{SOURCE1} %{buildroot}%{_bindir}/cliamp
+install -Dm644 cliamp.desktop %{buildroot}%{_datadir}/applications/cliamp.desktop
+install -Dm644 Cliamp.png %{buildroot}%{_datadir}/icons/hicolor/512x512/apps/cliamp.png
+install -Dm644 Cliamp.png %{buildroot}%{_datadir}/pixmaps/cliamp.png
+install -Dm644 LICENSE %{buildroot}%{_datadir}/licenses/%{name}/LICENSE
 
 %files
 %license LICENSE
 %{_bindir}/cliamp
+%{_datadir}/applications/cliamp.desktop
+%{_datadir}/icons/hicolor/512x512/apps/cliamp.png
+%{_datadir}/pixmaps/cliamp.png
 
 %changelog
-* Mon Aug 31 2026 whelanh <brickhousedevelopers@gmail.com> - 0.1.0-1
-- Scaffold SPEC (BLOCKED: Go/CGO audio build + libdevel names TBD)
+* Mon Aug 31 2026 whelanh <brickhousedevelopers@gmail.com> - 1.63.2-1
+- Repack of upstream release binary (v1.63.2), mirroring the Arch PKGBUILD

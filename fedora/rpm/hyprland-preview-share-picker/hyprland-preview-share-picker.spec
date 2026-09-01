@@ -1,55 +1,63 @@
 # Omarchy Quattro - hyprland-preview-share-picker
 # Upstream: https://github.com/WhySoBad/hyprland-preview-share-picker
-# (Rust, GTK4 + gtk4-layer-shell; vendored hyprland-protocols submodule)
-# STATUS: BLOCKED (PENDING-VERIFY). Requires a NIGHTLY Rust toolchain and a
-# vendored hyprland-protocols submodule (commit-pinned), plus gtk4-layer-shell
-# runtime. Until gtk4-layer-shell-devel + a nightly toolchain wrapper are sorted
-# in mock, this stays a scaffold.
-# %OT VERIFY: confirm gtk4-layer-shell-devel availability in Fedora, pin the
-# submodule, and arrange the nightly toolchain via rust-toolchain.toml or a
-# fetched rustup toolchain.
+# Rust + GTK4 + gtk4-layer-shell. Mirrors the Arch PKGBUILD: pins the
+# hyprland-protocols submodule commit, replaces build.rs (no git in the
+# tarball), and builds with the nightly toolchain fetched via rustup.
+%global protocols_commit 3a5c2bda1c1a4e55cc1330c782547695a93f05b2
+%global rustupdir %{_builddir}/rustup
+
 Name:           hyprland-preview-share-picker
 Version:        0.2.1
 Release:        1%{?dist}
-Summary:        Screen share picker with live preview for Hyprland
+Summary:        An alternative share picker for Hyprland with window and monitor previews
 
 License:        MIT
 URL:            https://github.com/WhySoBad/hyprland-preview-share-picker
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz
+Source1:        https://github.com/hyprwm/hyprland-protocols/archive/%{protocols_commit}.tar.gz
 
 BuildRequires:  rust
 BuildRequires:  gtk4-devel
 BuildRequires:  gtk4-layer-shell-devel
-BuildRequires:  git
+BuildRequires:  curl
 Requires:       gtk4
 Requires:       gtk4-layer-shell
 Requires:       xdg-desktop-portal-hyprland
 Requires:       hyprland
-Requires:       slurp
-
-Obsoletes:      hyprland-preview-share-picker-git
+Recommends:     slurp
 
 %description
-A share-picker for Hyprland's screen share portal that shows a live preview.
-STATUS: BLOCKED - scaffold only; nightly Rust + vendored submodule TBD.
+An alternative share picker for Hyprland's screen share portal, showing live
+window and monitor previews.
 
 %prep
 %autosetup -n %{name}-v%{version}
-# %OT VERIFY: initialize/update the vendored hyprland-protocols submodule and
-# arrange the nightly toolchain (rustup + rust-toolchain.toml).
+export RUSTUP_HOME=%{rustupdir}/rustup CARGO_HOME=%{rustupdir}/cargo
+curl -fsSL https://sh.rustup.rs -o rustup-init.sh
+sh rustup-init.sh -y --profile minimal --default-toolchain nightly >/dev/null
+rmdir lib/hyprland-protocols
+ln -sf %{_builddir}/hyprland-protocols-%{protocols_commit} lib/hyprland-protocols
+cat > build.rs <<'EOF'
+fn main() {
+    println!("cargo::rustc-env=GIT_VERSION=v0.2.1-r0-release");
+}
+EOF
 
 %build
-# %OT VERIFY: cargo build --release (frozen) with the replacement build.rs
-# that emits the schema; RUSTUP_TOOLCHAIN=nightly.
+export RUSTUP_HOME=%{rustupdir}/rustup CARGO_HOME=%{rustupdir}/cargo
+export PATH="%{rustupdir}/cargo/bin:$PATH"
+cargo build --release --locked
+./target/release/hyprland-preview-share-picker schema > schema.json
 
 %install
-# %OT VERIFY: install target/release/<binary>; also emit schema.json if the
-# runtime needs it.
+install -Dm755 target/release/hyprland-preview-share-picker %{buildroot}%{_bindir}/hyprland-preview-share-picker
+install -Dm644 schema.json %{buildroot}%{_datadir}/hyprland-preview-share-picker/schema.json
 
 %files
 %license LICENSE
-%{_bindir}/*
+%{_bindir}/hyprland-preview-share-picker
+%{_datadir}/hyprland-preview-share-picker/schema.json
 
 %changelog
 * Mon Aug 31 2026 whelanh <brickhousedevelopers@gmail.com> - 0.2.1-1
-- Scaffold SPEC (BLOCKED: nightly toolchain + vendored submodule TBD)
+- Source build mirroring the Arch PKGBUILD (nightly rustup toolchain + pinned hyprland-protocols)
