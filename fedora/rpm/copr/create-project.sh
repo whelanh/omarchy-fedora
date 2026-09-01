@@ -21,7 +21,7 @@ set -euo pipefail
 
 COPR="whelanh/omarchy"
 CHROOT="fedora-rawhide-x86_64"
-BUILD_REPO="https://copr.fedorainfracloud.org/coprs/nett00n/hyprland/repo/${CHROOT}/nett00n-hyprland-${CHROOT}.repo"
+BUILD_REPO="https://download.copr.fedorainfracloud.org/results/nett00n/hyprland/${CHROOT}/"
 DESCRIPTION="Omarchy Quattro first-party binaries (aether, cliamp, herdr, hyprland-preview-share-picker, omacalc, omacut, omawrite, tensaku, try, ttfx), source-built/repacked from fedora/rpm."
 INSTRUCTIONS="Enabling the repo: sudo dnf copr enable ${COPR}; then: sudo dnf install aether cliamp herdr hyprland-preview-share-picker omacalc omacut omawrite tensaku try ttfx"
 
