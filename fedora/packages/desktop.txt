@@ -20,6 +20,7 @@ xdg-desktop-portal-hyprland
 gtk4-layer-shell
 sddm
 qt6-qtwayland
+qt6-qtimageformats
 gpu-screen-recorder
 
 # IME

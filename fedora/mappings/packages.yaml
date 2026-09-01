@@ -284,6 +284,10 @@ packages:
     package: vips
     source: substitute
     note: libvips is packaged as vips on Fedora
+  vips-tools:
+    package: vips-tools
+    source: official
+    note: vips CLI tools (vipsthumbnail) are a separate subpackage on Fedora
   postgresql-libs:
     package: libpq
     source: substitute
@@ -486,6 +490,11 @@ packages:
   xdg-terminal-exec:
     package: xdg-terminal-exec
     source: official
+    note: ships the desktop default-terminal resolution Omarchy's launcher uses
+  qt6-qtimageformats:
+    package: qt6-qtimageformats
+    source: official
+    note: Qt image plugin formats (webp/jxl) — wallpapers render black without this
     note: Fedora ships xdg-terminal-exec 0.14.2 (rawhide)
   intel-ipu7-camera:     { package: null, source: unavailable, note: Intel IPU7 camera, very niche }
   linux-ptl:             { package: null, source: unavailable, note: patched kernel; use stock Fedora kernel }

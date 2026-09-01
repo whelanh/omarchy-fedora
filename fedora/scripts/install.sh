@@ -379,6 +379,99 @@ EOF
   fi
 }
 
+# Upstream Omarchy grants the browser-accent helper passwordless sudo via
+# /etc/sudoers.d/omarchy-theme-browser; without it every theme switch stalls on
+# a password prompt. Ship the rule from the installed tree when present.
+install_omarchy_sudoers() {
+  [ "$COPY_OMARCHY" = 1 ] || return 0
+
+  local sudoers_src=/usr/share/omarchy/etc/sudoers.d/omarchy-theme-browser
+  [ -f "$sudoers_src" ] || { warn "no sudoers rule shipped at $sudoers_src"; return 0; }
+  command -v visudo >/dev/null 2>&1 || { warn "visudo not found; skipping sudoers rule"; return 0; }
+
+  visudo -c -f "$sudoers_src" >/dev/null 2>&1 || { warn "skipping invalid sudoers source $sudoers_src"; return 0; }
+
+  local sudoers_dest=/etc/sudoers.d/omarchy-theme-browser
+  if [ -f "$sudoers_dest" ] && ! visudo -c -f "$sudoers_dest" >/dev/null 2>&1; then
+    warn "skipping bad existing $sudoers_dest; fix it manually"
+    return 0
+  fi
+
+  log "== Installing $sudoers_dest =="
+  if (( EUID == 0 )); then
+    install -Dm 0440 -o root -g root "$sudoers_src" "$sudoers_dest"
+  elif [ -n "${SUDO_USER:-}" ]; then
+    sudo install -Dm 0440 -o root -g root "$sudoers_src" "$sudoers_dest"
+  else
+    warn "not root and no sudo user; install $sudoers_src as $sudoers_dest (0440 root:root) manually"
+  fi
+}
+
+# Omarchy draws its bar/menu glyphs with whatever `monospace` resolves to, and
+# upstream ships a fontconfig alias mapping it to "JetBrainsMono Nerd Font".
+# Fedora ships neither the alias nor a Nerd Font, so icon-family widgets render
+# blank. Enable the alias and pull in the Nerd Font when missing.
+install_omarchy_fonts() {
+  [ "$COPY_OMARCHY" = 1 ] || return 0
+
+  local conf_src=/usr/share/omarchy/default/fontconfig/conf.avail/50-omarchy.conf
+  if [ -f "$conf_src" ]; then
+    log "== Enabling /etc/fonts/conf.d/50-omarchy.conf =="
+    if (( EUID == 0 )); then
+      ln -sf "$conf_src" /etc/fonts/conf.d/50-omarchy.conf
+    elif [ -n "${SUDO_USER:-}" ]; then
+      sudo ln -sf "$conf_src" /etc/fonts/conf.d/50-omarchy.conf
+    else
+      warn "skipping fontconfig alias (no /etc write access)"
+      return 0
+    fi
+  else
+    warn "no fontconfig alias shipped at $conf_src"
+  fi
+
+  if fc-match -f '%{family[0]}' 'JetBrainsMono Nerd Font' 2>/dev/null | grep -qi 'jetbrains'; then
+    log "== JetBrainsMono Nerd Font already present =="
+    fc-cache -f >/dev/null 2>&1 || true
+    return 0
+  fi
+
+  # Fedora has no Nerd Font package; fetch the TTF set upstream uses.
+  command -v curl >/dev/null 2>&1 || { warn "curl not found; skipping Nerd Font install"; return 0; }
+  command -v unzip >/dev/null 2>&1 || { warn "unzip not found; skipping Nerd Font install"; return 0; }
+
+  local tmp dest
+  tmp="$(mktemp -d)"
+  dest=/usr/share/fonts/jetbrainsmono-nerd
+  if ! curl -fsSLo "$tmp/JetBrainsMono.zip" \
+      https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/JetBrainsMono.zip; then
+    warn "failed to download JetBrainsMono Nerd Font"
+    rm -rf "$tmp"
+    return 0
+  fi
+
+  if (( EUID == 0 )); then
+    mkdir -p "$dest"
+    unzip -q -o "$tmp/JetBrainsMono.zip" -d "$tmp/out" 2>/dev/null || true
+    install -m 0644 "$tmp"/out/*.ttf "$dest/"
+  elif [ -n "${SUDO_USER:-}" ]; then
+    sudo mkdir -p "$dest"
+    unzip -q -o "$tmp/JetBrainsMono.zip" -d "$tmp/out" 2>/dev/null || true
+    sudo install -m 0644 "$tmp"/out/*.ttf "$dest/"
+  else
+    rm -rf "$tmp"
+    warn "skipping Nerd Font install (no /etc write access)"
+    return 0
+  fi
+  rm -rf "$tmp"
+
+  fc-cache -f >/dev/null 2>&1 || true
+  if fc-match -f '%{family[0]}' 'JetBrainsMono Nerd Font' 2>/dev/null | grep -qi 'jetbrains'; then
+    log "== JetBrainsMono Nerd Font installed =="
+  else
+    warn "fontconfig still not resolving JetBrainsMono Nerd Font"
+  fi
+}
+
 # ---------------------------------------------------------------------------
 # Phase F - User configuration
 # ---------------------------------------------------------------------------
@@ -486,6 +579,8 @@ main() {
   install_omarchy_bin
   install_omarchy_profile
   install_uwsm_app_shim
+  install_omarchy_sudoers
+  install_omarchy_fonts
   configure_user
   validate_install
 
