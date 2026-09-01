@@ -98,3 +98,5 @@ luarocks
 neovim
 gcc
 make
+# JSON::PP for omarchy-menu-select's perl payload building (missing from dnf perl base)
+perl-JSON-PP
