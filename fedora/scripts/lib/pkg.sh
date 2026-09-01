@@ -81,12 +81,12 @@ omarchy_pkg_install() {
     return 0
   fi
 
-  _omarchy_dnf install -y "${missing[@]}"
+  _omarchy_dnf install -y --skip-unavailable "${missing[@]}"
   local rc=$?
 
   # Distinguish package-not-found from transaction failure. dnf returns 1
-  # for "no match for argument"; retain exit code 1 for that, so callers can
-  # detect it, but print a clear message.
+  # for "no match for argument"; --skip-unavailable turns those into warnings
+  # so a single stale package name cannot abort the entire transaction.
   if (( rc != 0 )); then
     echo "omarchy: dnf install failed for: ${missing[*]}" >&2
   fi

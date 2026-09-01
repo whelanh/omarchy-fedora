@@ -46,7 +46,7 @@ repositories:
     kind: copr
     mandatory: false
     packages:
-      - gpu-screen-recorder-git
+      - gpu-screen-recorder
     why_not_official: >
       gpu-screen-recorder (NVIDIA/AMD screen recorder used by Omarchy
       screenshots) is not in official Fedora repos.
@@ -96,3 +96,38 @@ repositories:
       Enabled by installing the official rpmfusion-release RPM (signed).
     optional: true
     note: Nonfree NVIDIA/Broadcom support is optional; base install does not require it.
+
+  atim/lazygit:
+    kind: copr
+    mandatory: true
+    packages:
+      - lazygit
+    why_not_official: >
+      lazygit (terminal GUI for git), used by the Omarchy shell for git
+      workflows, is not packaged in official Fedora (Rust packaging rules).
+      atim/lazygit is the COPR referenced by lazygit upstream docs.
+    trust: Community COPR; gpgcheck on.
+    optional: false
+
+  atim/lazydocker:
+    kind: copr
+    mandatory: true
+    packages:
+      - lazydocker
+    why_not_official: >
+      lazydocker (terminal GUI for docker) is not packaged in official Fedora.
+      atim/lazydocker follows the same build pattern as atim/lazygit.
+    trust: Community COPR; gpgcheck on.
+    optional: false
+
+  atim/starship:
+    kind: copr
+    mandatory: true
+    packages:
+      - starship
+    why_not_official: >
+      starship (cross-shell prompt) was retired from official Fedora in 2019
+      because of strict Rust vendoring rules. atim/starship is the COPR listed
+      on starship's official install docs.
+    trust: Community COPR; gpgcheck on.
+    optional: false

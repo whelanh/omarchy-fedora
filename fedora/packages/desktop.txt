@@ -10,12 +10,17 @@ quickshell
 hyprpicker
 hyprsunset
 hyprland-guiutils
+# xkbcli (from libxkbcommon-utils) resolves code: keys in omarchy-menu-keybindings
+libxkbcommon-utils
+# uwsm from nett00n/hyprland only requires /usr/bin/python3, but imports the
+# xdg module at runtime (xdg.BaseDirectory etc.); pyxdg is its missing dep.
 uwsm
+python3-pyxdg
 xdg-desktop-portal-hyprland
 gtk4-layer-shell
 sddm
 qt6-qtwayland
-gpu-screen-recorder-git
+gpu-screen-recorder
 
 # IME
 fcitx5

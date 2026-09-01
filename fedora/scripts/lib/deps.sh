@@ -38,10 +38,12 @@ omarchy_fedora_repo_tools() {
 }
 
 # Enable the mandatory COPR repositories listed in repositories.yaml.
+# nett00n/hyprland supplies the Hyprland ecosystem; atim/* supplies CLI tools
+# (lazygit, lazydocker, starship) that are not packaged in official Fedora.
 omarchy_fedora_enable_coprs() {
   omarchy_fedora_repo_tools || return 1
   # Mandatory COPR repos
-  for entry in nett00n/hyprland; do
+  for entry in nett00n/hyprland atim/lazygit atim/lazydocker atim/starship; do
     if ! omarchy_pkg_repo_enabled "copr:copr.fedorainfracloud.org:${entry//\//:}" \
        && ! omarchy_pkg_repo_enabled "${entry//\//:}"; then
       echo "omarchy: enabling COPR: $entry"
@@ -109,6 +111,13 @@ omarchy_fedora_install_list() {
 # resolver mapping (packages.yaml) is used for upstream-sync classification
 # and is not the runtime install manifest.
 omarchy_fedora_install_base() {
+  # power-profiles-daemon provides ppd-service, which conflicts with tuned-ppd.
+  # Several Fedora spins (e.g. Sway, Workstation) pre-install tuned/tuned-ppd,
+  # so remove it first to avoid a hard transaction conflict.
+  if rpm -q tuned-ppd >/dev/null 2>&1 || rpm -q tuned >/dev/null 2>&1; then
+    echo "omarchy: removing tuned/tuned-ppd (conflicts with power-profiles-daemon)"
+    omarchy_pkg_remove tuned-ppd tuned || true
+  fi
   omarchy_fedora_install_list "$PACKAGES_DIR/base.txt" || return 1
 }
 

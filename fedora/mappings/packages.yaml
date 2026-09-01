@@ -145,13 +145,24 @@ packages:
     source: substitute
     note: same tool; Fedora package name capitalization
   imv:                   { package: imv, source: fedora }
-  inetutils:             { package: inetutils, source: fedora }
+  inetutils:
+    package: null
+    source: unavailable
+    note: not packaged for Fedora (removed upstream); its tools (hostname, ping...) ship in iputils/hostname
   inotify-tools:         { package: inotify-tools, source: fedora }
   inxi:                  { package: inxi, source: fedora }
   jq:                    { package: jq, source: fedora }
   kdenlive:              { package: kdenlive, source: fedora }
-  lazydocker:            { package: lazydocker, source: fedora }
-  lazygit:               { package: lazygit, source: fedora }
+  lazydocker:
+    package: lazydocker
+    source: copr
+    repository: atim/lazydocker
+    note: not in official Fedora; built from atim/lazydocker COPR
+  lazygit:
+    package: lazygit
+    source: copr
+    repository: atim/lazygit
+    note: not in official Fedora; built from atim/lazygit COPR
   less:                  { package: less, source: fedora }
   libreoffice-fresh:
     package: libreoffice-core
@@ -201,7 +212,7 @@ packages:
     package: python3-poetry-core
     source: substitute
     note: Fedora uses python3-* naming
-  qemu-user-static-binfmt: { package: qemu-user-static-binfmt, source: fedora }
+  qemu-user-static-binfmt: { package: qemu-user-static, source: substitute, note: Fedora names the static-user-mode package qemu-user-static }
   qrencode:              { package: qrencode, source: fedora }
   qt6-imageformats:
     package: qt6-qtimageformats
@@ -212,7 +223,11 @@ packages:
   sddm:                  { package: sddm, source: fedora }
   slurp:                 { package: slurp, source: fedora }
   socat:                 { package: socat, source: fedora }
-  starship:              { package: starship, source: fedora }
+  starship:
+    package: starship
+    source: copr
+    repository: atim/starship
+    note: not in official Fedora (was retired in 2019 due to Rust packaging rules); atim/starship COPR
   sushi:                 { package: sushi, source: fedora }
   system-config-printer: { package: system-config-printer, source: fedora }
   tesseract:             { package: tesseract, source: fedora }
@@ -223,7 +238,10 @@ packages:
   tldr:                  { package: tldr, source: fedora }
   tmux:                  { package: tmux, source: fedora }
   tree-sitter-cli:       { package: tree-sitter-cli, source: fedora }
-  tzupdate:              { package: tzupdate, source: fedora }
+  tzupdate:
+    package: null
+    source: unavailable
+    note: not packaged for Fedora (PyPI only); skip or install via pip/pipx if needed
   udiskie:               { package: udiskie, source: fedora }
   ufw:                   { package: ufw, source: fedora }
   unzip:                 { package: unzip, source: fedora }
@@ -248,7 +266,7 @@ packages:
     source: substitute
     note: Fedora CJK font package name
   noto-fonts-emoji:
-    package: google-noto-emoji-color-fonts
+    package: google-noto-color-emoji-fonts
     source: substitute
     note: Fedora emoji font package name
   ttf-jetbrains-mono-nerd-basic:
@@ -256,9 +274,9 @@ packages:
     source: substitute
     note: Fedora packages JetBrains Mono; Nerd Fonts variant may need a nerd-fonts COPR/fonts package
   woff2-font-awesome:
-    package: fontawesome-fonts
+    package: fontawesome-6-free-fonts
     source: substitute
-    note: Font Awesome; Fedora package name fontawesome-fonts
+    note: Fedora revamped fontawesome-fonts in F39; current package is fontawesome-6-free-fonts
   yaru-icon-theme:       { package: yaru-icon-theme, source: fedora }
 
   # --- libvips / postgresql-libs name differences ---
@@ -304,9 +322,10 @@ packages:
 
   # --- COPR (generic apps) ---
   gpu-screen-recorder:
-    package: gpu-screen-recorder-git
+    package: gpu-screen-recorder
     source: copr
     repository: brycensranch/gpu-screen-recorder-git
+    note: the COPR repo is named -git and builds the package gpu-screen-recorder
   moonlight-qt:
     package: moonlight-qt
     source: copr
@@ -465,9 +484,9 @@ packages:
     source: unavailable
     note: no Fedora package; prefer firewalld + docker integration
   xdg-terminal-exec:
-    package: null
-    source: unavailable
-    note: no package; configure via alternatives/xdg-terminal-exec shim
+    package: xdg-terminal-exec
+    source: official
+    note: Fedora ships xdg-terminal-exec 0.14.2 (rawhide)
   intel-ipu7-camera:     { package: null, source: unavailable, note: Intel IPU7 camera, very niche }
   linux-ptl:             { package: null, source: unavailable, note: patched kernel; use stock Fedora kernel }
   linux-ptl-headers:     { package: null, source: unavailable, note: patched kernel headers }

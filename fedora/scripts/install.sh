@@ -261,6 +261,39 @@ install_omarchy_tree() {
        "(see fedora/rpm/README.md); build and install them before those appear."
 }
 
+# Install the login-manager session entry so the greeter (SDDM on the Fedora
+# Sway/companion spins) offers "Omarchy (Hyprland uwsm)" alongside the stock
+# Hyprland sessions. Also install the uwsm env that sources the env-bootstrap
+# into the session, since uwsm does not read /etc/profile.d.
+install_omarchy_session() {
+  [ "$COPY_OMARCHY" = 1 ] || return 0
+  local ws_src="$UPSTREAM/default/wayland-sessions/omarchy.desktop"
+  local uwsm_env_src="$UPSTREAM/default/uwsm/env.d"
+  if [ -f "$ws_src" ]; then
+    log "== Installing Omarchy login session =="
+    if (( EUID == 0 )); then
+      mkdir -p /usr/share/wayland-sessions
+      cp -a "$ws_src" /usr/share/wayland-sessions/omarchy.desktop
+    else
+      sudo mkdir -p /usr/share/wayland-sessions
+      sudo cp -a "$ws_src" /usr/share/wayland-sessions/omarchy.desktop
+    fi
+  else
+    warn "no session desktop entry at $ws_src; Omarchy won't appear at the greeter"
+  fi
+  if [ -d "$uwsm_env_src" ]; then
+    if (( EUID == 0 )); then
+      mkdir -p /usr/share/uwsm/env.d
+      cp -a "$uwsm_env_src"/. /usr/share/uwsm/env.d/
+    else
+      sudo mkdir -p /usr/share/uwsm/env.d
+      sudo cp -a "$uwsm_env_src"/. /usr/share/uwsm/env.d/
+    fi
+  else
+    warn "no uwsm env dir at $uwsm_env_src"
+  fi
+}
+
 # Import omarchy-* commands onto PATH, mirroring the upstream architecture's
 # package map: bin/omarchy-* -> /usr/bin/omarchy-* (with symlinks kept under
 # /usr/share/omarchy/bin). This is what makes `omarchy plugin`, `omarchy theme`,
@@ -341,9 +374,27 @@ configure_user() {
     $as_user cp -a "$hd"/. "$home/" 2>/dev/null || true
   fi
 
+  # Seed the Omarchy user configs (~/.config) from the vendored upstream
+  # config/ tree: hypr/hyprland.lua is what Hyprland 0.55+ loads by default
+  # and it bootstraps the whole Omarchy desktop (binds, autostart, shell).
+  # Without this seed the session entry would boot stock Hyprland instead.
+  local cfg_src="$UPSTREAM/config"
+  if [ -d "$cfg_src" ]; then
+    $as_user mkdir -p "$home/.config"
+    $as_user cp -a "$cfg_src"/. "$home/.config/" 2>/dev/null || true
+    # Seed /etc/skel so future users get the same desktop.
+    if (( EUID == 0 )); then
+      mkdir -p /etc/skel/.config
+      cp -a "$cfg_src"/. /etc/skel/.config/ 2>/dev/null || true
+    else
+      sudo mkdir -p /etc/skel/.config
+      sudo cp -a "$cfg_src"/. /etc/skel/.config/ 2>/dev/null || true
+    fi
+  else
+    warn "no config tree at $cfg_src; user configs not seeded"
+  fi
+
   # Enable graphical session for the user.
-  local session_file=/usr/share/wayland-sessions/omarchy.desktop
-  $as_user mkdir -p "$home/.config" 2>/dev/null || true
   warn "User-level Omarchy config (shell, themes) will be provisioned on first login."
 }
 
@@ -399,6 +450,7 @@ main() {
   install_dracut
   enable_services
   install_omarchy_tree
+  install_omarchy_session
   install_omarchy_bin
   install_omarchy_profile
   configure_user

@@ -37,7 +37,6 @@ gvfs-nfs
 gvfs-smb
 ImageMagick
 imv
-inetutils
 inotify-tools
 inxi
 jq
@@ -50,14 +49,13 @@ man-db
 mpv
 mpv-mpris
 NetworkManager
-noto-fonts-cjk
 pamixer
 plocate
 plymouth
 power-profiles-daemon
 python3-gobject
 python3-poetry-core
-qemu-user-static-binfmt
+qemu-user-static
 qrencode
 ripgrep
 ruby
@@ -70,7 +68,6 @@ tesseract-langpack-eng
 tldr
 tmux
 tree-sitter-cli
-tzupdate
 udiskie
 ufw
 unzip
@@ -86,8 +83,8 @@ zbar
 zoxide
 
 # fonts / icons
-fontawesome-fonts
-google-noto-emoji-color-fonts
+fontawesome-6-free-fonts
+google-noto-color-emoji-fonts
 google-noto-sans-cjk-fonts
 google-noto-sans-fonts
 jetbrains-mono-fonts
