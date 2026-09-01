@@ -347,6 +347,38 @@ EOF
   fi
 }
 
+# Fedora's uwsm (nett00n/hyprland COPR) ships only the `uwsm app` subcommand,
+# not the legacy `uwsm-app` entry point that Omarchy's scripts (o.launch,
+# omarchy-launch-terminal, AppLibrary, webapps/tuis) all call. Install a
+# system-wide compat shim so `uwsm-app -- <cmd>` works as upstream expects.
+install_uwsm_app_shim() {
+  local dest=/usr/bin/uwsm-app
+  if [ -e "$dest" ]; then
+    log "== uwsm-app already present at $dest; skipping shim =="
+    return 0
+  fi
+  command -v /usr/bin/uwsm >/dev/null 2>&1 || { warn "uwsm not found; skipping uwsm-app shim"; return 0; }
+
+  log "== Installing $dest (uwsm-app -> uwsm app) =="
+  if (( EUID == 0 )); then
+    cat > "$dest" <<'EOF'
+#!/bin/sh
+# Compat shim: Omarchy calls `uwsm-app -- <cmd>`; Fedora's uwsm ships the
+# equivalent as the `uwsm app` subcommand.
+exec /usr/bin/uwsm app "$@"
+EOF
+    chmod +x "$dest"
+  else
+    sudo tee "$dest" >/dev/null <<'EOF'
+#!/bin/sh
+# Compat shim: Omarchy calls `uwsm-app -- <cmd>`; Fedora's uwsm ships the
+# equivalent as the `uwsm app` subcommand.
+exec /usr/bin/uwsm app "$@"
+EOF
+    sudo chmod +x "$dest"
+  fi
+}
+
 # ---------------------------------------------------------------------------
 # Phase F - User configuration
 # ---------------------------------------------------------------------------
@@ -453,6 +485,7 @@ main() {
   install_omarchy_session
   install_omarchy_bin
   install_omarchy_profile
+  install_uwsm_app_shim
   configure_user
   validate_install
 
