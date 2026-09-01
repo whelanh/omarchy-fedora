@@ -82,6 +82,7 @@ wireplumber
 wl-clipboard
 wtype
 xdg-desktop-portal-gtk
+xdg-terminal-exec
 yt-dlp
 zbar
 zoxide
