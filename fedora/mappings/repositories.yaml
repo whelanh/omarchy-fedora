@@ -131,3 +131,31 @@ repositories:
       on starship's official install docs.
     trust: Community COPR; gpgcheck on.
     optional: false
+
+  whelanh/omarchy:
+    kind: copr
+    mandatory: false
+    packages:
+      - aether
+      - cliamp
+      - herdr
+      - hyprland-preview-share-picker
+      - omacalc
+      - omacut
+      - omawrite
+      - tensaku
+      - try
+      - ttfx
+    why_not_official: >
+      The 10 first-party Omarchy binaries are built/repacked from
+      fedora/rpm/ SPECs (see fedora/rpm/README.md) and published to this COPR;
+      they are not in official Fedora and several upstream projects don't
+      publish Fedora binaries at all.
+    trust: >
+      First-party Omarchy project. Built by this repo's CI from the SPECs
+      under fedora/rpm/. gpgcheck on via COPR GPG signing. All repacks are
+      byte-for-byte upstream release binaries.
+    optional: true
+    note: >
+      Container-verified end-to-end (all 10 built green on fedora:rawhide via
+      fedora/rpm/build-rpm-in-ci.sh).

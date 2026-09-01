@@ -47,9 +47,9 @@ packages:
     binary: hyprland-preview-share-picker
     license: MIT
     deps: [gtk4, gtk4-layer-shell, xdg-desktop-portal-hyprland, hyprland, slurp]
-    status: blocked
+    status: verified
     version: 0.2.1
-    note: Spec written (nightly rustup + vendored hyprland-protocols + build.rs replacement); needs gtk4-layer-shell-devel from nett00n/hyprland COPR; not yet container-built.
+    note: Spec cds the pinned hyprland-protocols in (Source from hyprwm), builds on stable Fedora Rust; needs gtk4-layer-shell-devel from nett00n/hyprland COPR. Container-built OK.
   omacalc:
     repo: https://github.com/omacom/omacalc
     language: cpp

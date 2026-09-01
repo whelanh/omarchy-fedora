@@ -30,13 +30,15 @@ COPY_OMARCHY=1
 DRY_RUN=0
 TARGET_USER=""
 NVIDIA=0
+INSTALL_FIRSTPARTY=1
 
 for arg in "$@"; do
   case "$arg" in
-    --no-omarchy) COPY_OMARCHY=0 ;;
-    --dry-run)    DRY_RUN=1 ;;
-    --user)       TARGET_USER="__NEXT__" ;;
-    --nvidia)     NVIDIA=1 ;;
+    --no-omarchy)    COPY_OMARCHY=0 ;;
+    --dry-run)       DRY_RUN=1 ;;
+    --no-firstparty) INSTALL_FIRSTPARTY=0 ;;
+    --user)          TARGET_USER="__NEXT__" ;;
+    --nvidia)        NVIDIA=1 ;;
     *)
       if [ "$TARGET_USER" = "__NEXT__" ]; then
         TARGET_USER="$arg"
@@ -152,6 +154,13 @@ install_repos() {
   # gpu-screen-recorder is part of the desktop; enable its COPR.
   omarchy_fedora_enable_optional_coprs brycensranch/gpu-screen-recorder-git \
     || die "failed to enable gpu-screen-recorder COPR"
+  # First-party Omarchy binaries (aether, cliamp, herdr, share-picker,
+  # omacalc, omacut, omawrite, tensaku, try, ttfx) live in the whelanh/omarchy
+  # COPR (see fedora/rpm/copr/README.md).
+  if [ "$INSTALL_FIRSTPARTY" = 1 ]; then
+    omarchy_fedora_enable_optional_coprs whelanh/omarchy \
+      || die "failed to enable whelanh/omarchy COPR"
+  fi
   if [ "$NVIDIA" = 1 ]; then
     omarchy_fedora_enable_rpmfusion || die "failed to enable RPM Fusion"
   fi
@@ -167,6 +176,9 @@ install_packages() {
   omarchy_fedora_install_base || die "base package installation failed"
   omarchy_fedora_install_desktop || die "desktop package installation failed"
   omarchy_fedora_install_applications || die "application package installation failed"
+  if [ "$INSTALL_FIRSTPARTY" = 1 ]; then
+    omarchy_fedora_install_firstparty || die "first-party package installation failed"
+  fi
   log "packages installed"
 }
 
@@ -255,10 +267,10 @@ install_omarchy_tree() {
     sudo cp -a "$UPSTREAM"/* "$dest/"
   fi
   log "Omarchy tree installed to $dest"
-  log "NOTE: the 13 first-party command binaries (aether, asdcontrol, cliamp," \
-       "herdr, share-picker, omacalc, omacut, omarchy-nvim, omawrite, tensaku," \
-       "tobi-try, ttfx, usage) are scaffolded as Fedora RPMs under fedora/rpm" \
-       "(see fedora/rpm/README.md); build and install them before those appear."
+  log "NOTE: the 10 first-party command binaries (aether, cliamp, herdr,"
+       "hyprland-preview-share-picker, omacalc, omacut, omawrite, tensaku, try,"
+       "ttfx) are packaged under fedora/rpm and ship from the whelanh/omarchy"
+       "COPR (see fedora/rpm/copr/README.md)."
 }
 
 # Install the login-manager session entry so the greeter (SDDM on the Fedora

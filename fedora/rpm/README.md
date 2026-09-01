@@ -1,92 +1,86 @@
-# Omarchy Quattro first-party RPMs (scaffold)
+# Omarchy Quattro first-party RPMs
 
-This directory scaffolds Fedora RPM packaging for the 13 "first-party" command
+This directory scaffolds Fedora RPM packaging for the 10 "first-party"
 binaries that Omarchy ships but that are **not** available (or not maintained)
-in Fedora official/COPR repos. They are currently marked `source: build` in
-`fedora/mappings/packages.yaml` and were surfaced as remaining work in
-`COMPATIBILITY.md`.
+in Fedora official/COPR repos. They map to `source: build` entries in
+`fedora/mappings/packages.yaml` and are distributed via the
+`whelanh/omarchy` COPR.
 
-> **Status: 5 VERIFIED, 8 BLOCKED.** The five single-binary packages
-> (omacalc, omacut, omawrite, ttfx, try) have been **built successfully in a
-> Fedora Rawhide container** (`manifest.yaml` status `verified`) and are
-> auto-built by CI. The remaining eight are `blocked` (need extra toolchain,
-> prebuilt-repack, or in-tree source assembly) and carry a `%OT VERIFY:`
-> comment noting the specific risk. Treat a `blocked` spec as a starting point;
-> verify by actually building before shipping.
+> **Status: 10 VERIFIED, 0 BLOCKED.** Every package builds cleanly in the
+> Fedora Rawhide container (`manifest.yaml` status `verified`), driven by
+> `build-rpm-in-ci.sh` — the same path the CI `rpm-build` job runs.
 
 ## Layout
 
 - `manifest.yaml` — machine-readable record of every package: repo, language,
-  build command, license, upstream reference, and verification status.
-- `build-rpm.sh <pkg>` — helper that runs `rpmbuild`/`mock` for one package.
+  build command, license, upstream reference, version, and verification status.
+- `build-rpm.sh <pkg>` — builds one package with `rpmbuild` (optionally via
+  `mock`).
+- `build-rpm-in-ci.sh [pkg...]` — builds all `verified` packages (or the
+  listed ones when given args, with `FORCE=1` to verify unlisted specs) inside
+  an already-running Fedora container; this is the CI `rpm-build` job.
 - `<pkg>/<pkg>.spec` — one SPEC per package.
 
-## How to build
+## How to build locally
 
-Prereqs (Fedora):
-
-```sh
-sudo dnf install -y rpm-build rpmdevtools mock
-```
-
-Build one package (from the repo root):
+Prereqs (Fedora, non-root in this case): the build scripts run inside a
+`fedora:rawhide` container via podman.
 
 ```sh
-bash fedora/rpm/build-rpm.sh omacalc
+# one package (inside an interactive rawhide container)
+FEDORA=1 bash fedora/rpm/build-in-container.sh tensaku
+
+# everything, exactly like CI (inside the container):
+#   dnf -y install rpm-build dnf-plugins-core python3-pyyaml
+#   dnf -y copr enable nett00n/hyprland   # gtk4-layer-shell-devel for the share-picker
+#   bash /work/fedora/rpm/build-rpm-in-ci.sh
 ```
 
-Or all of them (those with `status: ready`):
+## The 10 packages
 
-```sh
-bash fedora/rpm/build-rpm.sh --all
-```
-
-Packages flagged `status: blocked` (bad toolchain/nightly Zig/archived) in
-`manifest.yaml` are skipped until real verification unblocks them.
-
-## The 13 packages
-
-| Package | Repo | Lang/build | License | Status |
-|---------|------|-----------|---------|--------|
-| aether | omacom/aether | Go + Wails (prebuilt release) | MIT | blocked |
-| asdcontrol | nikosdion/asdcontrol | C++ / make | GPL-2.0 | blocked |
-| cliamp | bjarneo/cliamp | Go / CGO | MIT | blocked |
-| herdr | omacom-io/herdr (fork) | Rust / pinned Zig 0.15 | Apache-2.0 | blocked |
-| hyprland-preview-share-picker | WhySoBad/... | Rust / nightly | MIT | blocked |
+| Package | Repo | Build | License | Status |
+|---------|------|-------|---------|--------|
+| aether | omacom/aether | prebuilt-repack | MIT | verified |
+| cliamp | bjarneo/cliamp | prebuilt-repack | MIT | verified |
+| herdr | herdrdev/herdr | prebuilt-repack | Apache-2.0 | verified |
+| hyprland-preview-share-picker | WhySoBad/… | cargo (stable Rust) | MIT | verified |
 | omacalc | omacom/omacalc | Qt6 / qmake6 | MIT | verified |
 | omacut | omacom/omacut | Qt6 / qmake6 | MIT | verified |
-| omarchy-nvim | omacom/omarchy-pkgs | config + LazyVim cache | MIT | blocked |
 | omawrite | omacom/omawrite | Qt6 / qmake6 | MIT | verified |
-| tensaku | jondkinney/tensaku | Rust / GTK4 | MPL-2.0 | blocked |
+| tensaku | jondkinney/tensaku | prebuilt-tarball repack | MPL-2.0 | verified |
 | tobi-try | tobi/try | Ruby gem | MIT | verified |
-| ttfx | omacom/ttfx | Rust / cargo | MIT | verified |
-| usage | omacom/omarchy (in-tree) | Python | MIT | blocked |
+| ttfx | omacom/ttfx | cargo | MIT | verified |
 
-## Why some are "blocked"
+### Dropped from RPM scope (were in the original 13)
 
-Feasibility was researched in `fedora/rpm/manifest.yaml`. Several need a
-non-trivial toolchain that Fedora doesn't ship cleanly:
+These are intentionally **not** RPMs here:
 
-- **aether** — best matched by vendoring the upstream prebuilt release binary
-  (which is exactly what Omarchy's own Arch PKGBUILD does) rather than
-  compiling the Wails toolchain; needs a binary-repackaging spec + WebKitGTK.
-- **herdr** — requires a **pinned Zig 0.15 toolchain** (`cargo build --frozen
-  --release` with Zig linker) not packaged in Fedora; vendor the Zig fetch or
-  use a prebuilt.
-- **hyprland-preview-share-picker** — requires **nightly Rust** + vendored
-  `hyprland-protocols` submodule; needs a rust-toolchain wrapper in mock.
-- **tensaku** — GTK4/libadwaita/relm4 with `gtk4-layer-shell`; verify libdevel
-  availability.
-- **asdcontrol** — archived (Aug 2025), Apple-display-specific; likely dropped
-  for most hardware.
-- **cliamp** — Go/CGO with ALSA audio deps; verify libdevel names.
-- **omarchy-nvim** — assembles a ~116 MiB LazyVim cache via headless `nvim`
-  sync; the source is an in-tree config assembly, not a standalone repo.
-- **usage** — source lives in the omarchy monorepo; needs a bundled source
-  tarball before it can be a standalone RPM.
+- **asdcontrol** (nikosdion/asdcontrol) — upstream archived Aug 2025,
+  Apple Studio Display hardware only.
+- **omarchy-nvim** (omacom/omarchy-pkgs) — assembles a ~116 MiB LazyVim cache
+  via an in-tree config/headless-nvim sync; not a standalone source RPM.
+- **usage** — shipped in-tree by the base fetch: `upstream/bin/omarchy-agent-
+  usage-*` plus `upstream/shell/plugins/agents/usage/`, and `install_omarchy_bin`
+  already symlinks every `bin/omarchy-*`. An RPM would file-conflict with the
+  base install.
 
-The five **verified** packages (omacalc, omacut, omawrite, ttfx, try) are
-built in CI. The rest need toolchain/assembly work before they'll build.
+## Build notes (the four repacks)
+
+- **aether / cliamp / herdr** — upstream ships a single prebuilt release
+  binary (`*-linux-amd64` / `*-linux-x86_64`), which is exactly what Omarchy's
+  Arch PKGBUILDs install; the specs repackage the release asset plus the
+  desktop/icon/license bits. `%global debug_package %{nil}` because the
+  prebuilt ELF carries no DWARF. `herdr` uses `herdrdev/herdr` release assets
+  (the `omacom-io/herdr` fork has tags but no release binaries).
+- **tensaku** — the `tensaku-v0.28.0-x86_64.tar.gz` release ships the full
+  install tree (`bin/` + `share/` with desktop, hicolor svg, man page,
+  completions, and MPL licenses), so the spec just stage-extracts it into the
+  buildroot with `tar --strip-components=1`.
+- **hyprland-preview-share-picker** — compiles from source on **stable Fedora
+  Rust** (no nightly needed); the empty git-submodule placeholder
+  `lib/hyprland-protocols` is replaced with the pinned commit from
+  `Source1`. Requires `gtk4-layer-shell-devel` from the `nett00n/hyprland`
+  COPR — enable it as a build-repo in COPR for this package.
 
 ## Verification checklist before a package is "verified"
 
@@ -94,4 +88,8 @@ built in CI. The rest need toolchain/assembly work before they'll build.
 - [ ] `%files` matches real build output (no missing/unpackaged files)
 - [ ] Runtime deps (WebKitGTK, Qt6, ffmpeg, gtk4-layer-shell, etc.) correct
 - [ ] License `%license` file packaged
-- [ ] Symlinked `/usr/bin/<name>` resolves; smoke-test the binary
+- [ ] `%{_bindir}/<name>` resolves; smoke-test the binary
+
+Packages that previously sat as `blocked` stubs (aether, cliamp, herdr,
+tensaku, share-picker) have been rewritten as working specs and their prior
+`%OT VERIFY:` risk comments are resolved in `manifest.yaml`.

@@ -142,6 +142,23 @@ omarchy_fedora_install_applications() {
   omarchy_fedora_install_list "$PACKAGES_DIR/applications.txt" || return 1
 }
 
+# Install the first-party Omarchy binaries from the whelanh/omarchy COPR
+# (aether, cliamp, herdr, hyprland-preview-share-picker, omacalc, omacut,
+# omawrite, tensaku, tobi-try, ttfx). Requires the COPR enabled (install.sh
+# does this in install_repos). The 10 are `source: copr` in packages.yaml;
+# resolve.py --copr whelanh/omarchy emits the exact install set.
+omarchy_fedora_install_firstparty() {
+  local -a firstparty=()
+  while IFS= read -r p; do [ -n "$p" ] && firstparty+=("$p"); done \
+    < <(python3 "$RESOLVE" --copr whelanh/omarchy)
+  if (( ${#firstparty[@]} == 0 )); then
+    echo "omarchy: no first-party packages resolved from whelanh/omarchy" >&2
+    return 0
+  fi
+  omarchy_pkg_install "${firstparty[@]}" || return 1
+  return 0
+}
+
 # Install optional packages by category name (e.g. gaming, notes).
 omarchy_fedora_install_optional() {
   local which="$1"; shift

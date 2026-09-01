@@ -12,7 +12,7 @@ human-readable summary. Classifications:
 - `FEDORA_RPMFUSION` — via RPM Fusion
 - `FEDORA_FLATPAK` — best via Flathub
 - `FEDORA_SUBSTITUTE` — same functionality, different package name
-- `BUILD_FROM_SOURCE` — Omarchy first-party, must build RPM from source
+- `FIRST_PARTY` — Omarchy first-party, shipped as RPMs from `whelanh/omarchy` COPR
 - `NOT_AVAILABLE` — no reasonable Fedora equivalent
 - `NOT_REQUIRED` — Arch-only tooling to drop
 
@@ -22,14 +22,13 @@ human-readable summary. Classifications:
 for each classification. Static tests verify every upstream base package is
 mapped.
 
-## Summary counts (from packages.yaml, 206 entries)
+## Summary counts (from packages.yaml, 199 entries)
 
 | Classification | ~Count |
 |---|---|
 | fedora (official) | ~120 |
 | substitute | ~30 |
-| copr | ~11 |
-| build (first-party) | 13 |
+| copr | ~11 + 10 first-party |
 | unavailable | ~19 |
 | drop (Arch-only) | ~8 |
 | rpmfusion | ~8 |
@@ -54,30 +53,37 @@ Arch's custom kernels (`linux-ptl`, `linux-t2`) and `linux-headers` have no
 direct analog: Fedora uses the stock `kernel` and `kernel-devel`. Limine and
 mkinitcpio are replaced by Fedora's GRUB2/systemd-boot and dracut.
 
-### First-party Omarchy binaries (BUILD_FROM_SOURCE)
-13 Omarchy packages (`aether`, `asdcontrol`, `cliamp`, `herdr`,
-`hyprland-preview-share-picker`, `omacalc`, `omacut`, `omawrite`,
-`omarchy-nvim`, `tensaku`, `tobi-try`, `ttfx`, `usage`) must be rebuilt or
-repacked as Fedora RPMs. Scaffolding lives in `fedora/rpm/`: one SPEC per
-package plus a `manifest.yaml` (repo, build system, license, status) and build
-helpers.
+### First-party Omarchy binaries (FIRST_PARTY, COPR `whelanh/omarchy`)
+10 Omarchy packages (`aether`, `cliamp`, `herdr`, `hyprland-preview-share-picker`,
+`omacalc`, `omacut`, `omawrite`, `tensaku`, `tobi-try → try`, `ttfx`) are
+source-built or repacked as Fedora RPMs. Specs live in `fedora/rpm/` (one SPEC
+per package) with a `manifest.yaml` (repo, build system, license, status) and
+publish tooling in `fedora/rpm/copr/`.
 
-**Status — 5 verified, 8 blocked.** Five packages now build successfully in a
-Fedora Rawhide container and are auto-built by CI:
+**Status — 10 verified, 0 blocked.** Every package builds cleanly in a Fedora
+Rawhide container and is published from the `whelanh/omarchy` COPR. The
+default installer enables that COPR and installs the set (disable with
+`install.sh --no-firstparty`).
 
 | Package | Version | Notes |
 |---------|---------|-------|
+| aether | v4.29.8 | Go/Wails, repacked release binary |
+| cliamp  | v1.63.2 | Go/CGO, repacked release binary |
+| herdr   | v0.8.2 | Rust, repacked release binary (herdrdev/herdr) |
+| hyprland-preview-share-picker | v0.2.1 | Rust/GTK4, source-built |
 | omacalc | v0.2.2 | Qt6/qmake6 |
 | omacut  | v0.4.0 | Qt6/qmake6 + ffmpeg |
 | omawrite| v0.5.0 | Qt6/qmake6 |
-| ttfx    | v0.3.2 | pure Rust/cargo |
+| tensaku | v0.28.0 | repacked release tarball (GTK4) |
 | try (tobi-try) | v1.10.1 | Ruby gem |
+| ttfx    | v0.3.2 | pure Rust/cargo |
 
-The remaining 8 are `blocked` in `fedora/rpm/manifest.yaml`: `omarchy-nvim` and
-`usage` need in-tree source assembly (LazyVim cache / monorepo files, not a
-standalone repo), and `aether`, `herdr`, `hyprland-preview-share-picker`,
-`tensaku`, `cliamp`, `asdcontrol` need extra toolchain or repack work (pinned
-Zig, nightly Rust, archived upstream, etc.). See `fedora/rpm/README.md`.
+Dropped from RPM scope (were in the original 13): `asdcontrol` (archived
+upstream, Apple-display-only), `omarchy-nvim` (in-tree LazyVim cache
+assembly), and `usage` (already shipped in-tree by the base install — an RPM
+would file-conflict). Rationale in `fedora/rpm/README.md`.
+`hyprland-preview-share-picker` needs `gtk4-layer-shell-devel`, which the
+COPR pulls from the `nett00n/hyprland` build repo.
 
 ## Omarchy CLI / plugin commands on Fedora
 
@@ -92,19 +98,17 @@ session — no package manager. The installer wires them onto PATH by symlinking
 Caveats:
 - `omarchy plugin enable/disable` talk to the running shell via
   `omarchy-shell shell enablePlugin`, so Quickshell must be running.
-- The 13 first-party binary packages are scaffolded under `fedora/rpm/`; 5 are
-  `verified` (built in CI) and 8 are `blocked`. None are installed by the
-  default installer yet, so commands backed by those binaries are unavailable
-  until the RPMs are built and installed.
+- The 10 first-party binary packages are built and published from the
+  `whelanh/omarchy` COPR and installed by the default installer
+  (`--no-firstparty` to skip); all are `verified` in `fedora/rpm/manifest.yaml`.
 - `gum` and `git-delta` were added to `fedora/packages/base.txt` as
   dependencies of the CLI layer.
 
 ## Known incompatibilities / open work
 
-1. **First-party RPM packaging (in progress)** — 13 Omarchy binaries scaffolded
-   under `fedora/rpm/`; 5 `verified` (omacalc, omacut, omawrite, ttfx, try),
-   8 `blocked` (see above). A CI job builds the verified set in a Fedora
-   Rawhide container. Not yet installed by the default installer.
+1. **First-party RPM packaging (done)** — 10 Omarchy binaries built + published
+   from the `whelanh/omarchy` COPR (`fedora/rpm/`, see `fedora/rpm/copr/`).
+   Installed by the default installer. CI re-verifies the specs on push.
 2. **libalpm hooks / "update guard"** — Arch's pacman PreTransaction guard that
    forces updates through `omarchy update` has no dnf equivalent; dropped.
 3. **UFW vs firewalld** — upstream default firewall is UFW. Fedora defaults to

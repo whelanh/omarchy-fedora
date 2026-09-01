@@ -65,10 +65,10 @@ sudo systemctl reboot
 
 The installer is **idempotent** — running it again is safe.
 
-> Note: Omarchy's first-party packages (aether, asdcontrol, cliamp, herdr,
-> omacalc, omacut, omawrite, omarchy-nvim, tensaku, ttfx, usage) must still be
-> built as Fedora RPMs (`BUILD_FROM_SOURCE`). The installer installs the
-> vendored desktop tree but not yet those binaries.
+> Note: Omarchy's first-party binaries (aether, cliamp, herdr,
+> hyprland-preview-share-picker, omacalc, omacut, omawrite, tensaku, try, ttfx)
+> are built as Fedora RPMs and installed from the `whelanh/omarchy` COPR by the
+> installer (see `fedora/rpm/copr/README.md`). Pass `--no-firstparty` to skip.
 
 ## Documentation
 

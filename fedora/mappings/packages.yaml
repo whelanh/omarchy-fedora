@@ -19,74 +19,85 @@
 # commented with the compatibility rationale.
 
 packages:
-  # --- Omarchy "first-party" runtimes rebuilt/repacked as Fedora RPMs ---
-  # Each maps to a scaffold spec under fedora/rpm/. status in
-  # fedora/rpm/manifest.yaml reflects build feasibility (PENDING-VERIFY).
+  # --- Omarchy "first-party" binaries, shipped from the whelanh/omarchy COPR ---
+  # Each maps to a SPEC under fedora/rpm/ (status in fedora/rpm/manifest.yaml;
+  # build + publish tooling in fedora/rpm/copr/). Fedora official does not ship
+  # these; they are source-built or repacked as Fedora RPMs.
   aether:
     package: aether
-    source: build
+    source: copr
+    repository: whelanh/omarchy
     rpm: fedora/rpm/aether/aether.spec
-    note: Desktop theming (wallpaper colour); Go/Wails, best repacked as prebuilt release binary.
-  asdcontrol:
-    package: asdcontrol
-    source: build
-    rpm: fedora/rpm/asdcontrol/asdcontrol.spec
-    note: Apple display brightness (archived upstream); likely drop on Fedora.
+    note: Desktop theming (wallpaper colour); Go/Wails, repacked as prebuilt release binary.
   cliamp:
     package: cliamp
-    source: build
+    source: copr
+    repository: whelanh/omarchy
     rpm: fedora/rpm/cliamp/cliamp.spec
-    note: Terminal music player; Go/CGO with ALSA deps.
+    note: Terminal music player; Go/CGO with ALSA deps, repacked from release binary.
   herdr:
     package: herdr
-    source: build
+    source: copr
+    repository: whelanh/omarchy
     rpm: fedora/rpm/herdr/herdr.spec
-    note: AI-agent workspace manager; Rust needs pinned Zig toolchain.
+    note: AI-agent workspace manager; Rust, repacked from herdrdev/herdr release binary.
   hyprland-preview-share-picker:
     package: hyprland-preview-share-picker
-    source: build
+    source: copr
+    repository: whelanh/omarchy
     rpm: fedora/rpm/hyprland-preview-share-picker/hyprland-preview-share-picker.spec
-    note: Rust GTK4 share picker; needs nightly Rust + vendored hyprland-protocols.
+    note: Rust GTK4 share picker; source-built on stable Rust, vendored hyprland-protocols.
   omacalc:
     package: omacalc
-    source: build
+    source: copr
+    repository: whelanh/omarchy
     rpm: fedora/rpm/omacalc/omacalc.spec
-    note: Calculator; Qt6/qmake6, easiest build of the set.
+    note: Calculator; Qt6/qmake6.
   omacut:
     package: omacut
-    source: build
+    source: copr
+    repository: whelanh/omarchy
     rpm: fedora/rpm/omacut/omacut.spec
     note: Video length trimmer; Qt6/qmake6, needs qt6-multimedia + ffmpeg.
-  omarchy-nvim:
-    package: omarchy-nvim
-    source: build
-    rpm: fedora/rpm/omarchy-nvim/omarchy-nvim.spec
-    note: Neovim config + LazyVim cache; seeds /etc/skel, largest package.
   omawrite:
     package: omawrite
-    source: build
+    source: copr
+    repository: whelanh/omarchy
     rpm: fedora/rpm/omawrite/omawrite.spec
     note: Markdown editor; Qt6/qmake6 with quickcontrols2.
   tensaku:
     package: tensaku
-    source: build
+    source: copr
+    repository: whelanh/omarchy
     rpm: fedora/rpm/tensaku/tensaku.spec
-    note: Screenshot annotator (Satty fork); Rust/GTK4 layer-shell.
+    note: Screenshot annotator (Satty fork); repacked from release tarball tree.
   tobi-try:
-    package: tobi-try
-    source: build
+    package: try
+    source: copr
+    repository: whelanh/omarchy
     rpm: fedora/rpm/tobi-try/tobi-try.spec
-    note: Ephemeral workspace manager; Ruby gem (try-cli).
+    note: Ephemeral workspace manager; Ruby gem try-cli. dnf name is `try`.
   ttfx:
     package: ttfx
-    source: build
+    source: copr
+    repository: whelanh/omarchy
     rpm: fedora/rpm/ttfx/ttfx.spec
-    note: Terminal text-effects engine; pure Rust/cargo, easy build.
+    note: Terminal text-effects engine; pure Rust/cargo.
+
+  # Dropped from RPM scope (were part of the original 13). Classified so the
+  # upstream base package list still resolves; see fedora/rpm/README.md.
+  asdcontrol:
+    package: null
+    source: drop
+    note: Upstream archived Aug 2025, Apple Studio Display only; not on Fedora.
+  omarchy-nvim:
+    package: null
+    source: drop
+    note: In-tree LazyVim cache assembly, not a standalone RPM.
   usage:
-    package: usage
-    source: build
-    rpm: fedora/rpm/usage/usage.spec
-    note: Model-usage bar widget + Python collectors (in-tree in omarchy).
+    package: null
+    source: drop
+    note: Shipped in-tree by the base install; an RPM would file-conflict.
 
   # --- Fedora official (same or near-identical name) ---
   alsa-utils:            { package: alsa-utils, source: fedora }
