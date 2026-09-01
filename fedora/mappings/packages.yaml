@@ -194,8 +194,13 @@ packages:
     note: Fedora names the client library mariadb-connector-c
   mise-bin:
     package: mise
-    source: fedora
-    note: mise is packaged in Fedora; no separate -bin needed
+    source: external-repo
+    repository: mise
+    note: >
+      mise (runtime version manager) is required by Omarchy tooling
+      (omarchy-default-agent / omarchy-install-dev-env) but is NOT in Fedora
+      official. Shipped via the upstream mise RPM repo (mise.jdx.dev/rpm), see
+      fedora/mappings/repositories.yaml. binary `mise`; Fedora has no -bin split.
   mpv:                   { package: mpv, source: fedora }
   mpv-mpris:             { package: mpv-mpris, source: fedora }
   nautilus:              { package: nautilus, source: fedora }

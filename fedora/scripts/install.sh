@@ -161,6 +161,11 @@ install_repos() {
     omarchy_fedora_enable_optional_coprs whelanh/omarchy \
       || die "failed to enable whelanh/omarchy COPR"
   fi
+  # mise (runtime version manager, used by omarchy-default-agent and
+  # omarchy-install-dev-env) is NOT in Fedora official; enable its upstream
+  # RPM repo. Required so `mise` in base.txt resolves.
+  omarchy_fedora_enable_external_repo "https://mise.jdx.dev/rpm/mise.repo" \
+    || die "failed to enable the mise RPM repository"
   if [ "$NVIDIA" = 1 ]; then
     omarchy_fedora_enable_rpmfusion || die "failed to enable RPM Fusion"
   fi

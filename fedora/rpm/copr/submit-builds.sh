@@ -27,6 +27,14 @@ need() { command -v "$1" >/dev/null 2>&1 || { echo "missing required tool: $1" >
 need rpmbuild
 need python3
 
+# resolve the RPM Name from a spec (mirrors install-rpms.sh)
+spec_name() {
+  python3 - "$1" <<'PY'
+import re,sys
+print(re.search(r'^Name:\s*(\S+)', open(sys.argv[1]).read(), re.M).group(1))
+PY
+}
+
 for a in "$@"; do
   [ "$a" = "--srpms-only" ] && SUBMIT=0
 done
@@ -79,8 +87,9 @@ for m in re.finditer(r'^Source\d*:\s*(\S+)',spec,re.M):
         print('fetching',u); urllib.request.urlretrieve(u,fn)
 PY
 )
+  rpm_name="$(spec_name "$spec")"
   rpmbuild --define "_topdir $TOP" -bs "$spec" || { echo "SRPM build failed: $pkg" >&2; exit 1; }
-  SRPMS+=("$TOP/SRPMS/${pkg}"*)
+  SRPMS+=("$TOP/SRPMS/${rpm_name}"*)
 done
 
 [ -n "${SRPMS[*]}" ] || { echo "no SRPMs produced" >&2; exit 1; }

@@ -62,6 +62,36 @@ omarchy_fedora_enable_optional_coprs() {
   done
 }
 
+# Fetch and enable an external RPM repo (a URL to a .repo file) via
+# `dnf config-manager --add-repo`. Used for repos that are neither Fedora
+# official nor COPR (currently: the upstream mise RPM repo). Idempotent.
+omarchy_fedora_enable_external_repo() {
+  local url="$1"
+  local repo_name repo_file
+  repo_name="$(basename "${url%%.repo*}")"
+  repo_file="/etc/yum.repos.d/${repo_name}.repo"
+  if [ -f "$repo_file" ]; then
+    echo "omarchy: external repo already configured: $repo_name"
+    return 0
+  fi
+  if ! command -v dnf >/dev/null 2>&1; then
+    echo "omarchy: dnf not found" >&2
+    return 1
+  fi
+  echo "omarchy: adding external repo: $url"
+  # --add-repo fetches the .repo, enables it, and (for a fetch) installs the
+  # repo GPG key; the URL is pinned to a trusted upstream in repositories.yaml.
+  _omarchy_dnf config-manager --add-repo "$url" || return 1
+  # sanity: the fetched repo file must actually contain a baseurl, so we don't
+  # silently add an empty/broken repo.
+  if ! grep -q '^\s*baseurl\s*=' "$repo_file"; then
+    echo "omarchy: fetched repo $repo_file has no baseurl; removing it" >&2
+    rm -f "$repo_file"
+    return 1
+  fi
+  return 0
+}
+
 # Enable RPM Fusion (free + nonfree) via official release RPMs. Idempotent.
 omarchy_fedora_enable_rpmfusion() {
   local rel

@@ -48,6 +48,7 @@ libyaml
 man-db
 mpv
 mpv-mpris
+mise
 NetworkManager
 pamixer
 plocate

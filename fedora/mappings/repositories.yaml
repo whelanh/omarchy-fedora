@@ -159,3 +159,26 @@ repositories:
     note: >
       Container-verified end-to-end (all 10 built green on fedora:rawhide via
       fedora/rpm/build-rpm-in-ci.sh).
+
+  mise:
+    kind: external-repo
+    mandatory: true
+    enable: dnf config-manager --add-repo https://mise.jdx.dev/rpm/mise.repo
+    packages:
+      - mise
+    why_not_official: >
+      mise (universal dev-environment / runtime version manager) is required
+      by the Omarchy shell: `omarchy-default-agent` uses `mise use -g` to
+      install opening agents (opencode/claude/etc.) from the shell menu, and
+      `omarchy-install-dev-env` manages node/ruby/python/go/etc. through it.
+      mise is NOT packaged in Fedora official (packages.fedoraproject.org
+      returns 404 for both 'mise' and 'mise-bin'). The upstream official RPM
+      repo (https://mise.jdx.dev/rpm) is what mise documents.
+    trust: >
+      Official mise upstream repo, distributed on GitHub Pages at
+      mise.jdx.dev, signed with a gpg key shipped over TLS (gpgcheck=1). The
+      .repo file is validated before use.
+    optional: false
+    note: >
+      Enabled with `dnf config-manager --add-repo` (not a COPR) because mise
+      only publishes to its own RPM repo.
