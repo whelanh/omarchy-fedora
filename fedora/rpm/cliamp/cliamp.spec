@@ -4,8 +4,8 @@
 # Repack of the upstream release binary (cliamp-linux-amd64), mirroring the
 # Arch PKGBUILD's package layout. No Go toolchain needed.
 Name:           cliamp
-Version:        2.0.0
-Release:        2%{?dist}
+Version:        2.0.1
+Release:        1%{?dist}
 Summary:        A retro terminal music player inspired by Winamp 2.x
 
 License:        MIT
@@ -41,6 +41,9 @@ install -Dm644 LICENSE %{buildroot}%{_datadir}/licenses/%{name}/LICENSE
 %{_datadir}/pixmaps/cliamp.png
 
 %changelog
+* Wed Sep 02 2026 whelanh <brickhousedevelopers@gmail.com> - 2.0.1-1
+- Update to upstream v2.0.1 (prebuilt cliamp-linux-amd64 repack
+
 * Tue Sep 01 2026 whelanh <brickhousedevelopers@gmail.com> - 2.0.0-2
 - Use ffmpeg-free (Fedora official) and drop stale CGO deps (flac/libvorbis/libogg not linked)
 
