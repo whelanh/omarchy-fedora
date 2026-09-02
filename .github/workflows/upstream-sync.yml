@@ -1,8 +1,9 @@
 name: upstream-sync
 
 # Periodically checks upstream omacom/omarchy `quattro` for changes and, when
-# the Fedora layer is unaffected (SAFE classification), creates a PR that
-# refreshes the vendored subtree. Releases do not deploy automatically.
+# there are real changes and the Fedora layer is unaffected (SAFE
+# classification), opens a DRAFT PR that refreshes the vendored subtree. No PR
+# is opened when upstream is unchanged. Releases do not deploy automatically.
 
 on:
   schedule:
@@ -34,22 +35,48 @@ jobs:
       - name: Fetch upstream quattro
         run: git fetch upstream quattro
 
+      - name: Record current HEAD
+        id: base
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
       - name: Attempt subtree pull
         id: pull
         continue-on-error: true
         run: |
           git subtree pull --prefix upstream --squash upstream quattro \
             -m "chore(upstream): sync Omarchy quattro"
-        # If this fails, a conflict occurred -> manual review required.
+        # On conflict this fails -> outcome 'failure' -> issue opened below.
+
+      - name: Detect changes
+        id: changes
+        if: steps.pull.outcome == 'success'
+        run: |
+          if [ "$(git rev-parse HEAD)" != "${{ steps.base.outputs.sha }}" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Set up Python
+        if: steps.changes.outputs.changed == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install PyYAML
+        if: steps.changes.outputs.changed == 'true'
+        run: pip install pyyaml
 
       - name: Run static tests
+        if: steps.changes.outputs.changed == 'true'
         run: bash fedora/tests/static.sh
 
       - name: Create sync PR
-        if: steps.pull.outputs.continue-on-error == 'false' || steps.pull.outcome == 'success'
+        if: steps.changes.outputs.changed == 'true'
         uses: peter-evans/create-pull-request@v6
         with:
           branch: upstream-sync
+          draft: true
           title: 'chore(upstream): sync Omarchy quattro'
           commit-message: 'chore(upstream): sync Omarchy quattro'
           body: |
@@ -59,7 +86,7 @@ jobs:
             - Static tests: see job status
             - The vendored `upstream/` subtree has been refreshed.
 
-            Manual review is required before merge.
+            Opened as a draft — review and mark it ready when you approve it.
           delete-branch: true
 
       - name: Open issue when manual intervention required
