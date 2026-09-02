@@ -24,7 +24,7 @@ Omarchy.**
 > Fedora Sway Rawhide system).  Most/many features work and
 > the Super keys act as expected.  The update process has also been
 > tested.  However, there are no doubt still some
-> things still to be ironed out.  Bug reports are welcome.
+> things to be ironed out.  Bug reports are welcome.
 
 <img width="1267" height="790" alt="screenshot-2026-09-02_12-59-51" src="https://github.com/user-attachments/assets/9e159b6e-e4f6-401c-8eaf-4c9fc7a546e7" />
 <img width="1273" height="790" alt="screenshot-2026-09-02_12-54-14" src="https://github.com/user-attachments/assets/ac7628ed-43a5-4a23-b6a5-a9b1dc451a22" />
