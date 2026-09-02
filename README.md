@@ -18,11 +18,17 @@ Omarchy.**
 
 ## Status
 
-> **IN DEVELOPMENT.** This is the initial scaffold. The installer
-> (`fedora/scripts/install.sh`) and package mapping exist and pass static
-> tests, but have not yet been validated on a live Fedora system. See
-> `docs/ARCH_SPECIFIC_INVENTORY.md` and `QUATTRO_FEATURES.md` for what is
-> done and what remains.
+> **IN DEVELOPMENT.** This has been successfully run on VirtManager VMs
+> that start with the latest nightly Fedora Sway Rawhide image.  It has
+> also been successfully deployed on an Asus ROG laptop (also starting from
+> Fedora Sway Rawhide system).  Most/many features work and
+> the Super keys act as expected.  The update process has also been
+> tested.  However, there are no doubt still some
+> things still to be ironed out.  Bug reports are welcome.
+
+<img width="1267" height="790" alt="screenshot-2026-09-02_12-59-51" src="https://github.com/user-attachments/assets/9e159b6e-e4f6-401c-8eaf-4c9fc7a546e7" />
+<img width="1273" height="790" alt="screenshot-2026-09-02_12-54-14" src="https://github.com/user-attachments/assets/ac7628ed-43a5-4a23-b6a5-a9b1dc451a22" />
+<img width="1257" height="787" alt="screenshot-2026-09-02_12-53-20" src="https://github.com/user-attachments/assets/21a8025e-a1e6-4c9c-be45-7585eb118344" />
 
 ## Supported target
 
