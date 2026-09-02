@@ -764,17 +764,25 @@ configure_user() {
   local as_user
   if (( EUID == 0 )); then as_user="runuser -u $user --"; else as_user="sudo -u $user"; fi
   if [ -d "$hd" ]; then
-    $as_user cp -a "$hd"/. "$home/" 2>/dev/null || true
+    $as_user cp -a -n "$hd"/. "$home/" 2>/dev/null || true
   fi
 
   # Seed the Omarchy user configs (~/.config) from the vendored upstream
   # config/ tree: hypr/hyprland.lua is what Hyprland 0.55+ loads by default
   # and it bootstraps the whole Omarchy desktop (binds, autostart, shell).
   # Without this seed the session entry would boot stock Hyprland instead.
+  #
+  # -n (--no-clobber) means we only place files the user does not already have,
+  # so `omarchy update` (which re-runs `install.sh --update`) never overwrites
+  # user edits such as the bar layout in ~/.config/omarchy/shell.json. This
+  # mirrors upstream, where existing users resync individual files explicitly
+  # via `omarchy refresh <config>` rather than having ~/.config clobbered.
+  # New files shipped upstream still land on the user's system, and future
+  # users get a full copy via /etc/skel below.
   local cfg_src="$UPSTREAM/config"
   if [ -d "$cfg_src" ]; then
     $as_user mkdir -p "$home/.config"
-    $as_user cp -a "$cfg_src"/. "$home/.config/" 2>/dev/null || true
+    $as_user cp -a -n "$cfg_src"/. "$home/.config/" 2>/dev/null || true
     # Seed /etc/skel so future users get the same desktop.
     if (( EUID == 0 )); then
       mkdir -p /etc/skel/.config
