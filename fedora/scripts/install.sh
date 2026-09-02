@@ -514,6 +514,119 @@ EOF
   fi
 }
 
+# Upstream's bin/omarchy-pkg-* family (add, drop, missing, present, install,
+# remove, aur-*) is a pacman/yay wrapper and fails on Fedora with "pacman:
+# command not found". These commands are called by nearly every `omarchy
+# install service|app|game|browser ...` flow (including the Tailscale service
+# installer) and by the menu guards (`omarchy-pkg-present tailscale`). Replace
+# the vendored copies with thin dnf/rpm wrappers that source
+# fedora/scripts/lib/pkg.sh (same philosophy as the omarchy-update shim). The
+# wrappers preserve the # omarchy:* metadata so the `omarchy` dispatcher still
+# recognises the commands. The checkout path is embedded at install time;
+# re-run install.sh if you move the checkout.
+install_omarchy_pkg_shims() {
+  [ "$COPY_OMARCHY" = 1 ] || return 0
+  local tree=/usr/share/omarchy/bin
+  [ -d "$tree" ] || { warn "no bin dir at $tree; skipping pkg shims"; return 0; }
+  local pkg_lib="$OMARCHY_ROOT/fedora/scripts/lib/pkg.sh"
+  [ -f "$pkg_lib" ] || { warn "no $pkg_lib; skipping pkg shims"; return 0; }
+
+  log "== Installing omarchy-pkg-* shims (dnf/rpm backend) =="
+
+  local _ps_binary _ps_summary _ps_args _ps_examples _ps_reqsudo _ps_fn
+  _pkg_shim_write() {
+    local dest="$tree/$_ps_binary"
+    if (( EUID == 0 )); then
+      {
+        printf '#!/bin/bash\n\n'
+        printf '# omarchy:summary=%s\n' "$_ps_summary"
+        [ -n "$_ps_args" ] && printf '# omarchy:args=%s\n' "$_ps_args"
+        [ -n "$_ps_examples" ] && printf '# omarchy:examples=%s\n' "$_ps_examples"
+        [ "$_ps_reqsudo" = "true" ] && printf '# omarchy:requires-sudo=true\n'
+        printf '\n'
+        printf '# Fedora-native %s shim (dnf/rpm). Installed by install.sh.\n' "$_ps_binary"
+        printf '# shellcheck disable=SC1091\n'
+        printf '. "%s" || exit 1\n' "$pkg_lib"
+        printf '%s "$@"\n' "$_ps_fn"
+      } > "$dest"
+      chmod +x "$dest"
+    else
+      {
+        printf '#!/bin/bash\n\n'
+        printf '# omarchy:summary=%s\n' "$_ps_summary"
+        [ -n "$_ps_args" ] && printf '# omarchy:args=%s\n' "$_ps_args"
+        [ -n "$_ps_examples" ] && printf '# omarchy:examples=%s\n' "$_ps_examples"
+        [ "$_ps_reqsudo" = "true" ] && printf '# omarchy:requires-sudo=true\n'
+        printf '\n'
+        printf '# Fedora-native %s shim (dnf/rpm). Installed by install.sh.\n' "$_ps_binary"
+        printf '# shellcheck disable=SC1091\n'
+        printf '. "%s" || exit 1\n' "$pkg_lib"
+        printf '%s "$@"\n' "$_ps_fn"
+      } | sudo tee "$dest" >/dev/null
+      sudo chmod +x "$dest"
+    fi
+  }
+
+  _pkg_shim() {
+    _ps_binary="$1"; _ps_summary="$2"; _ps_args="$3"; _ps_examples="$4"; _ps_reqsudo="$5"; _ps_fn="$6"
+    _pkg_shim_write
+  }
+
+  _pkg_shim omarchy-pkg-add \
+    "Install Fedora packages if they are missing" \
+    "<packages...>" \
+    "omarchy pkg add jq ripgrep" \
+    "true" omarchy_pkg_add
+
+  _pkg_shim omarchy-pkg-drop \
+    "Remove all the named packages from the system if they're installed (otherwise ignore)." \
+    "<packages...>" \
+    "" \
+    "true" omarchy_pkg_drop
+
+  _pkg_shim omarchy-pkg-missing \
+    "Returns true if any of the named packages are missing from the system (or false if they're all there)." \
+    "<packages...>" \
+    "" \
+    "false" omarchy_pkg_missing
+
+  _pkg_shim omarchy-pkg-present \
+    "Returns true if all of the named packages are installed on the system (or false if any of them are missing)." \
+    "<packages...>" \
+    "" \
+    "false" omarchy_pkg_present
+
+  _pkg_shim omarchy-pkg-install \
+    "Show a fuzzy-finder TUI for picking new Fedora packages to install." \
+    "" \
+    "" \
+    "true" omarchy_pkg_install_tui
+
+  _pkg_shim omarchy-pkg-remove \
+    "Show a fuzzy-finder TUI for picking packages installed on the system to be removed." \
+    "" \
+    "" \
+    "true" omarchy_pkg_remove_tui
+
+  _pkg_shim omarchy-pkg-aur-add \
+    "Install the named packages from the AUR if they're missing (Fedora: installs from Fedora repos instead)." \
+    "<packages...>" \
+    "" \
+    "false" omarchy_pkg_aur_add
+
+  _pkg_shim omarchy-pkg-aur-install \
+    "Show a fuzzy-finder TUI for picking new AUR packages to install (Fedora: installs from Fedora repos instead)." \
+    "" \
+    "" \
+    "true" omarchy_pkg_aur_install_tui
+
+  _pkg_shim omarchy-pkg-aur-accessible \
+    "Returns true if the AUR is up and available." \
+    "" \
+    "" \
+    "false" omarchy_pkg_aur_accessible
+}
+
 # Upstream's `version` file is stale (it reads 4.0.0.alpha even on the v4.0.2
 # release tag), so derive the real version from the git refs: the latest v* tag
 # plus the current quattro HEAD short sha. Written to /usr/share/omarchy/version
@@ -737,6 +850,7 @@ main() {
   install_omarchy_session
   install_omarchy_bin
   install_omarchy_update_shim
+  install_omarchy_pkg_shims
   install_omarchy_profile
   install_uwsm_app_shim
   install_omarchy_chromium_compat

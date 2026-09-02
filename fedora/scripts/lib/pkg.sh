@@ -195,3 +195,114 @@ omarchy_pkg_repo_enabled() {
   local id="$1"
   dnf repolist --enabled 2>/dev/null | awk '{print $1}' | grep -qx "$id"
 }
+
+# ---------------------------------------------------------------------------
+# omarchy-pkg-* command shims
+# ---------------------------------------------------------------------------
+# These mirror the upstream bin/omarchy-pkg-* command contracts (including
+# their exit-code semantics) on the dnf/rpm backend. install.sh installs thin
+# wrappers at /usr/share/omarchy/bin/omarchy-pkg-* that source this file and
+# dispatch to the functions below, replacing the vendored pacman-based
+# implementations on Fedora without editing anything under upstream/ (same
+# philosophy as the omarchy-update shim).
+
+# omarchy-pkg-missing: 0 (true) if ANY named package is missing, 1 if all present.
+omarchy_pkg_missing() {
+  local pkg
+  for pkg in "$@"; do
+    omarchy_pkg_is_installed "$pkg" || return 0
+  done
+  return 1
+}
+
+# omarchy-pkg-present: 0 (true) if ALL named packages are present, 1 otherwise.
+omarchy_pkg_present() {
+  local pkg
+  for pkg in "$@"; do
+    omarchy_pkg_is_installed "$pkg" || return 1
+  done
+  return 0
+}
+
+# omarchy-pkg-add: install the named packages if missing, then verify.
+omarchy_pkg_add() {
+  omarchy_pkg_install "$@" || return 1
+  local pkg
+  for pkg in "$@"; do
+    if ! omarchy_pkg_is_installed "$pkg"; then
+      printf '\033[31mError: Package '\''%s'\'' did not install\033[0m\n' "$pkg" >&2
+      return 1
+    fi
+  done
+  return 0
+}
+
+# omarchy-pkg-drop: remove the named packages only if installed.
+omarchy_pkg_drop() {
+  omarchy_pkg_remove "$@"
+}
+
+# omarchy-pkg-install: fzf TUI over available dnf packages.
+omarchy_pkg_install_tui() {
+  local fzf_args=(
+    --multi
+    --preview 'dnf info {1}'
+    --preview-label='alt-p: toggle description, alt-j/k: scroll, tab: multi-select'
+    --preview-label-pos='bottom'
+    --preview-window 'down:65%:wrap'
+    --bind 'alt-p:toggle-preview'
+    --bind 'alt-d:preview-half-page-down,alt-u:preview-half-page-up'
+    --bind 'alt-k:preview-up,alt-j:preview-down'
+    --color 'pointer:green,marker:green'
+  )
+
+  local pkg_names
+  pkg_names="$(dnf repoquery --qf '%{name}' 2>/dev/null | sort -u | fzf "${fzf_args[@]}")"
+
+  if [[ -n $pkg_names ]]; then
+    local -a pkgs
+    mapfile -t pkgs <<< "$pkg_names"
+    _omarchy_dnf install -y "${pkgs[@]}" || return 1
+  fi
+  return 0
+}
+
+# omarchy-pkg-remove: fzf TUI over installed dnf packages.
+omarchy_pkg_remove_tui() {
+  local fzf_args=(
+    --multi
+    --preview 'dnf info {1}'
+    --preview-label='alt-p: toggle description, alt-j/k: scroll, tab: multi-select'
+    --preview-label-pos='bottom'
+    --preview-window 'down:65%:wrap'
+    --bind 'alt-p:toggle-preview'
+    --bind 'alt-d:preview-half-page-down,alt-u:preview-half-page-up'
+    --bind 'alt-k:preview-up,alt-j:preview-down'
+    --color 'pointer:red,marker:red'
+  )
+
+  local pkg_names
+  pkg_names="$(rpm -qa --qf '%{NAME}\n' 2>/dev/null | sort -u | fzf "${fzf_args[@]}")"
+
+  if [[ -n $pkg_names ]]; then
+    local -a pkgs
+    mapfile -t pkgs <<< "$pkg_names"
+    _omarchy_dnf remove -y "${pkgs[@]}" || return 1
+  fi
+  return 0
+}
+
+# omarchy-pkg-aur-add: the AUR is Arch-only; on Fedora install from dnf instead.
+omarchy_pkg_aur_add() {
+  omarchy_pkg_add "$@"
+}
+
+# omarchy-pkg-aur-install: the AUR is Arch-only; on Fedora use the dnf TUI.
+omarchy_pkg_aur_install_tui() {
+  omarchy_pkg_install_tui "$@"
+}
+
+# omarchy-pkg-aur-accessible: the AUR does not exist on Fedora.
+omarchy_pkg_aur_accessible() {
+  return 1
+}

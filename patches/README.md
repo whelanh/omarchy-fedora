@@ -25,6 +25,7 @@ Expected removal condition:
 | Area | Upstream mechanism | Fedora implementation | Can be upstreamed? |
 |---|---|---|---|
 | package manager | `pacman`/`yay` (`omarchy-pkg-*`) | `fedora/scripts/lib/pkg.sh` (`omarchy_pkg_*` on dnf/rpm) | Yes — a distro-neutral `omarchy_pkg_*` abstraction |
+| `omarchy-pkg-*` commands (add/drop/missing/present/install/remove/aur-*) | pacman/yay wrappers vendored under `upstream/bin/` | install-time shims written by `install.sh` (`install_omarchy_pkg_shims`) that source `pkg.sh` and dispatch to `omarchy_pkg_*`; leaves `upstream/` untouched | Yes — upstream `omarchy_pkg_*` abstraction would remove the shims entirely |
 | initramfs | mkinitcpio | `fedora/system/dracut/` | Yes — detect dracut vs mkinitcpio |
 | bootloader | Limine | Fedora GRUB2/systemd-boot (not yet wired) | Partial |
 | DKMS cleanup | kernel-modules-hook | akmods (not yet wired) | No — distro-specific |
