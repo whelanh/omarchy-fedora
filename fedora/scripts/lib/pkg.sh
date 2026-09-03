@@ -122,13 +122,19 @@ omarchy_pkg_remove() {
 }
 
 # --- update (refresh metadata) --------------------------------------------
+# --refresh forces a fresh metadata download. dnf5's bare `makecache` honours
+# metadata_expire and can leave a stale cache in place, which made
+# `omarchy update` resolve against old metadata ("Nothing to do") even when the
+# COPR had newer packages (e.g. cliamp 2.0.1).
 omarchy_pkg_update() {
-  _omarchy_dnf makecache
+  _omarchy_dnf --refresh makecache
 }
 
 # --- upgrade (full system upgrade) ----------------------------------------
+# --refresh as a backstop so the upgrade always resolves against current
+# metadata even if the makecache step above was skipped or failed.
 omarchy_pkg_upgrade() {
-  _omarchy_dnf upgrade -y
+  _omarchy_dnf --refresh upgrade -y
 }
 
 # --- enable_repo ----------------------------------------------------------
