@@ -23,6 +23,8 @@ repositories:
     kind: copr
     mandatory: true
     packages:
+      - hyprland
+      - aquamarine
       - hyprland-guiutils
       - hyprpicker
       - hyprsunset
@@ -31,11 +33,12 @@ repositories:
       - xdg-desktop-portal-hyprland
       - gtk4-layer-shell
     why_not_official: >
-      Fedora official repos ship hyprland and quickshell (Rawhide), but the
-      surrounding Hyprland ecosystem (hyprpicker, hyprsunset, uwsm,
-      hyprland-guiutils, xdg-desktop-portal-hyprland, gtk4-layer-shell) is not
-      in official Fedora repos. nett00n/hyprland is the actively-maintained COPR
-      for the full ecosystem as of 2026.
+      The Hyprland runtime (hyprland, aquamarine, hyprpicker, hyprsunset, uwsm,
+      hyprland-guiutils, xdg-desktop-portal-hyprland) is not consistently
+      available in official Fedora Rawhide, and even where an official package
+      exists (quickshell, gtk4-layer-shell) the COPR tracks newer upstream
+      releases. nett00n/hyprland is the actively-maintained COPR for the full
+      ecosystem as of 2026.
     trust: >
       Community-maintained COPR. Packages built on Fedora's COPR infra from
       upstream sources; verified with COPR GPG key and gpgcheck=1. Review the

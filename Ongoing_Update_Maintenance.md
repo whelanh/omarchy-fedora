@@ -110,9 +110,13 @@ COPR first-party.)
 2. In `fedora/rpm/<pkg>/<pkg>.spec`: bump `Version:`, reset `Release:` to `1`,
    and add a `%changelog` entry (or bump `Release:` only if it's a packaging
    fix with no upstream change).
-3. Container-verify: `bash fedora/rpm/build-rpm-in-ci.sh <pkg>`.
-4. Submit: `bash fedora/rpm/copr/submit-builds.sh <pkg>`.
-5. Watch: `copr-cli list-builds whelanh/omarchy --output-format text`.
+3. Update `fedora/rpm/manifest.yaml` for that package: set `version:` (and
+   `deps:`/`note:` if they changed) to match the spec. This is a manual record
+   — nothing auto-syncs it — and `fedora/tests/static.sh` fails if the two
+   drift out of sync.
+4. Container-verify: `bash fedora/rpm/build-rpm-in-ci.sh <pkg>`.
+5. Submit: `bash fedora/rpm/copr/submit-builds.sh <pkg>`.
+6. Watch: `copr-cli list-builds whelanh/omarchy --output-format text`.
 
 ---
 

@@ -280,6 +280,28 @@ install_omarchy_tree() {
        "COPR (see fedora/rpm/copr/README.md)."
 }
 
+# Install the upstream user systemd units (bt-agent, sleep-lock, crash-watch,
+# fcitx5, migrate-notify, recover-internal-monitor, speaker-tuning,
+# tailscale-receive, and the app.slice.d oomd drop-in) into /usr/lib/systemd/user/,
+# mirroring upstream's omarchy-settings PKGBUILD. On a fresh install these units
+# are absent, so omarchy-provision-first-run's "enable user systemd units" step
+# fails on every login, never writes the first-run done marker, and re-shows the
+# "Learn Keybindings" / "Update System" toasts on every boot.
+install_omarchy_user_units() {
+  [ "$COPY_OMARCHY" = 1 ] || return 0
+  local src="$UPSTREAM/default/systemd/user"
+  [ -d "$src" ] || { warn "no user units dir at $src; skipping"; return 0; }
+
+  log "== Installing Omarchy user systemd units =="
+  if (( EUID == 0 )); then
+    mkdir -p /usr/lib/systemd/user
+    cp -a "$src"/. /usr/lib/systemd/user/
+  else
+    sudo mkdir -p /usr/lib/systemd/user
+    sudo cp -a "$src"/. /usr/lib/systemd/user/
+  fi
+}
+
 # Install the login-manager session entry so the greeter (SDDM on the Fedora
 # Sway/companion spins) offers "Omarchy (Hyprland uwsm)" alongside the stock
 # Hyprland sessions. Also install the uwsm env that sources the env-bootstrap
@@ -795,6 +817,23 @@ configure_user() {
     warn "no config tree at $cfg_src; user configs not seeded"
   fi
 
+  # Mark the upstream (Arch-specific) migrations as done in the user's state, so
+  # omarchy-migrate-notify.service (installed with the user units) doesn't nag
+  # about "N pending migrations" on every login. The Fedora port does not run
+  # upstream's pacman-based omarchy-migrate; it runs its own fedora/migrations/
+  # via omarchy_fedora_migrate (state under /var/lib/omarchy-fedora/). This
+  # mirrors upstream's omarchy-provision-user --first-install, which marks every
+  # shipped migration complete on a fresh install.
+  local mig_dir="$home/.local/state/omarchy/migrations"
+  if [ -d "$UPSTREAM/migrations" ]; then
+    $as_user mkdir -p "$mig_dir"
+    local m
+    for m in "$UPSTREAM/migrations"/*.sh; do
+      [ -f "$m" ] || continue
+      $as_user touch "$mig_dir/$(basename "$m")" 2>/dev/null || true
+    done
+  fi
+
   # Enable graphical session for the user.
   warn "User-level Omarchy config (shell, themes) will be provisioned on first login."
 }
@@ -855,6 +894,7 @@ main() {
   install_dracut
   enable_services
   install_omarchy_tree
+  install_omarchy_user_units
   install_omarchy_session
   install_omarchy_bin
   install_omarchy_update_shim

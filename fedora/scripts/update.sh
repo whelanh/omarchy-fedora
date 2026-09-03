@@ -90,9 +90,13 @@ omarchy_fedora_sync_userspace_tarball() {
 }
 
 # 1 + 2 — Fedora packages (incl. first-party COPR RPMs).
+# Best-effort: a package conflict (e.g. a transient COPR ABI mismatch such as a
+# stale fc45 hyprland build) must not block the userspace sync or the Fedora
+# migrations below. Without the || guards, `set -euo pipefail` would abort the
+# entire update here, leaving the userspace stuck on an old snapshot.
 log "Refreshing repository metadata and upgrading Fedora packages..."
-omarchy_pkg_update
-omarchy_pkg_upgrade
+omarchy_pkg_update || warn "dnf makecache failed; continuing"
+omarchy_pkg_upgrade || warn "dnf upgrade failed (package conflicts or a transient repo issue); continuing with the userspace sync"
 
 # 3 + 4 — Omarchy userspace.
 if [ "${OMARCHY_FEDORA_UPDATE_UPSTREAM:-1}" != "1" ]; then

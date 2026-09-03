@@ -150,7 +150,11 @@ packages:
   gvfs-mtp:              { package: gvfs-mtp, source: fedora }
   gvfs-nfs:              { package: gvfs-nfs, source: fedora }
   gvfs-smb:              { package: gvfs-smb, source: fedora }
-  hyprland:              { package: hyprland, source: fedora, note: official in Rawhide (F42+) }
+  hyprland:
+    package: hyprland
+    source: copr
+    repository: nett00n/hyprland
+    note: not in official Rawhide on the current snapshot; ships from the nett00n/hyprland COPR (pulls aquamarine as a dependency)
   imagemagick:
     package: ImageMagick
     source: substitute

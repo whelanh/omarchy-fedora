@@ -26,9 +26,9 @@ packages:
     build: repack-release (upstream ships prebuilt release binary)
     binary: cliamp
     license: MIT
-    deps: [alsa-lib, flac, libvorbis, libogg, ffmpeg, yt-dlp]
+    deps: [alsa-lib, ffmpeg-free, yt-dlp]
     status: verified
-    version: 2.0.0
+    version: 2.0.1
     note: Repack of cliamp-linux-amd64; desktop + Cliamp.png. Container-built OK.
   herdr:
     repo: https://github.com/herdrdev/herdr

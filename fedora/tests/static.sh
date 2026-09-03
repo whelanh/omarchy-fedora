@@ -80,6 +80,17 @@ spec = open('fedora/rpm/$pkg/$pkg.spec').read()
 assert re.search(r'^Name:\\s+\\S+', spec, re.M), 'missing Name'
 assert re.search(r'^\\* [A-Z][a-z]{2} [A-Z][a-z]{2} [0-9]{2} [0-9]{4} whelanh', spec, re.M), 'bad changelog date'
 "
+  # every manifest version must match its spec's Version:. Nothing auto-syncs
+  # manifest.yaml, so a bumped spec with a stale manifest otherwise drifts
+  # silently (check-updates.sh would keep reporting the package OUTDATED).
+  t "manifest/spec version: $pkg" python3 -c "
+import re, yaml
+name = '$pkg'
+spec = open('fedora/rpm/$pkg/$pkg.spec').read()
+m = re.search(r'^Version:\\s*(\\S+)', spec, re.M)
+man = yaml.safe_load(open('fedora/rpm/manifest.yaml'))['packages'][name].get('version')
+assert m and str(m.group(1)) == str(man), 'drift'
+"
 done
 
 echo
