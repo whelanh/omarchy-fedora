@@ -39,11 +39,17 @@ mapped.
 ## Notable decisions (not mechanical renames)
 
 ### Hyprland ecosystem (COPR: `nett00n/hyprland`)
-Fedora Rawhide ships `hyprland` and `quickshell` in official repos. The rest of
-the desktop ecosystem — `hyprland-guiutils`, `hyprpicker`, `hyprsunset`,
+Fedora Rawhide ships `quickshell` (and `gtk4-layer-shell`) in official repos, but
+**not `hyprland` itself** — the compositor is only available from COPR. The full
+desktop ecosystem — `hyprland`, `hyprland-guiutils`, `hyprpicker`, `hyprsunset`,
 `uwsm`, `xdg-desktop-portal-hyprland`, `gtk4-layer-shell` — comes from the
 actively-maintained `nett00n/hyprland` COPR. `solopasha/hyprland` is no longer
 actively maintained (as of 2026).
+
+> Note: nett00n's `hyprland` is built against Fedora Rawhide's Lua 5.5 (Arch
+> targets Lua 5.4). This can surface an upstream Hyprland-vs-Lua-5.5 config
+> loading issue (`require` returning a boolean for some modules); see
+> `fedora/rpm` docs and report against Hyprland upstream if it appears.
 
 ### NVIDIA (RPM Fusion nonfree)
 Arch's `nvidia-*-dkms` + `nvidia-utils` map to Fedora's `akmod-nvidia` +
