@@ -723,7 +723,7 @@ install_omarchy_fonts() {
     warn "no fontconfig alias shipped at $conf_src"
   fi
 
-  if fc-match -f '%{family[0]}' 'JetBrainsMono Nerd Font' 2>/dev/null | grep -qi 'jetbrains'; then
+  if fc-list : family 2>/dev/null | tr ',' '\n' | grep -Fxq 'JetBrainsMono Nerd Font'; then
     log "== JetBrainsMono Nerd Font already present =="
     fc-cache -f >/dev/null 2>&1 || true
     return 0
@@ -755,7 +755,7 @@ install_omarchy_fonts() {
   rm -rf "$tmp"
 
   fc-cache -f >/dev/null 2>&1 || true
-  if fc-match -f '%{family[0]}' 'JetBrainsMono Nerd Font' 2>/dev/null | grep -qi 'jetbrains'; then
+  if fc-list : family 2>/dev/null | tr ',' '\n' | grep -Fxq 'JetBrainsMono Nerd Font'; then
     log "== JetBrainsMono Nerd Font installed =="
   else
     warn "fontconfig still not resolving JetBrainsMono Nerd Font"
