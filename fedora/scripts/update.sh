@@ -141,9 +141,19 @@ elif [ -d "$OMARCHY_ROOT/.git" ] && (cd "$OMARCHY_ROOT" && git remote get-url up
   else
     log "upstream pull failed (manual review required; see UPSTREAM.md)"
   fi
+elif [ -d "$OMARCHY_ROOT/.git" ]; then
+  # A git checkout without an `upstream` remote. Syncing here would rsync the
+  # tarball into the tracked upstream/ tree and dirty the working copy, so
+  # leave the checkout alone and re-apply whatever is committed. The owner
+  # refreshes upstream/ via the upstream-sync workflow (or by adding an
+  # `upstream` remote), not by running `omarchy update`.
+  log "git checkout without an 'upstream' remote; re-applying the committed userspace"
+  log "  (refresh upstream/ by adding the 'upstream' remote or running the upstream-sync workflow)"
+  bash "$INSTALL_SH" --update
 else
-  # Fallback: fetch the quattro tarball, refresh the vendored upstream/ tree,
-  # then re-apply via install.sh --update (which copies it to /usr/share/omarchy).
+  # No git checkout: install.sh embedded this path, but the user no longer has
+  # a copy of the repo (or never did). Fetch the quattro tarball, refresh the
+  # vendored upstream/ tree, then re-apply via install.sh --update.
   if omarchy_fedora_sync_userspace_tarball; then
     log "Re-applying the Omarchy userspace (idempotent)..."
     bash "$INSTALL_SH" --update
