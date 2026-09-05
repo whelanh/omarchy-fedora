@@ -297,8 +297,8 @@ install_snapper() {
   fi
 
   # Cap retained snapshots (tunable). snapper-cleanup.timer enforces this.
-  _snapper -c root set-config NUMBER_LIMIT=5 \
-    || warn "  could not set snapper NUMBER_LIMIT"
+  _snapper -c root set-config NUMBER_LIMIT=5 TIMELINE_LIMIT_HOURLY=5 TIMELINE_LIMIT_DAILY=0 TIMELINE_LIMIT_WEEKLY=0 TIMELINE_LIMIT_MONTHLY=0 TIMELINE_LIMIT_YEARLY=0 \
+    || warn "  could not set snapper snapshot limits"
 
   _systemctl_enable --now snapper-timeline.timer \
     || warn "  could not enable snapper-timeline.timer"
