@@ -76,6 +76,9 @@ The installer is **idempotent** — running it again is safe.
 > are built as Fedora RPMs and installed from the `whelanh/omarchy` COPR by the
 > installer (see `fedora/rpm/copr/README.md`). Pass `--no-firstparty` to skip.
 
+## Rollback
+In an attempt to emulate Omarchy's Limine rollback structure. The install script installs `snapper`, `btrfs-assistant`, and `grub-btrfs` (from COPR).  Snapshots are created pre and post upgrade and on a time-line (with retention limits). You can boot into a snapshot.  To actually re-set to a snapshot, follow directions for `snapper`.
+
 ## Documentation
 
 - [ARCHITECTURE.md](ARCHITECTURE.md) — design and upstream integration model
