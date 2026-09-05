@@ -112,11 +112,11 @@ omarchy_fedora_snapshot() {
   log "Creating pre-update snapshot..."
   desc="omarchy update"
   if (( EUID == 0 )); then
-    snapper -c root create -c number -d "$desc" >/dev/null \
-      && snapper -c root cleanup number >/dev/null
+    snapper --no-dbus -c root create -c number -d "$desc" >/dev/null \
+      && snapper --no-dbus -c root cleanup number >/dev/null
   else
-    sudo snapper -c root create -c number -d "$desc" >/dev/null \
-      && sudo snapper -c root cleanup number >/dev/null
+    sudo snapper --no-dbus -c root create -c number -d "$desc" >/dev/null \
+      && sudo snapper --no-dbus -c root cleanup number >/dev/null
   fi || warn "Pre-update snapshot failed (continuing without one)"
 }
 
