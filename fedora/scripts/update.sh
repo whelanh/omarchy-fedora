@@ -92,7 +92,7 @@ omarchy_fedora_sync_userspace_tarball() {
 # Create a pre-update btrfs snapshot so a broken upgrade can be rolled back
 # from the boot menu (snapper + grub-btrfs). Mirrors upstream's
 # `omarchy-snapshot create` without depending on the upstream binary. Skipped
-# silently when snapper is absent or has no root config - a missing snapshot
+# with a notice when snapper is absent or has no root config - a missing snapshot
 # must never block the update.
 omarchy_fedora_snapshot() {
   local rootfs desc
