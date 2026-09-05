@@ -256,6 +256,104 @@ _systemctl_enable() {
   if (( EUID == 0 )); then systemctl enable "$@"; else sudo systemctl enable "$@"; fi
 }
 
+# Run snapper as the right user. --no-dbus avoids depending on snapperd, which
+# is not running during an unattended install/update.
+_snapper() {
+  if (( EUID == 0 )); then snapper --no-dbus "$@"; else sudo snapper --no-dbus "$@"; fi
+}
+
+# snapper produces the btrfs snapshots that grub-btrfs surfaces in the boot
+# menu. Install it, create a root timeline config, cap retained snapshots, and
+# keep the timeline + cleanup timers running so the cap is actually enforced.
+# Idempotent; gated on btrfs since snapper does not apply to other filesystems.
+install_snapper() {
+  local rootfs
+  rootfs="$(findmnt -no FSTYPE / 2>/dev/null || true)"
+  if [ "$rootfs" != "btrfs" ]; then
+    log "snapper: skipped (root filesystem is $rootfs, not btrfs)"
+    return 0
+  fi
+
+  log "== snapper: btrfs snapshot timeline =="
+
+  if omarchy_pkg_is_installed snapper; then
+    log "  snapper already installed"
+  else
+    log "  installing snapper"
+    if ! omarchy_pkg_install snapper; then
+      warn "  snapper install failed"
+      return 0
+    fi
+  fi
+
+  if [ -e /etc/snapper/configs/root ]; then
+    log "  snapper root config already exists"
+  else
+    log "  creating snapper root config"
+    if ! _snapper -c root create-config /; then
+      warn "  could not create snapper root config"
+      return 0
+    fi
+  fi
+
+  # Cap retained snapshots (tunable). snapper-cleanup.timer enforces this.
+  _snapper -c root set-config NUMBER_LIMIT=5 TIMELINE_LIMIT_HOURLY=5 TIMELINE_LIMIT_DAILY=0 TIMELINE_LIMIT_WEEKLY=0 TIMELINE_LIMIT_MONTHLY=0 TIMELINE_LIMIT_YEARLY=0 \
+    || warn "  could not set snapper snapshot limits"
+
+  _systemctl_enable --now snapper-timeline.timer \
+    || warn "  could not enable snapper-timeline.timer"
+  _systemctl_enable --now snapper-cleanup.timer \
+    || warn "  could not enable snapper-cleanup.timer"
+}
+
+# Omarchy on Arch ships Limine + snapshots so a broken upgrade can be rolled
+# back from the boot menu. Fedora has no Limine, so offer the GRUB equivalent:
+# grub-btrfs (jmarcoshp/grub-btrfs COPR) regenerates GRUB entries for btrfs
+# snapshots, and grub-btrfsd.service keeps those entries current. Only applies
+# on btrfs-on-GRUB systems; fully idempotent so re-running install.sh --update
+# is safe and a pre-existing install (COPR/package/service) is detected.
+install_grub_btrfs() {
+  local rootfs
+  rootfs="$(findmnt -no FSTYPE / 2>/dev/null || true)"
+  if [ "$rootfs" != "btrfs" ]; then
+    log "grub-btrfs: skipped (root filesystem is $rootfs, not btrfs)"
+    return 0
+  fi
+  if [ ! -e /boot/grub2/grub.cfg ] && [ ! -e /boot/grub/grub.cfg ]; then
+    log "grub-btrfs: skipped (no GRUB configuration found)"
+    return 0
+  fi
+
+  log "== grub-btrfs: boot snapshot rollback =="
+
+  if omarchy_pkg_repo_enabled "copr:copr.fedorainfracloud.org:jmarcoshp:grub-btrfs"; then
+    log "  grub-btrfs COPR already enabled"
+  else
+    log "  enabling jmarcoshp/grub-btrfs COPR"
+    if ! omarchy_fedora_enable_optional_coprs jmarcoshp/grub-btrfs; then
+      warn "  could not enable jmarcoshp/grub-btrfs COPR; skipping grub-btrfs"
+      return 0
+    fi
+  fi
+
+  if omarchy_pkg_is_installed grub-btrfs; then
+    log "  grub-btrfs already installed"
+  else
+    log "  installing grub-btrfs"
+    if ! omarchy_pkg_install grub-btrfs; then
+      warn "  grub-btrfs install failed"
+      return 0
+    fi
+  fi
+
+  if systemctl is-enabled --quiet grub-btrfsd.service 2>/dev/null; then
+    log "  grub-btrfsd.service already enabled"
+  else
+    log "  enabling grub-btrfsd.service"
+    _systemctl_enable --now grub-btrfsd.service || warn "  could not enable grub-btrfsd.service"
+  fi
+}
+
 # ---------------------------------------------------------------------------
 # Phase E - Omarchy desktop (vendored upstream -> /usr/share/omarchy)
 # ---------------------------------------------------------------------------
@@ -723,7 +821,7 @@ install_omarchy_fonts() {
     warn "no fontconfig alias shipped at $conf_src"
   fi
 
-  if fc-list : family 2>/dev/null | tr ',' '\n' | grep -Fxq 'JetBrainsMono Nerd Font'; then
+  if fc-list : family 2>/dev/null | tr ',' '\n' | grep -Fx 'JetBrainsMono Nerd Font' >/dev/null; then
     log "== JetBrainsMono Nerd Font already present =="
     fc-cache -f >/dev/null 2>&1 || true
     return 0
@@ -755,7 +853,7 @@ install_omarchy_fonts() {
   rm -rf "$tmp"
 
   fc-cache -f >/dev/null 2>&1 || true
-  if fc-list : family 2>/dev/null | tr ',' '\n' | grep -Fxq 'JetBrainsMono Nerd Font'; then
+  if fc-list : family 2>/dev/null | tr ',' '\n' | grep -Fx 'JetBrainsMono Nerd Font' >/dev/null; then
     log "== JetBrainsMono Nerd Font installed =="
   else
     warn "fontconfig still not resolving JetBrainsMono Nerd Font"
@@ -893,6 +991,8 @@ main() {
   install_udev
   install_dracut
   enable_services
+  install_snapper
+  install_grub_btrfs
   install_omarchy_tree
   install_omarchy_user_units
   install_omarchy_session
