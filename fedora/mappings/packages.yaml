@@ -265,6 +265,10 @@ packages:
   udiskie:               { package: udiskie, source: fedora }
   ufw:                   { package: ufw, source: fedora }
   unzip:                 { package: unzip, source: fedora }
+  vi:
+    package: vim-minimal
+    source: substitute
+    note: Fedora has no `vi` package; vim-minimal provides /usr/bin/vi
   whois:                 { package: whois, source: fedora }
   wireless-regdb:        { package: wireless-regdb, source: fedora }
   wireplumber:           { package: wireplumber, source: fedora }
