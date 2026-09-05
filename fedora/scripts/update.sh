@@ -89,6 +89,37 @@ omarchy_fedora_sync_userspace_tarball() {
   return $rc
 }
 
+# Create a pre-update btrfs snapshot so a broken upgrade can be rolled back
+# from the boot menu (snapper + grub-btrfs). Mirrors upstream's
+# `omarchy-snapshot create` without depending on the upstream binary. Skipped
+# silently when snapper is absent or has no root config - a missing snapshot
+# must never block the update.
+omarchy_fedora_snapshot() {
+  local rootfs desc
+  rootfs="$(findmnt -no FSTYPE / 2>/dev/null || true)"
+  if [ "$rootfs" != "btrfs" ]; then
+    return 0
+  fi
+  if ! omarchy_pkg_is_installed snapper; then
+    log "No pre-update snapshot (snapper not installed)"
+    return 0
+  fi
+  if [ ! -e /etc/snapper/configs/root ]; then
+    log "No pre-update snapshot (no snapper root config)"
+    return 0
+  fi
+
+  log "Creating pre-update snapshot..."
+  desc="omarchy update"
+  if (( EUID == 0 )); then
+    snapper -c root create -c number -d "$desc" >/dev/null \
+      && snapper -c root cleanup number >/dev/null
+  else
+    sudo snapper -c root create -c number -d "$desc" >/dev/null \
+      && sudo snapper -c root cleanup number >/dev/null
+  fi || warn "Pre-update snapshot failed (continuing without one)"
+}
+
 # 1 + 2 — Fedora packages (incl. first-party COPR RPMs).
 # Best-effort: a package conflict (e.g. a transient COPR ABI mismatch such as a
 # stale fc45 hyprland build) must not block the userspace sync or the Fedora
@@ -96,6 +127,7 @@ omarchy_fedora_sync_userspace_tarball() {
 # entire update here, leaving the userspace stuck on an old snapshot.
 log "Refreshing repository metadata and upgrading Fedora packages..."
 omarchy_pkg_update || warn "dnf makecache failed; continuing"
+omarchy_fedora_snapshot
 omarchy_pkg_upgrade || warn "dnf upgrade failed (package conflicts or a transient repo issue); continuing with the userspace sync"
 
 # 3 + 4 — Omarchy userspace.
