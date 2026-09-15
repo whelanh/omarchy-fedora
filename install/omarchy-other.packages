@@ -23,8 +23,8 @@ limine-snapper-sync
 linux
 linux-firmware
 linux-headers
-linux-omarchy-ptl-novrr-mm
-linux-omarchy-ptl-novrr-mm-headers
+linux-omarchy
+linux-omarchy-headers
 macbook12-spi-driver-dkms
 nvidia-580xx-dkms
 nvidia-dkms
