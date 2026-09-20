@@ -81,7 +81,7 @@ t "fedora/rpm/manifest.yaml parses" python3 -c "
 import yaml
 d = yaml.safe_load(open('fedora/rpm/manifest.yaml'))
 assert 'packages' in d
-assert len(d['packages']) == 10, len(d['packages'])
+assert len(d['packages']) == 11, len(d['packages'])
 for name, p in d['packages'].items():
     for k in ('repo','language','build','binary','license','status'):
         assert k in p, (name, k)

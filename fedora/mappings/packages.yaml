@@ -35,6 +35,12 @@ packages:
     repository: whelanh/omarchy
     rpm: fedora/rpm/cliamp/cliamp.spec
     note: Terminal music player; Go/CGO with ALSA deps, repacked from release binary.
+  elsewhen:
+    package: elsewhen
+    source: copr
+    repository: whelanh/omarchy
+    rpm: fedora/rpm/elsewhen/elsewhen.spec
+    note: World clock shell plugin; noarch QML/JS/Python, no compile. The config seed links it into ~/.config/omarchy/plugins.
   herdr:
     package: herdr
     source: copr

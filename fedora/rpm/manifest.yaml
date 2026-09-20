@@ -1,8 +1,13 @@
-# Machine-readable record of the 10 "first-party" Omarchy binaries for Fedora
-# RPM packaging. Grounded in the upstream omacom/omarchy-pkgs PKGBUILDs and
-# each project's own build docs. status: verified = container-built in this
+# Machine-readable record of the "first-party" Omarchy binaries/plugins for
+# Fedora RPM packaging. Grounded in the upstream omacom/omarchy-pkgs PKGBUILDs
+# and each project's own build docs. status: verified = container-built in this
 # repo's Fedora Rawhide container; blocked = still needs work. Packages are
 # distributed via the whelanh/omarchy COPR (see fedora/rpm/README.md).
+#
+# elsewhen was added after the original 10: upstream now ships it as a
+# dependency of the shell (install/omarchy-base.packages) and a world-clock
+# bar widget. It is a noarch plugin bundle with no compile step, unlike the
+# original set.
 #
 # Dropped from the original 13-package scope:
 #   - asdcontrol: upstream archived Aug 2025, Apple Studio Display hardware only
@@ -30,6 +35,16 @@ packages:
     status: verified
     version: 2.0.1
     note: Repack of cliamp-linux-amd64; desktop + Cliamp.png. Container-built OK.
+  elsewhen:
+    repo: https://github.com/omacom/elsewhen
+    language: javascript
+    build: noarch-repack (plugin file tree; no compile step)
+    binary: null
+    license: MIT
+    deps: [quickshell, python3]
+    status: verified
+    version: 1.0.0
+    note: World clock shell plugin; arch=any QML/JS/Python from the v1.0.0 tag archive, installed to /usr/share/omarchy/plugins/omacom.elsewhen. No `omarchy` Requires (the port owns that tree).
   herdr:
     repo: https://github.com/herdrdev/herdr
     language: rust
