@@ -78,13 +78,16 @@ assert not missing, 'mapped but not installed: %r' % missing
 
 echo "== First-party RPM scaffold: manifest + spec + build helper =="
 t "fedora/rpm/manifest.yaml parses" python3 -c "
-import yaml
+import glob, os, yaml
 d = yaml.safe_load(open('fedora/rpm/manifest.yaml'))
 assert 'packages' in d
-assert len(d['packages']) == 11, len(d['packages'])
 for name, p in d['packages'].items():
     for k in ('repo','language','build','binary','license','status'):
         assert k in p, (name, k)
+    assert os.path.isfile(f'fedora/rpm/{name}/{name}.spec'), f'missing spec {name}'
+specs = sorted(os.path.basename(os.path.dirname(s)) for s in glob.glob('fedora/rpm/*/*.spec'))
+orphans = [s for s in specs if s not in d['packages']]
+assert not orphans, f'specs without a manifest entry: {orphans}'
 "
 # Every manifest package must have a matching <pkg>/<pkg>.spec.
 t "build-rpm.sh bash -n" bash -n fedora/rpm/build-rpm.sh

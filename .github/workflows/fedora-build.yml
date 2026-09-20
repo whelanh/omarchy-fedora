@@ -62,11 +62,16 @@ jobs:
           python3 - <<'PY'
           import os, yaml
           d = yaml.safe_load(open('manifest.yaml'))
-          assert len(d['packages']) == 10
-          for name, p in d['packages'].items():
+          pkgs = d['packages']
+          for name, p in pkgs.items():
               assert os.path.isfile(f"{name}/{name}.spec"), f"missing spec {name}"
               assert p['status'] in ('verified', 'blocked'), name
-          print(f"OK: {len(d['packages'])} specs validated")
+          # Every spec directory must have a manifest entry (and vice-versa), so
+          # the two can't drift the way a hard-coded package count did.
+          specs = sorted(f for f in os.listdir('.') if os.path.isfile(f"{f}/{f}.spec"))
+          orphans = [s for s in specs if s not in pkgs]
+          assert not orphans, f"specs without a manifest entry: {orphans}"
+          print(f"OK: {len(pkgs)} manifest entries / {len(specs)} specs validated")
           PY
 
   rpm-build:
