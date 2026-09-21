@@ -95,6 +95,26 @@ packages:
     status: verified
     version: 0.5.0
     note: Built in Fedora Rawhide container (v0.5.0); Qt6 markdown editor.
+  owe:
+    repo: https://github.com/omacom/owe
+    language: c
+    build: meson
+    binary: owe, owed, owe-render, owe-idle
+    license: MIT
+    deps: [mpv, ffmpeg-free, socat, wayland-devel, libglvnd-devel, libepoxy-devel, systemd-devel]
+    status: verified
+    version: 0.2.2
+    note: OWE wallpaper engine (owed daemon + owe CLI + owe-render); desktop video backgrounds, feeds the lock screen via owe-lockfeed. Container-built OK.
+  owe-lockfeed:
+    repo: https://github.com/omacom/owe
+    language: cpp
+    build: cmake (qml-plugin/ subtree)
+    binary: null
+    license: MIT
+    deps: [qt6-qtdeclarative]
+    status: verified
+    version: 0.2.2
+    note: Qt6 QML module Owe.LockFeed from the same omacom/owe tag archive as `owe`; this is the package Omarchy splits out of the AUR owe build. Container-built OK.
   tensaku:
     repo: https://github.com/jondkinney/tensaku
     language: rust

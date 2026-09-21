@@ -71,6 +71,18 @@ packages:
     repository: whelanh/omarchy
     rpm: fedora/rpm/omawrite/omawrite.spec
     note: Markdown editor; Qt6/qmake6 with quickcontrols2.
+  owe:
+    package: owe
+    source: copr
+    repository: whelanh/omarchy
+    rpm: fedora/rpm/owe/owe.spec
+    note: OWE wallpaper engine (owed daemon + owe CLI + owe-render); meson/C, mpv + ffmpeg-free.
+  owe-lockfeed:
+    package: owe-lockfeed
+    source: copr
+    repository: whelanh/omarchy
+    rpm: fedora/rpm/owe-lockfeed/owe-lockfeed.spec
+    note: Qt6 QML module Owe.LockFeed for the lock screen; same omacom/owe source as `owe`, no AUR counterpart.
   tensaku:
     package: tensaku
     source: copr

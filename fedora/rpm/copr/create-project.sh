@@ -26,8 +26,8 @@ set -euo pipefail
 COPR="whelanh/omarchy"
 DEFAULT_CHROOT="fedora-rawhide-x86_64"
 HYPRLAND_BASE="https://download.copr.fedorainfracloud.org/results/nett00n/hyprland"
-DESCRIPTION="Omarchy Quattro first-party binaries (aether, cliamp, herdr, hyprland-preview-share-picker, omacalc, omacut, omawrite, tensaku, try, ttfx), source-built/repacked from fedora/rpm."
-INSTRUCTIONS="Enabling the repo: sudo dnf copr enable ${COPR}; then: sudo dnf install aether cliamp herdr hyprland-preview-share-picker omacalc omacut omawrite tensaku try ttfx"
+DESCRIPTION="Omarchy Quattro first-party packages (aether, cliamp, elsewhen, herdr, hyprland-preview-share-picker, omacalc, omacut, omawrite, owe, owe-lockfeed, tensaku, try, ttfx), source-built/repacked from fedora/rpm."
+INSTRUCTIONS="Enabling the repo: sudo dnf copr enable ${COPR}; then: sudo dnf install aether cliamp elsewhen herdr hyprland-preview-share-picker omacalc omacut omawrite owe owe-lockfeed tensaku try ttfx"
 
 need() { command -v "$1" >/dev/null 2>&1 || { echo "missing required tool: $1" >&2; exit 1; }; }
 need copr-cli

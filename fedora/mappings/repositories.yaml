@@ -147,6 +147,8 @@ repositories:
       - omacalc
       - omacut
       - omawrite
+      - owe
+      - owe-lockfeed
       - tensaku
       - try
       - ttfx
