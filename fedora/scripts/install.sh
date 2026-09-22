@@ -254,6 +254,44 @@ _reload_udev() {
   else sudo udevadm control --reload >/dev/null 2>&1 || true; fi
 }
 
+# Relabel the system paths this installer writes. `cp -a` copies the checkout's
+# SELinux label (user_home_t, because the checkout lives in $HOME) as the
+# security.selinux xattr, so copied files stay user_home_t under /etc and
+# /usr/share. Confined readers cannot open those: sddm (xdm_t) is denied
+# /usr/share/sddm and /etc/sddm.conf.d, udevd (udev_t) is denied
+# /etc/udev/rules.d, and the system/user managers are denied their unit files.
+# (Unconfined readers such as Hyprland/quickshell are unaffected, but the copy
+# window can still surface as a transient "Permission denied" reload error.)
+# restorecon applies the policy's fcontext labels and is idempotent; the pass
+# also heals installs that predate the fix. Best-effort: a no-op without
+# SELinux/restorecon.
+restorecon_paths() {
+  command -v restorecon >/dev/null 2>&1 || return 0
+  local -a paths=(
+    /usr/share/omarchy
+    /usr/lib/systemd/user
+    /etc/systemd/system
+    /usr/share/wayland-sessions
+    /usr/share/uwsm
+    /etc/sddm.conf.d
+    /usr/share/sddm
+    /etc/sysctl.d
+    /etc/udev/rules.d
+    /etc/dracut.conf.d
+    /usr/share/fonts/omarchy
+    /usr/share/fonts/jetbrainsmono-nerd
+  )
+  local path
+  for path in "${paths[@]}"; do
+    [ -e "$path" ] || continue
+    if (( EUID == 0 )); then
+      restorecon -R "$path" >/dev/null 2>&1 || true
+    else
+      sudo restorecon -R "$path" >/dev/null 2>&1 || true
+    fi
+  done
+}
+
 enable_services() {
   log "== Enabling system services =="
   local -a units=(cups.service avahi-daemon.service NetworkManager.service \
@@ -385,13 +423,20 @@ install_omarchy_tree() {
   # writable by a non-root account -- code later executed with sudo elsewhere
   # (omarchy-apply-lock, omarchy-plymouth-set, ...) -- so reset it to root
   # after every copy, matching what a real package install would produce.
+  #
+  # -u (update only) skips files whose destination is not older than the
+  # source. Without it every update rewrites all ~2100 files, and Hyprland
+  # watches the files it sources under /usr/share/omarchy/default/hypr, so it
+  # reloads (and can read a file mid-write) on every no-op update -- the
+  # "errors in your config" flash. Timestamps are preserved, so repeated runs
+  # copy nothing until the checkout actually changes.
   if (( EUID == 0 )); then
     mkdir -p "$dest"
-    cp -a "$UPSTREAM"/* "$dest/"
+    cp -au "$UPSTREAM"/* "$dest/"
     chown -R root:root "$dest"
   else
     sudo mkdir -p "$dest"
-    sudo cp -a "$UPSTREAM"/* "$dest/"
+    sudo cp -au "$UPSTREAM"/* "$dest/"
     sudo chown -R root:root "$dest"
   fi
   log "Omarchy tree installed to $dest"
@@ -1233,6 +1278,7 @@ main() {
   install_omarchy_fonts
   install_omarchy_version
   configure_user
+  restorecon_paths
   validate_install
 
   log "== Installation complete =="

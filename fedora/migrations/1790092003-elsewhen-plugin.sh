@@ -17,9 +17,12 @@
 # OMARCHY_PATH/shell/plugins. The file was renamed so machines that already ran
 # the broken one run this corrected one.
 #
-# Idempotent: `omarchy bar put` leaves a widget that is already on the bar where
-# it is. It also returns 0 when no shell is running, so this runs once and is
-# marked done either way (upstream omarchy-migrate semantics).
+# Placement asks the running shell (omarchy bar put), which is the only writer
+# of the bar layout. An update copies the userspace tree while the shell is
+# live, so the shell can be mid-reload when this runs, and rescanPlugins is
+# asynchronous. Both are waited out below; if the widget still cannot be
+# placed, the migration fails so it runs again on the next update rather than
+# marking itself done with no widget on the bar.
 set -euo pipefail
 
 PLUGIN=/usr/share/omarchy/shell/plugins/omacom.elsewhen
@@ -53,23 +56,66 @@ fi
 home="$(getent passwd "$user" | cut -d: -f6)"
 uid="$(id -u "$user")"
 runtime="${XDG_RUNTIME_DIR:-/run/user/$uid}"
+shell_json="$home/.config/omarchy/shell.json"
 
-# Re-scan the plugins so a running shell notices the freshly installed plugin
-# before we ask it to place the widget. -q is best-effort when no shell runs.
-runuser -u "$user" -- env \
-  HOME="$home" \
-  OMARCHY_PATH="$OMARCHY_PATH" \
-  XDG_RUNTIME_DIR="$runtime" \
-  PATH="$OMARCHY_PATH/bin:/usr/bin:/bin" \
-  omarchy-shell -q shell rescanPlugins
+as_user() {
+  runuser -u "$user" -- env \
+    HOME="$home" \
+    OMARCHY_PATH="$OMARCHY_PATH" \
+    XDG_RUNTIME_DIR="$runtime" \
+    PATH="$OMARCHY_PATH/bin:/usr/bin:/bin" \
+    "$@"
+}
 
-# `omarchy bar put` leaves an existing placement alone and returns 0 even when
-# no shell is running, matching upstream's migration semantics.
-runuser -u "$user" -- env \
-  HOME="$home" \
-  OMARCHY_PATH="$OMARCHY_PATH" \
-  XDG_RUNTIME_DIR="$runtime" \
-  PATH="$OMARCHY_PATH/bin:/usr/bin:/bin" \
-  omarchy bar put omacom.elsewhen --before omarchy.clock
+# Wait for the shell to answer. A tree update can leave it mid-reload, and
+# omarchy-shell reports a not-yet-ready shell as "not running". Bounded so an
+# update from a TTY with no shell finishes in a few seconds.
+ready=0
+for (( i = 0; i < 100; i++ )); do
+  if pgrep -x quickshell >/dev/null 2>&1 \
+     && as_user omarchy-shell shell ping >/dev/null 2>&1; then
+    ready=1
+    break
+  fi
+  sleep 0.1
+done
+if (( ready == 0 )); then
+  echo "elsewhen: no running shell to place the widget; leaving migration pending" >&2
+  exit 1
+fi
+
+# rescanPlugins is asynchronous: wait until the shell has actually registered
+# the plugin before asking it to place the widget, or the put races the scan.
+as_user omarchy-shell -q shell rescanPlugins
+registered=0
+for (( i = 0; i < 100; i++ )); do
+  if as_user omarchy-shell shell listPlugins 2>/dev/null \
+       | grep -q '"id":"omacom.elsewhen"'; then
+    registered=1
+    break
+  fi
+  sleep 0.1
+done
+if (( registered == 0 )); then
+  echo "elsewhen: shell did not register the plugin; leaving migration pending" >&2
+  exit 1
+fi
+
+# `omarchy bar put` leaves an existing placement alone and retries a shell that
+# is still coming up. The shell persists to shell.json; confirm it landed. A
+# silent no-op (shell never answered) must not be recorded as done.
+as_user omarchy bar put omacom.elsewhen --before omarchy.clock
+placed=0
+for (( i = 0; i < 50; i++ )); do
+  if grep -q '"omacom.elsewhen"' "$shell_json" 2>/dev/null; then
+    placed=1
+    break
+  fi
+  sleep 0.1
+done
+if (( placed == 0 )); then
+  echo "elsewhen: widget was not placed on the bar; leaving migration pending" >&2
+  exit 1
+fi
 
 echo "elsewhen: placed before the clock (or left where it was)"

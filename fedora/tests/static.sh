@@ -146,6 +146,22 @@ assert '/usr/share/omarchy/shell/plugins/omacom.elsewhen' in mig, \\
     'elsewhen migration must probe shell/plugins'
 "
 
+echo "== Installer SELinux + update-window hygiene =="
+# `cp -a` carries the checkout's user_home_t label onto system paths, which
+# confines readers like sddm (xdm_t) and udevd (udev_t) out. install.sh must
+# relabel what it copies, and the tree copy must skip unchanged files so a
+# no-op update does not make Hyprland reload (and read a file mid-write).
+t "install.sh relabels copied system paths" python3 -c "
+src = open('fedora/scripts/install.sh').read()
+assert 'restorecon_paths()' in src, 'missing restorecon_paths helper'
+assert 'restorecon -R' in src, 'restorecon_paths must call restorecon'
+assert src.count('restorecon_paths') >= 2, 'restorecon_paths must be defined and called'
+"
+t "tree copy skips unchanged files (no per-update reload)" python3 -c "
+src = open('fedora/scripts/install.sh').read()
+assert 'cp -au \"\$UPSTREAM\"/*' in src, 'install_omarchy_tree must use cp -au'
+"
+
 echo
 echo "== Result: $PASS passed, $FAIL failed =="
 [ "$FAIL" -eq 0 ] || exit 1
