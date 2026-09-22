@@ -3,7 +3,7 @@ set -euo pipefail
 source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/base-test.sh"
 
 if ! command -v quickshell >/dev/null 2>&1; then
-  pass "quickshell unavailable; skipping lock feed QML lifecycle"
+  skip "quickshell unavailable; skipping lock feed QML lifecycle"
   exit 0
 fi
 work=$(mktemp -d)
