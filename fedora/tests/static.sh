@@ -123,6 +123,29 @@ assert m and str(m.group(1)) == str(man), 'drift'
 "
 done
 
+echo "== First-party shell plugins install where the shell scans =="
+# The shell scans OMARCHY_PATH/shell/plugins for first-party plugins
+# (upstream/shell/shell.qml: firstPartyPluginsDir). An RPM that installs a
+# plugin under OMARCHY_PATH/plugins instead is never discovered, which silently
+# leaves a default bar widget (e.g. elsewhen) off the bar. Guard the spec and
+# the migration that places it against the same drift.
+t "elsewhen spec installs under shell/plugins" python3 -c "
+import re
+spec = open('fedora/rpm/elsewhen/elsewhen.spec').read()
+assert re.search(r'%{_datadir}/omarchy/shell/plugins/omacom\.elsewhen', spec), \\
+    'elsewhen must install under shell/plugins'
+assert not re.search(r'%{_datadir}/omarchy/plugins/', spec), \\
+    'elsewhen must not install under OMARCHY_PATH/plugins'
+"
+t "elsewhen migration probes shell/plugins" python3 -c "
+import glob
+migs = glob.glob('fedora/migrations/*-elsewhen-plugin.sh')
+assert len(migs) == 1, migs
+mig = open(migs[0]).read()
+assert '/usr/share/omarchy/shell/plugins/omacom.elsewhen' in mig, \\
+    'elsewhen migration must probe shell/plugins'
+"
+
 echo
 echo "== Result: $PASS passed, $FAIL failed =="
 [ "$FAIL" -eq 0 ] || exit 1

@@ -44,7 +44,7 @@ packages:
     deps: [quickshell, python3]
     status: verified
     version: 1.0.0
-    note: World clock shell plugin; arch=any QML/JS/Python from the v1.0.0 tag archive, installed to /usr/share/omarchy/plugins/omacom.elsewhen. No `omarchy` Requires (the port owns that tree).
+    note: World clock shell plugin; arch=any QML/JS/Python from the v1.0.0 tag archive, installed to /usr/share/omarchy/shell/plugins/omacom.elsewhen (the shell's first-party plugin directory). No `omarchy` Requires (the port owns that tree).
   herdr:
     repo: https://github.com/herdrdev/herdr
     language: rust
