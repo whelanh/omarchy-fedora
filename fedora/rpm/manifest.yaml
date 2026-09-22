@@ -95,6 +95,16 @@ packages:
     status: verified
     version: 0.5.0
     note: Built in Fedora Rawhide container (v0.5.0); Qt6 markdown editor.
+  omasnap:
+    repo: https://github.com/tobi/omasnap
+    language: cpp
+    build: repack-release (prebuilt Arch x86_64 /usr tree, no compile)
+    binary: omasnap
+    license: MIT
+    deps: [hyprland, layer-shell-qt, wl-clipboard, qt6-qtbase]
+    status: verified
+    version: 1.21.0
+    note: Repack of omasnap-1.21.0-archlinux-x86_64.tar.gz (mirrors AUR omasnap-bin); screenshot/annotation editor that supersedes tensaku. Container-built OK.
   owe:
     repo: https://github.com/omacom/owe
     language: c

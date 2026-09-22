@@ -71,6 +71,12 @@ packages:
     repository: whelanh/omarchy
     rpm: fedora/rpm/omawrite/omawrite.spec
     note: Markdown editor; Qt6/qmake6 with quickcontrols2.
+  omasnap:
+    package: omasnap
+    source: copr
+    repository: whelanh/omarchy
+    rpm: fedora/rpm/omasnap/omasnap.spec
+    note: Screenshot/annotation editor; repack of the prebuilt Arch release (AUR omasnap-bin), supersedes tensaku.
   owe:
     package: owe
     source: copr

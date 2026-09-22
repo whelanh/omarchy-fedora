@@ -157,8 +157,8 @@ install_repos() {
   omarchy_fedora_enable_optional_coprs brycensranch/gpu-screen-recorder-git \
     || die "failed to enable gpu-screen-recorder COPR"
   # First-party Omarchy packages (aether, cliamp, elsewhen, herdr, share-picker,
-  # omacalc, omacut, omawrite, owe, owe-lockfeed, tensaku, try, ttfx) live in the
-  # whelanh/omarchy COPR (see fedora/rpm/copr/README.md).
+  # omacalc, omacut, omawrite, omasnap, owe, owe-lockfeed, tensaku, try, ttfx)
+  # live in the whelanh/omarchy COPR (see fedora/rpm/copr/README.md).
   if [ "$INSTALL_FIRSTPARTY" = 1 ]; then
     omarchy_fedora_enable_optional_coprs whelanh/omarchy \
       || die "failed to enable whelanh/omarchy COPR"
