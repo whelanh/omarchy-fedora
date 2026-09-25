@@ -2,7 +2,7 @@
 # Upstream: https://github.com/omacom/ttfx (pure Rust, v0.3.2)
 # Verified against upstream Cargo.toml (package name + single bin `ttfx`).
 Name:           ttfx
-Version:        0.3.2
+Version:        0.3.3
 Release:        1%{?dist}
 Summary:        Terminal text-effects engine for Omarchy
 
@@ -38,5 +38,8 @@ cargo test --release --offline --locked >/dev/null 2>&1 || true
 %{_bindir}/ttfx
 
 %changelog
+* Fri Sep 25 2026 whelanh <brickhousedevelopers@gmail.com> - 0.3.3-1
+- Automatic update to upstream v0.3.3
+
 * Mon Aug 31 2026 whelanh <brickhousedevelopers@gmail.com> - 0.3.2-1
 - Vendor crates.io deps for offline COPR builds

@@ -23,7 +23,7 @@ packages:
     license: MIT
     deps: [webkit2gtk4.1, gtk3]
     status: verified
-    version: 4.29.8
+    version: 4.30.0
     note: Repack of aether-linux-amd64; desktop + aether:// url-handler + icons. Container-built OK.
   cliamp:
     repo: https://github.com/bjarneo/cliamp
@@ -33,7 +33,7 @@ packages:
     license: MIT
     deps: [alsa-lib, ffmpeg-free, yt-dlp]
     status: verified
-    version: 2.0.1
+    version: 2.2.0
     note: Repack of cliamp-linux-amd64; desktop + Cliamp.png. Container-built OK.
   elsewhen:
     repo: https://github.com/omacom/elsewhen
@@ -53,7 +53,7 @@ packages:
     license: Apache-2.0
     deps: [gcc-libs, glibc]
     status: verified
-    version: 0.8.2
+    version: 0.9.1
     note: Repack of herdr-linux-x86_64 from herdrdev/herdr (the omacom-io/herdr fork has no release assets); Obsoletes/Provides omarchy-herdr.
   hyprland-preview-share-picker:
     repo: https://github.com/WhySoBad/hyprland-preview-share-picker
@@ -113,7 +113,7 @@ packages:
     license: MIT
     deps: [mpv, ffmpeg-free, socat, wayland-devel, libglvnd-devel, libepoxy-devel, systemd-devel]
     status: verified
-    version: 0.2.2
+    version: 0.2.7
     note: OWE wallpaper engine (owed daemon + owe CLI + owe-render); desktop video backgrounds, feeds the lock screen via owe-lockfeed. Container-built OK.
   owe-lockfeed:
     repo: https://github.com/omacom/owe
@@ -123,7 +123,7 @@ packages:
     license: MIT
     deps: [qt6-qtdeclarative]
     status: verified
-    version: 0.2.2
+    version: 0.2.7
     note: Qt6 QML module Owe.LockFeed from the same omacom/owe tag archive as `owe`; this is the package Omarchy splits out of the AUR owe build. Container-built OK.
   tensaku:
     repo: https://github.com/jondkinney/tensaku
@@ -153,5 +153,5 @@ packages:
     license: MIT
     deps: []
     status: verified
-    version: 0.3.2
+    version: 0.3.3
     note: Built in Fedora Rawhide container (v0.3.2); pure Rust. Crates vendored via fedora/rpm/vendor-rust.sh; cargo build --offline --locked.

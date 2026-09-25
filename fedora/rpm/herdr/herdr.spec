@@ -6,8 +6,8 @@
 # so shipping the release assets mirrors the same end result without the
 # vendored Zig toolchain.
 Name:           herdr
-Version:        0.8.2
-Release:        2%{?dist}
+Version:        0.9.1
+Release:        1%{?dist}
 Summary:        Herdr terminal workspace manager for AI coding agents
 
 License:        Apache-2.0
@@ -35,6 +35,9 @@ install -Dm644 LICENSE %{buildroot}%{_datadir}/licenses/%{name}/LICENSE
 %{_bindir}/herdr
 
 %changelog
+* Fri Sep 25 2026 whelanh <brickhousedevelopers@gmail.com> - 0.9.1-1
+- Automatic update to upstream v0.9.1
+
 * Tue Sep 01 2026 whelanh <brickhousedevelopers@gmail.com> - 0.8.2-2
 - Drop bogus Requires (gcc-libs is Arch-only; glibc/libgcc auto-detected)
 

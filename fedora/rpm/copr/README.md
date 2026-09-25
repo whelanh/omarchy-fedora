@@ -117,6 +117,28 @@ filtered) and reports any whose version is newer than the packaged one, e.g.
 `cliamp 1.63.2 -> v2.0.0 OUTDATED`. Exit status is 1 when something is stale.
 Uses unauthenticated GitHub API (~2 calls/package, well under rate limits).
 
+### Fully automated: check → bump → submit
+
+```sh
+# preview the bumps, change nothing
+bash fedora/rpm/copr/auto-update.sh --dry-run
+
+# bump spec Version/Release + %changelog and manifest.yaml, then submit
+bash fedora/rpm/copr/auto-update.sh --yes
+
+# bump + build SRPMs locally, don't submit
+bash fedora/rpm/copr/auto-update.sh --yes --srpms-only
+```
+
+`auto-update.sh` automates the manual loop above. It considers only
+`status: verified` packages, bumps packages that share an upstream repo
+(`owe` + `owe-lockfeed`) together to the same version, reads the current
+version from the spec (so a stale manifest can't hide a bump), and writes all
+edits only after every edit has succeeded. `--verify` additionally runs
+`build-rpm-in-ci.sh` before submitting, and `--chroot <name>` (repeatable)
+submits to specific chroots. Set `GITHUB_TOKEN`/`GH_TOKEN` (or use `gh auth
+token`) to avoid the 60-requests/hour unauthenticated API limit.
+
 ## Why COPR and not official Fedora
 
 Fedora source rules require vendored Rust/Go deps and a maintainer review

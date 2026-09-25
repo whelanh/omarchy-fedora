@@ -4,7 +4,7 @@
 # Repack mirrors the upstream Arch PKGBUILD: the release ships prebuilt
 # aether-linux-amd64, so no Wails/WebKitGTK toolchain is needed.
 Name:           aether
-Version:        4.29.8
+Version:        4.30.0
 Release:        1%{?dist}
 Summary:        Desktop theming application - extract colors from wallpapers and apply cohesive themes
 
@@ -43,5 +43,8 @@ install -Dm644 README.md %{buildroot}%{_datadir}/doc/%{name}/README.md
 %{_datadir}/doc/%{name}/README.md
 
 %changelog
+* Fri Sep 25 2026 whelanh <brickhousedevelopers@gmail.com> - 4.30.0-1
+- Automatic update to upstream v4.30.0
+
 * Mon Aug 31 2026 whelanh <brickhousedevelopers@gmail.com> - 4.29.8-1
 - Repack of upstream prebuilt release (v4.29.8), mirroring the Arch PKGBUILD

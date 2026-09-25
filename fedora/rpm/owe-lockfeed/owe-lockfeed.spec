@@ -3,7 +3,7 @@
 # Built from the same tag archive as `owe`; this SPEC packages only the
 # qml-plugin/ subtree, mirroring Omarchy's separate `owe-lockfeed` package.
 Name:           owe-lockfeed
-Version:        0.2.2
+Version:        0.2.7
 Release:        1%{?dist}
 Summary:        Lock screen video feed module for the OWE wallpaper engine
 
@@ -42,5 +42,8 @@ DESTDIR=%{buildroot} cmake --install build
 %{_libdir}/qt6/qml/Owe/LockFeed/
 
 %changelog
+* Fri Sep 25 2026 whelanh <brickhousedevelopers@gmail.com> - 0.2.7-1
+- Automatic update to upstream v0.2.7
+
 * Mon Sep 21 2026 whelanh <brickhousedevelopers@gmail.com> - 0.2.2-1
 - Initial Fedora package: OWE lock feed QML module (v0.2.2)
