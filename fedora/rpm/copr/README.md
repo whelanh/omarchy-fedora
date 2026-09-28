@@ -1,13 +1,14 @@
 # whelanh/omarchy COPR publishing
 
-This directory holds the tooling that publishes the 10 first-party Omarchy
+This directory holds the tooling that publishes the 16 first-party Omarchy
 RPMs (specs in `fedora/rpm/<pkg>/`) to the **`whelanh/omarchy`** COPR, so a
 stock Fedora install gets them with a plain `dnf install` — no local builds.
 
-## The 10 packages
+## The 16 packages
 
-aether, cliamp, herdr, hyprland-preview-share-picker, omacalc, omacut,
-omawrite, tensaku, try (tobi-try), ttfx. All are `status: verified` in
+aether, cliamp, elsewhen, herdr, hype, hyprland-preview-share-picker,
+monologue, omacalc, omacut, omawrite, omasnap, owe, owe-lockfeed, tensaku,
+try (tobi-try), ttfx. All are `status: verified` in
 `fedora/rpm/manifest.yaml` and built green end-to-end on `fedora:rawhide`
 via `fedora/rpm/build-rpm-in-ci.sh`.
 
@@ -88,8 +89,9 @@ already does when `--with-firstparty` is on, default):
 
 ```sh
 sudo dnf copr enable whelanh/omarchy
-sudo dnf install aether cliamp herdr hyprland-preview-share-picker \
-                 omacalc omacut omawrite tensaku try ttfx
+sudo dnf install aether cliamp elsewhen herdr hype \
+                 hyprland-preview-share-picker monologue omacalc omacut \
+                 omawrite omasnap owe owe-lockfeed tensaku try ttfx
 ```
 
 `fedora/scripts/lib/deps.sh` exposes
@@ -148,7 +150,7 @@ key, and is fully scriptable from this repo.
 
 ## Security / trust notes
 
-- Every repack (aether, cliamp, herdr, tensaku) installs the byte-for-byte
+- Every repack (aether, cliamp, herdr, omasnap, tensaku) installs the byte-for-byte
   upstream release binary; the spec pins the exact version + Source URLs.
 - `hyprland-preview-share-picker` is compiled from source on the versioned
   tag with hyprland-protocols vendored at a pinned commit.

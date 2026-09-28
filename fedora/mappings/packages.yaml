@@ -47,12 +47,24 @@ packages:
     repository: whelanh/omarchy
     rpm: fedora/rpm/herdr/herdr.spec
     note: AI-agent workspace manager; Rust, repacked from herdrdev/herdr release binary.
+  hype:
+    package: hype
+    source: copr
+    repository: whelanh/omarchy
+    rpm: fedora/rpm/hype/hype.spec
+    note: Markdown presentation editor with a visual slide editor; Qt6/qmake6, shells out to source-highlight + ffmpeg.
   hyprland-preview-share-picker:
     package: hyprland-preview-share-picker
     source: copr
     repository: whelanh/omarchy
     rpm: fedora/rpm/hyprland-preview-share-picker/hyprland-preview-share-picker.spec
     note: Rust GTK4 share picker; source-built on stable Rust, vendored hyprland-protocols.
+  monologue:
+    package: monologue
+    source: copr
+    repository: whelanh/omarchy
+    rpm: fedora/rpm/monologue/monologue.spec
+    note: Theme-synced webcam recorder with a built-in trim/cut editor; Qt6/qmake6 + libpulse, shells out to ffmpeg/ffprobe.
   omacalc:
     package: omacalc
     source: copr

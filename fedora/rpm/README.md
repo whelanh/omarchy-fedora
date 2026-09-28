@@ -6,7 +6,7 @@ in Fedora official/COPR repos. They map to `source: copr` entries in
 `fedora/mappings/packages.yaml` and are distributed via the
 `whelanh/omarchy` COPR.
 
-> **Status: 14 VERIFIED, 0 BLOCKED.** Every package builds cleanly in the
+> **Status: 16 VERIFIED, 0 BLOCKED.** Every package builds cleanly in the
 > Fedora Rawhide container (`manifest.yaml` status `verified`), driven by
 > `build-rpm-in-ci.sh` — the same path the CI `rpm-build` job runs.
 
@@ -44,7 +44,9 @@ FEDORA=1 bash fedora/rpm/build-in-container.sh tensaku
 | cliamp | bjarneo/cliamp | prebuilt-repack | MIT | verified |
 | elsewhen | omacom/elsewhen | noarch-repack | MIT | verified |
 | herdr | herdrdev/herdr | prebuilt-repack | Apache-2.0 | verified |
+| hype | omacom/hype | Qt6 / qmake6 | MIT | verified |
 | hyprland-preview-share-picker | WhySoBad/… | cargo (stable Rust) | MIT | verified |
+| monologue | omacom/monologue | Qt6 / qmake6 | MIT | verified |
 | omacalc | omacom/omacalc | Qt6 / qmake6 | MIT | verified |
 | omacut | omacom/omacut | Qt6 / qmake6 | MIT | verified |
 | omawrite | omacom/omawrite | Qt6 / qmake6 | MIT | verified |

@@ -7,7 +7,9 @@
 # elsewhen was added after the original 10: upstream now ships it as a
 # dependency of the shell (install/omarchy-base.packages) and a world-clock
 # bar widget. It is a noarch plugin bundle with no compile step, unlike the
-# original set.
+# original set. hype and monologue are later first-party Qt6 apps that upstream
+# added to install/omarchy-base.packages (Markdown presentations and a
+# theme-synced webcam recorder), so they are packaged here too.
 #
 # Dropped from the original 13-package scope:
 #   - asdcontrol: upstream archived Aug 2025, Apple Studio Display hardware only
@@ -55,6 +57,16 @@ packages:
     status: verified
     version: 0.9.1
     note: Repack of herdr-linux-x86_64 from herdrdev/herdr (the omacom-io/herdr fork has no release assets); Obsoletes/Provides omarchy-herdr.
+  hype:
+    repo: https://github.com/omacom/hype
+    language: cpp
+    build: qmake6
+    binary: hype
+    license: MIT
+    deps: [qt6-qtbase, qt6-qtdeclarative, qt6-qtmultimedia, qt6-qtimageformats, qt6-qtsvg, libwebp, source-highlight, ffmpeg-free, xdg-desktop-portal]
+    status: verified
+    version: 0.4.3
+    note: Markdown presentation editor with a visual slide editor; Qt6/qmake6, shells out to source-highlight (code blocks) and ffmpeg (video/animated media export), links zlib + libwebp. Container-built OK.
   hyprland-preview-share-picker:
     repo: https://github.com/WhySoBad/hyprland-preview-share-picker
     language: rust
@@ -65,6 +77,16 @@ packages:
     status: verified
     version: 0.2.1
     note: Spec cds the pinned hyprland-protocols in (Source from hyprwm), builds on stable Fedora Rust with crates.io deps vendored for offline COPR build; needs gtk4-layer-shell-devel from nett00n/hyprland COPR. Container-built OK.
+  monologue:
+    repo: https://github.com/omacom/monologue
+    language: cpp
+    build: qmake6
+    binary: monologue
+    license: MIT
+    deps: [qt6-qtbase, qt6-qtdeclarative, qt6-qtmultimedia, pulseaudio-libs, ffmpeg-free, xdg-desktop-portal]
+    status: verified
+    version: 0.3.0
+    note: Theme-synced webcam recorder with a built-in trim/cut editor; Qt6/qmake6 with libpulse for metering, shells out to ffmpeg/ffprobe. Container-built OK.
   omacalc:
     repo: https://github.com/omacom/omacalc
     language: cpp

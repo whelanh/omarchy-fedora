@@ -76,10 +76,11 @@ sudo systemctl reboot
 
 The installer is **idempotent** — running it again is safe.
 
-> Note: Omarchy's first-party binaries (aether, cliamp, herdr,
-> hyprland-preview-share-picker, omacalc, omacut, omawrite, tensaku, try, ttfx)
-> are built as Fedora RPMs and installed from the `whelanh/omarchy` COPR by the
-> installer (see `fedora/rpm/copr/README.md`). Pass `--no-firstparty` to skip.
+> Note: Omarchy's first-party binaries and plugins (aether, cliamp, elsewhen,
+> herdr, hype, hyprland-preview-share-picker, monologue, omacalc, omacut,
+> omawrite, omasnap, owe, owe-lockfeed, tensaku, try, ttfx) are built as Fedora
+> RPMs and installed from the `whelanh/omarchy` COPR by the installer (see
+> `fedora/rpm/copr/README.md`). Pass `--no-firstparty` to skip.
 
 ## Rollback
 In an attempt to emulate Omarchy's Limine rollback structure. The install script installs `snapper`, `btrfs-assistant`, and `grub-btrfs` (from COPR).  Snapshots are created pre and post upgrade and on a time-line (with retention limits). You can boot into a snapshot.  To actually re-set to a snapshot, follow directions for `snapper`.

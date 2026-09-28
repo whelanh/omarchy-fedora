@@ -29,7 +29,7 @@ mapped.
 |---|---|
 | fedora (official) | ~120 |
 | substitute | ~30 |
-| copr | ~11 + 10 first-party |
+| copr | ~11 + 16 first-party |
 | external (mise) | 1 |
 | unavailable | ~19 |
 | drop (Arch-only) | ~8 |
@@ -72,29 +72,36 @@ gpgcheck=1) enabled by the installer via `dnf config-manager --add-repo`. See
 `fedora/mappings/repositories.yaml` (entry `mise`).
 
 ### First-party Omarchy binaries (FIRST_PARTY, COPR `whelanh/omarchy`)
-10 Omarchy packages (`aether`, `cliamp`, `herdr`, `hyprland-preview-share-picker`,
-`omacalc`, `omacut`, `omawrite`, `tensaku`, `tobi-try → try`, `ttfx`) are
+16 Omarchy packages (`aether`, `cliamp`, `elsewhen`, `herdr`, `hype`,
+`hyprland-preview-share-picker`, `monologue`, `omacalc`, `omacut`, `omawrite`,
+`omasnap`, `owe`, `owe-lockfeed`, `tensaku`, `tobi-try → try`, `ttfx`) are
 source-built or repacked as Fedora RPMs. Specs live in `fedora/rpm/` (one SPEC
 per package) with a `manifest.yaml` (repo, build system, license, status) and
 publish tooling in `fedora/rpm/copr/`.
 
-**Status — 10 verified, 0 blocked.** Every package builds cleanly in a Fedora
+**Status — 16 verified, 0 blocked.** Every package builds cleanly in a Fedora
 Rawhide container and is published from the `whelanh/omarchy` COPR. The
 default installer enables that COPR and installs the set (disable with
 `install.sh --no-firstparty`).
 
 | Package | Version | Notes |
 |---------|---------|-------|
-| aether | v4.29.8 | Go/Wails, repacked release binary |
-| cliamp  | v1.63.2 | Go/CGO, repacked release binary |
-| herdr   | v0.8.2 | Rust, repacked release binary (herdrdev/herdr) |
+| aether | v4.30.0 | Go/Wails, repacked release binary |
+| cliamp  | v2.2.0 | Go/CGO, repacked release binary |
+| elsewhen | v1.0.0 | noarch QML/JS/Python shell plugin |
+| herdr   | v0.9.1 | Rust, repacked release binary (herdrdev/herdr) |
+| hype    | v0.4.3 | Qt6/qmake6 Markdown presentation editor |
 | hyprland-preview-share-picker | v0.2.1 | Rust/GTK4, source-built |
+| monologue | v0.3.0 | Qt6/qmake6 webcam recorder + libpulse |
 | omacalc | v0.2.2 | Qt6/qmake6 |
 | omacut  | v0.4.0 | Qt6/qmake6 + ffmpeg |
 | omawrite| v0.5.0 | Qt6/qmake6 |
-| tensaku | v0.28.0 | repacked release tarball (GTK4) |
+| omasnap | v1.21.0 | repacked Arch release (supersedes tensaku) |
+| owe     | v0.2.7 | meson/C wallpaper engine (mpv + ffmpeg-free) |
+| owe-lockfeed | v0.2.7 | Qt6 QML lock-screen feed module |
+| tensaku | v0.29.0 | repacked release tarball (GTK4) |
 | try (tobi-try) | v1.10.1 | Ruby gem |
-| ttfx    | v0.3.2 | pure Rust/cargo |
+| ttfx    | v0.3.3 | pure Rust/cargo |
 
 Dropped from RPM scope (were in the original 13): `asdcontrol` (archived
 upstream, Apple-display-only), `omarchy-nvim` (in-tree LazyVim cache
@@ -116,7 +123,7 @@ session — no package manager. The installer wires them onto PATH by symlinking
 Caveats:
 - `omarchy plugin enable/disable` talk to the running shell via
   `omarchy-shell shell enablePlugin`, so Quickshell must be running.
-- The 10 first-party binary packages are built and published from the
+- The 16 first-party binary packages are built and published from the
   `whelanh/omarchy` COPR and installed by the default installer
   (`--no-firstparty` to skip); all are `verified` in `fedora/rpm/manifest.yaml`.
 - `gum` and `git-delta` were added to `fedora/packages/base.txt` as
@@ -124,7 +131,7 @@ Caveats:
 
 ## Known incompatibilities / open work
 
-1. **First-party RPM packaging (done)** — 10 Omarchy binaries built + published
+1. **First-party RPM packaging (done)** — 16 Omarchy binaries built + published
    from the `whelanh/omarchy` COPR (`fedora/rpm/`, see `fedora/rpm/copr/`).
    Installed by the default installer. CI re-verifies the specs on push.
 2. **libalpm hooks / "update guard"** — Arch's pacman PreTransaction guard that

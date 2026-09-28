@@ -177,8 +177,9 @@ omarchy_fedora_install_applications() {
 }
 
 # Install the first-party Omarchy packages from the whelanh/omarchy COPR
-# (aether, cliamp, elsewhen, herdr, hyprland-preview-share-picker, omacalc,
-# omacut, omawrite, omasnap, owe, owe-lockfeed, tensaku, tobi-try, ttfx).
+# (aether, cliamp, elsewhen, herdr, hype, hyprland-preview-share-picker,
+# monologue, omacalc, omacut, omawrite, omasnap, owe, owe-lockfeed, tensaku,
+# tobi-try, ttfx).
 # Requires the COPR enabled (install.sh does this in install_repos). They are
 # `source: copr` in packages.yaml; resolve.py --copr whelanh/omarchy emits the
 # exact set.

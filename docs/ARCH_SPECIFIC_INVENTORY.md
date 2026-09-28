@@ -148,9 +148,12 @@ Categories:
 - **COPR / rpmfusion**: hyprland (now FEDORA_OFFICIAL in Rawhide), quickshell,
   uwsm, sddm, gpu-screen-recorder, nerd fonts, nvidia drivers, etc.
 - **FLATPAK**: obsidian, localsend (some have native/Deb too), etc.
-- **NOT_AVAILABLE / needs build**: omacalc, omacut, omawrite, aether,
-  asdcontrol, cliamp, herdr, tensaku, ttfx, tobi-try, usage, omarchy-nvim —
-  Omarchy-first-party packages must be rebuilt from source as RPMs.
+- **FIRST_PARTY (COPR `whelanh/omarchy`)**: Omarchy's own binaries/plugins,
+  rebuilt or repacked as RPMs from `fedora/rpm/` — aether, cliamp, elsewhen,
+  herdr, hype, hyprland-preview-share-picker, monologue, omacalc, omacut,
+  omawrite, omasnap, owe, owe-lockfeed, tensaku, tobi-try, ttfx. `asdcontrol`,
+  `usage` and `omarchy-nvim` are intentionally out of RPM scope (rationale in
+  `fedora/rpm/README.md`).
 
 **Arch-only tools to drop**: `expac`, `pacman-contrib`, `fakeroot` (build
 only), `yay` / `yay-debug`, `base` / `base-devel` (replace with Fedora

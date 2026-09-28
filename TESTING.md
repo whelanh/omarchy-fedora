@@ -113,8 +113,9 @@ desktop session — they will not work from a bare SSH/tty.
 
 ## 5. Build and install the verified first-party RPMs
 
-The five verified packages (`omacalc`, `omacut`, `omawrite`, `ttfx`, `try`)
-build cleanly in a Fedora Rawhide container. Two ways to build them:
+All `status: verified` packages in `fedora/rpm/manifest.yaml` (currently 16,
+e.g. `aether`, `hype`, `monologue`, `omacalc`, `ttfx`, `try`) build cleanly in
+a Fedora Rawhide container. Two ways to build them:
 
 ### 5a. Directly in the VM
 
@@ -141,10 +142,10 @@ sudo dnf -y install /tmp/rpmbuild-omacalc/RPMS/x86_64/omacalc-*.rpm
 omacalc --help
 ```
 
-(Repeat with `omacut`, `omawrite`, `ttfx`, `try` — adjust the RPM path per
-package; `try` installs as `/usr/bin/try`.)
+(Repeat with any other package in `fedora/rpm/manifest.yaml` — adjust the RPM
+path per package; `tobi-try` installs as `/usr/bin/try`.)
 
-### Install all five at once
+### Install all verified packages at once
 
 After building with `build-rpm-in-ci.sh` (step 5a), install every verified RPM
 in one shot:
@@ -178,5 +179,5 @@ To return to a pristine state, roll back to the snapshot taken in step 1.
 - `ttfx` uses explicit `cargo build --release` rather than Fedora's
   `%cargo_build`, because a plain `rpmbuild` environment lacks the `rpm` cargo
   profile. This is intended and matches CI.
-- The 8 `blocked` packages (see `fedora/rpm/README.md`) are skipped by the
-  build helpers; they need toolchain/repack/assembly work first.
+- No first-party packages are `blocked`; all are `verified` and built by the
+  build helpers. (See `fedora/rpm/README.md` for the per-package status.)
