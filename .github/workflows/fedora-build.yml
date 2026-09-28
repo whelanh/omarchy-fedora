@@ -3,11 +3,22 @@ name: fedora-build
 # Validates that the Fedora package manifests and resolver produce a coherent,
 # parseable set. A real RPM/environment-group build requires a Fedora container
 # and is wired separately (see integration-test).
+#
+# Triggers:
+#   - push to main / pull_request: static + manifest/scaffold checks (PRs stop
+#     there; rpm-build is skipped on PRs to keep them fast).
+#   - schedule (weekly) + workflow_dispatch: the full set runs, including
+#     rpm-build, so the committed specs are container-built even when nothing is
+#     pushed. This catches Fedora rawhide/toolchain moves and upstream release
+#     assets disappearing without a version change.
 
 on:
   push:
     branches: [main]
   pull_request:
+  schedule:
+    - cron: '0 4 * * 1'   # Mondays 04:00 UTC
+  workflow_dispatch: {}
 
 jobs:
   static:
@@ -76,9 +87,9 @@ jobs:
 
   rpm-build:
     # Builds the 'verified' first-party RPMs inside a Fedora Rawhide container
-    # to confirm each SPEC actually produces a package. Runs on push to main
-    # and on demand (not per-PR, since it downloads build deps from the network
-    # and takes minutes).
+    # to confirm each SPEC actually produces a package. Runs on push to main,
+    # on the weekly schedule, and on manual workflow_dispatch (not per-PR,
+    # since it downloads build deps from the network and takes minutes).
     runs-on: ubuntu-latest
     container:
       image: fedora:rawhide
