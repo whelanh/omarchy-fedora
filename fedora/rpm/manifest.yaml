@@ -175,5 +175,5 @@ packages:
     license: MIT
     deps: []
     status: verified
-    version: 0.3.3
+    version: 0.5.0
     note: Built in Fedora Rawhide container (v0.3.2); pure Rust. Crates vendored via fedora/rpm/vendor-rust.sh; cargo build --offline --locked.
