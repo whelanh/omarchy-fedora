@@ -144,8 +144,14 @@ Caveats:
    file edits. Addressed in Phase 6 (not yet in installer).
 5. **snapper boot-menu sync** — upstream uses `limine-snapper-sync`; on Fedora
    this needs a GRUB snapper plugin. Not yet wired.
-6. **Session/display manager** — SDDM is available on Fedora and used, but the
-   wayland-session entry and Hyprland greeter config need Fedora packaging.
+6. **Session/display manager** — SDDM is available on Fedora and used; the
+   installer installs the wayland-session entry, the Omarchy greeter config, and
+   preselects the Omarchy session for the installing user. On a **GNOME
+   Workstation** base, GDM is installed and owns the `display-manager.service`
+   alias, so `systemctl enable sddm` fails outright and the machine keeps
+   showing GDM. The installer therefore disables GDM (and LightDM/LXDM) before
+   enabling SDDM. The user keeps their GNOME session entry, but GDM's session
+   memory is ignored; SDDM's `[Last]` record is what decides the default.
 
 ## Requirement: no security bypass
 

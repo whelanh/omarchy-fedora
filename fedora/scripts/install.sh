@@ -61,6 +61,20 @@ log() { printf '\033[1;34m[omarchy] %s\033[0m\n' "$*"; }
 warn() { printf '\033[1;33m[omarchy] %s\033[0m\n' "$*" >&2; }
 die()  { printf '\033[1;31m[omarchy] %s\033[0m\n' "$*" >&2; exit 1; }
 
+# Resolve which account the desktop is being configured for: an explicit
+# --user wins, then the user who invoked sudo, then the first regular
+# (uid 1000+) account. Shared by every install step that needs a username.
+resolve_target_user() {
+  local user="${TARGET_USER:-}"
+  if [ -z "$user" ] && [ -n "${SUDO_USER:-}" ] && [ "$SUDO_USER" != root ]; then
+    user="$SUDO_USER"
+  fi
+  if [ -z "$user" ]; then
+    user="$(awk -F: '$3>=1000 && $3<60000 {print $1; exit}' /etc/passwd)"
+  fi
+  printf '%s\n' "$user"
+}
+
 # Source the dnf abstraction + deps libraries.
 . "$SCRIPT_DIR/lib/pkg.sh"
 . "$SCRIPT_DIR/lib/deps.sh"
@@ -296,12 +310,22 @@ restorecon_paths() {
 enable_services() {
   log "== Enabling system services =="
   local -a units=(cups.service avahi-daemon.service NetworkManager.service \
-                  systemd-resolved.service power-profiles-daemon.service sddm.service)
+                  systemd-resolved.service power-profiles-daemon.service)
   for u in "${units[@]}"; do
     if systemctl list-unit-files "$u" >/dev/null 2>&1; then
       _systemctl_enable "$u" || warn "could not enable $u"
     fi
   done
+
+  # Take over the display manager. Fedora Workstation/GNOME ships GDM enabled
+  # and owning the display-manager.service alias; `systemctl enable sddm`
+  # refuses to overwrite that alias ("File ... already exists and is a symlink
+  # to /usr/lib/systemd/system/gdm.service"), so a GNOME-based machine would
+  # stay on GDM and never show the Omarchy greeter (or its Omarchy session
+  # preselection). Disable the other DMs Fedora ships first, then enable SDDM so
+  # the alias lands on it.
+  _enable_display_manager sddm.service
+
   _systemctl_enable --now systemd-oomd >/dev/null 2>&1 || true
   # Bluetooth
   _systemctl_enable --now bluetooth.service >/dev/null 2>&1 || true
@@ -309,6 +333,24 @@ enable_services() {
 
 _systemctl_enable() {
   if (( EUID == 0 )); then systemctl enable "$@"; else sudo systemctl enable "$@"; fi
+}
+
+_systemctl_disable() {
+  if (( EUID == 0 )); then systemctl disable "$@"; else sudo systemctl disable "$@"; fi
+}
+
+# Make $1 the active display manager, disabling the DMs Fedora ships first so
+# the display-manager.service alias points at it deterministically.
+_enable_display_manager() {
+  local target="$1" dm
+  for dm in gdm.service lightdm.service lxdm.service; do
+    if systemctl list-unit-files "$dm" >/dev/null 2>&1; then
+      _systemctl_disable "$dm" || warn "could not disable $dm"
+    fi
+  done
+  if systemctl list-unit-files "$target" >/dev/null 2>&1; then
+    _systemctl_enable "$target" || warn "could not enable $target"
+  fi
 }
 
 # Run snapper as the right user. --no-dbus avoids depending on snapperd, which
@@ -580,6 +622,47 @@ install_omarchy_sddm_theme() {
   fi
 }
 
+# Seed SDDM's session memory so the first login lands in Omarchy. SDDM
+# preselects the session and user from /var/lib/sddm/state.conf ([Last]), and
+# upstream's Omarchy greeter theme (default/sddm/omarchy/Main.qml) has no
+# session or user picker of its own -- it reads the username straight from that
+# file and logs into sessionModel.lastIndex, which SDDM derives from the same
+# [Last] Session record. On a machine converted from another desktop, [Last]
+# still names the previous session (Sway/GNOME), so the first Omarchy login
+# silently drops back into it; with no state file at all the password field has
+# no account to authenticate. Write [Last] with the Omarchy session and the
+# target user so the very first login opens Omarchy. Mirrors upstream
+# omarchy-provision-owner's configure_login, minus its one-shot autologin (the
+# Fedora port has no first-boot wizard to justify skipping the password).
+configure_sddm_login() {
+  [ "$COPY_OMARCHY" = 1 ] || return 0
+
+  local user
+  user="$(resolve_target_user)"
+  [ -n "$user" ] || { warn "no user found; not setting the SDDM default session"; return 0; }
+  id "$user" >/dev/null 2>&1 || { warn "user $user does not exist; not setting the SDDM default session"; return 0; }
+
+  log "== Defaulting SDDM to the Omarchy session (user $user) =="
+  local state_dir=/var/lib/sddm
+  local state_conf="$state_dir/state.conf"
+  local owner=root:root
+  getent passwd sddm >/dev/null 2>&1 && owner=sddm:sddm
+
+  if (( EUID == 0 )); then
+    mkdir -p "$state_dir"
+    printf '[Last]\nSession=omarchy.desktop\nUser=%s\n' "$user" > "$state_conf"
+    chown "$owner" "$state_dir" "$state_conf"
+    chmod 0750 "$state_dir"
+    chmod 0644 "$state_conf"
+  else
+    sudo mkdir -p "$state_dir"
+    printf '[Last]\nSession=omarchy.desktop\nUser=%s\n' "$user" | sudo tee "$state_conf" >/dev/null
+    sudo chown "$owner" "$state_dir" "$state_conf"
+    sudo chmod 0750 "$state_dir"
+    sudo chmod 0644 "$state_conf"
+  fi
+}
+
 # Import omarchy-* commands onto PATH, mirroring the upstream architecture's
 # package map: bin/omarchy + bin/omarchy-* -> /usr/bin/omarchy* (with symlinks
 # kept under /usr/share/omarchy/bin). This is what makes `omarchy`, `omarchy
@@ -622,13 +705,8 @@ install_omarchy_lock_pam() {
     || { warn "omarchy-apply-lock not on PATH; skipping lock-screen PAM"; return 0; }
 
   log "== Configuring lock screen authentication (PAM) =="
-  local lock_user="${TARGET_USER:-}"
-  if [ -z "$lock_user" ] && [ -n "${SUDO_USER:-}" ] && [ "$SUDO_USER" != root ]; then
-    lock_user="$SUDO_USER"
-  fi
-  if [ -z "$lock_user" ]; then
-    lock_user="$(awk -F: '$3>=1000 && $3<60000 {print $1; exit}' /etc/passwd)"
-  fi
+  local lock_user
+  lock_user="$(resolve_target_user)"
   if (( EUID == 0 )); then
     OMARCHY_INSTALL_USER="$lock_user" omarchy-apply-lock
   else
@@ -922,6 +1000,57 @@ install_omarchy_pkg_shims() {
     "false" omarchy_pkg_aur_accessible
 }
 
+# Upstream's omarchy-setup-security-fingerprint installs its packages with
+# `sudo pacman -S ... libfprint-git fprintd usbutils`, which fails on Fedora
+# ("pacman: command not found"). The Fedora layer also can't use the Arch names:
+# `libfprint-git` does not exist here, and the PAM module (`pam_fprintd.so`) is
+# packaged separately as `fprintd-pam`. Generate an override at the path the
+# dispatcher execs, rewriting only the package step to the Fedora names through
+# the omarchy-pkg-* shims, and leave the rest of the upstream script (hardware
+# detection, PAM stacks, enrollment, verification) byte-identical so it keeps
+# tracking upstream. Same generated-shim pattern as omarchy-update and
+# omarchy-pkg-*; nothing under upstream/ is edited.
+install_omarchy_fingerprint_shim() {
+  [ "$COPY_OMARCHY" = 1 ] || return 0
+  local src="$UPSTREAM/bin/omarchy-setup-security-fingerprint"
+  local dest=/usr/share/omarchy/bin/omarchy-setup-security-fingerprint
+
+  [ -f "$src" ] || { warn "no fingerprint setup at $src; skipping shim"; return 0; }
+  [ -d /usr/share/omarchy/bin ] || { warn "no /usr/share/omarchy/bin; skipping fingerprint shim"; return 0; }
+
+  local fedora_pkgs="fprintd fprintd-pam libfprint usbutils"
+  local tmp
+  tmp="$(mktemp)"
+  sed -E \
+    -e "s|sudo pacman -S.*$|omarchy-pkg-add $fedora_pkgs|" \
+    -e "s|omarchy-pkg-missing [^;]*|omarchy-pkg-missing $fedora_pkgs|" \
+    "$src" > "$tmp"
+
+  # If upstream changed the package step beyond what the rewrite above covers,
+  # `pacman` survives. Refuse to install a known-broken command rather than
+  # silently leaving the menu entry pointing at pacman.
+  if grep -q 'pacman' "$tmp"; then
+    rm -f "$tmp"
+    warn "could not rewrite pacman usage in $(basename "$src"); leaving the upstream fingerprint setup in place"
+    return 0
+  fi
+
+  # Skip the write when the result is unchanged, so a no-op update does not
+  # rewrite an executable the user might be running.
+  if [ -f "$dest" ] && cmp -s "$tmp" "$dest"; then
+    rm -f "$tmp"
+    return 0
+  fi
+
+  log "== Wiring fingerprint setup to Fedora packages (dnf) =="
+  if (( EUID == 0 )); then
+    install -m 0755 "$tmp" "$dest"
+  else
+    sudo install -m 0755 "$tmp" "$dest"
+  fi
+  rm -f "$tmp"
+}
+
 # Upstream's `version` file is stale (it reads 4.0.0.alpha even on the v4.0.2
 # release tag), so derive the real version from the git refs: the latest v* tag
 # plus the current quattro HEAD short sha. Written to /usr/share/omarchy/version
@@ -1063,15 +1192,8 @@ install_omarchy_fonts() {
 # ---------------------------------------------------------------------------
 
 configure_user() {
-  local user="${TARGET_USER:-}"
-  if [ -z "$user" ]; then
-    # pick the first non-root uid>=1000 user (or the sudo user)
-    if [ -n "${SUDO_USER:-}" ] && [ "$SUDO_USER" != root ]; then
-      user="$SUDO_USER"
-    else
-      user="$(awk -F: '$3>=1000 && $3<60000 {print $1; exit}' /etc/passwd)"
-    fi
-  fi
+  local user
+  user="$(resolve_target_user)"
   [ -n "$user" ] || { warn "no user to configure; skipping user files"; return 0; }
   id "$user" >/dev/null 2>&1 || { warn "user $user does not exist"; return 0; }
   local home
@@ -1113,6 +1235,31 @@ configure_user() {
     fi
   else
     warn "no config tree at $cfg_src; user configs not seeded"
+  fi
+
+  # uwsm runs /etc/xdg/autostart entries for the Omarchy session through
+  # systemd-xdg-autostart-generator. Most KDE Plasma entries are guarded with
+  # OnlyShowIn=KDE or X-systemd-skip, but org.kde.xwaylandvideobridge is not:
+  # it forces QT_QPA_PLATFORM=xcb and maps an invisible X11 helper window (so
+  # X11 clients can offer screencast streams). On Plasma that window is hosted
+  # by the Plasma tray; under Hyprland there is no XEmbed tray, so it surfaces
+  # as an empty, unclosable black Xwayland window (reported as
+  # "xorg-x11-server-Xwayland", not as the bridge). It is only useful on Plasma
+  # -- Hyprland screencast goes through xdg-desktop-portal-hyprland -- so mask
+  # its autostart with a user-level override (Hidden=true), which takes XDG
+  # precedence over the /etc/xdg one. Gate on the KDE file so non-KDE bases are
+  # untouched, and seed /etc/skel for future users.
+  if [ "$COPY_OMARCHY" = 1 ] && [ -f /etc/xdg/autostart/org.kde.xwaylandvideobridge.desktop ]; then
+    log "  masking KDE's xwaylandvideobridge autostart for the Omarchy session"
+    $as_user mkdir -p "$home/.config/autostart"
+    printf '[Desktop Entry]\nHidden=true\n' | $as_user tee "$home/.config/autostart/org.kde.xwaylandvideobridge.desktop" >/dev/null
+    if (( EUID == 0 )); then
+      mkdir -p /etc/skel/.config/autostart
+      printf '[Desktop Entry]\nHidden=true\n' > /etc/skel/.config/autostart/org.kde.xwaylandvideobridge.desktop
+    else
+      sudo mkdir -p /etc/skel/.config/autostart
+      printf '[Desktop Entry]\nHidden=true\n' | sudo tee /etc/skel/.config/autostart/org.kde.xwaylandvideobridge.desktop >/dev/null
+    fi
   fi
 
   # Pre-fill the keyboard layout on a fresh seed. Upstream ships input.lua with
@@ -1269,10 +1416,12 @@ main() {
   install_omarchy_session
   install_omarchy_sddm_config
   install_omarchy_sddm_theme
+  configure_sddm_login
   install_omarchy_bin
   install_omarchy_lock_pam
   install_omarchy_update_shim
   install_omarchy_pkg_shims
+  install_omarchy_fingerprint_shim
   install_omarchy_profile
   install_uwsm_app_shim
   install_omarchy_chromium_compat
@@ -1289,7 +1438,8 @@ main() {
   echo " Please REBOOT now to start:"
   echo "   sudo systemctl reboot"
   echo
-  echo " After reboot, select the Omarchy session at the display manager."
+  echo " After reboot you will log straight into the Omarchy session (it is"
+  echo " preselected at the login screen)."
 }
 
 main "$@"

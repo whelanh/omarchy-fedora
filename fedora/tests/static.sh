@@ -162,6 +162,58 @@ src = open('fedora/scripts/install.sh').read()
 assert 'cp -au \"\$UPSTREAM\"/*' in src, 'install_omarchy_tree must use cp -au'
 "
 
+echo "== Installer preselects the Omarchy SDDM session =="
+# Upstream's Omarchy greeter theme has no session picker and reads the username
+# from /var/lib/sddm/state.conf; without seeding [Last] a converted machine logs
+# back into its previous session (Sway/GNOME). Guard the default-session seed and
+# its call from main().
+t "install.sh seeds /var/lib/sddm/state.conf for Omarchy" python3 -c "
+src = open('fedora/scripts/install.sh').read()
+assert 'configure_sddm_login()' in src, 'missing configure_sddm_login helper'
+assert '/var/lib/sddm' in src, 'must write SDDM state under /var/lib/sddm'
+assert 'Session=omarchy.desktop' in src, 'must preselect the omarchy session'
+assert 'User=%s' in src, 'must preselect the target user'
+assert src.count('configure_sddm_login') >= 2, 'configure_sddm_login must be defined and called'
+"
+
+echo "== Installer rewrites fingerprint setup onto dnf =="
+# Upstream's omarchy-setup-security-fingerprint installs libfprint-git/fprintd
+# with raw pacman. install.sh must replace it with a generated override that
+# uses the omarchy-pkg-* (dnf) shims and the Fedora package names, including the
+# separate fprintd-pam package that ships pam_fprintd.so.
+t "install.sh rewrites fingerprint setup for Fedora" python3 -c "
+src = open('fedora/scripts/install.sh').read()
+assert 'install_omarchy_fingerprint_shim()' in src, 'missing fingerprint shim helper'
+assert 'fprintd-pam' in src, 'must install the Fedora PAM package'
+assert 'omarchy-pkg-add' in src, 'must install via the dnf shim'
+assert 'pacman -S' in src, 'rewrite must target the pacman install line'
+assert src.count('install_omarchy_fingerprint_shim') >= 2, 'fingerprint shim must be defined and called'
+"
+
+echo "== Installer masks KDE's xwaylandvideobridge autostart =="
+# On a KDE base, org.kde.xwaylandvideobridge autostarts under Hyprland (its
+# .desktop lacks OnlyShowIn=KDE) and paints an unclosable black Xwayland window.
+# install.sh must mask it with a user-level Hidden=true override.
+t "install.sh masks xwaylandvideobridge autostart" python3 -c "
+src = open('fedora/scripts/install.sh').read()
+assert 'org.kde.xwaylandvideobridge.desktop' in src, 'must name the leaking autostart entry'
+assert '/etc/xdg/autostart/org.kde.xwaylandvideobridge.desktop' in src, 'must gate on the KDE-provided file'
+assert '.config/autostart/org.kde.xwaylandvideobridge.desktop' in src, 'must write the user override'
+assert 'Hidden=true' in src, 'override must set Hidden=true'
+"
+
+echo "== Installer takes over the display manager (GNOME/GDM base) =="
+# On Fedora Workstation GDM owns display-manager.service, so `systemctl enable
+# sddm` fails and the Omarchy greeter never appears. install.sh must disable the
+# other DMs first.
+t "install.sh disables competing DMs before enabling SDDM" python3 -c "
+src = open('fedora/scripts/install.sh').read()
+assert '_enable_display_manager()' in src, 'missing _enable_display_manager helper'
+assert 'gdm.service' in src and '_systemctl_disable' in src, 'must disable GDM'
+assert src.count('_enable_display_manager') >= 2, '_enable_display_manager must be defined and called'
+assert 'display-manager.service' in src, 'must account for the display-manager alias'
+"
+
 echo
 echo "== Result: $PASS passed, $FAIL failed =="
 [ "$FAIL" -eq 0 ] || exit 1

@@ -57,6 +57,11 @@ sudo ./fedora/scripts/install.sh --nvidia      # also enable RPM Fusion + NVIDIA
 sudo systemctl reboot
 ```
 
-On reboot, select the Omarchy session at the display manager.
+On reboot, SDDM is preselected to the **Omarchy** session for the installing
+user, so logging in lands directly in Omarchy. If no session is selected (e.g.
+you log in a different account), choose **Omarchy (Hyprland uwsm)** at the login
+screen; the stock Omarchy greeter theme has no session picker of its own, so the
+installer writes the selection to `/var/lib/sddm/state.conf`. Re-running the
+installer (or `omarchy update`) re-asserts it.
 
 > **Note:** Some Omarchy first-party binaries are available from COPRs. See COMPATIBILITY.md.
