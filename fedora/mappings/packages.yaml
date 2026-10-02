@@ -173,6 +173,10 @@ packages:
     package: fd-find
     source: substitute
     note: same tool; Fedora names the package fd-find
+  ffmpeg:
+    package: ffmpeg-free
+    source: substitute
+    note: Fedora's official FFmpeg (ffmpeg-free); the full/lawful build is RPM Fusion `ffmpeg`
   ffmpegthumbnailer:     { package: ffmpegthumbnailer, source: fedora }
   fontconfig:            { package: fontconfig, source: fedora }
   foot:                  { package: foot, source: fedora }
@@ -270,6 +274,14 @@ packages:
     note: Fedora uses python3-* naming
   qemu-user-static-binfmt: { package: qemu-user-static, source: substitute, note: Fedora names the static-user-mode package qemu-user-static }
   qrencode:              { package: qrencode, source: fedora }
+  qt6-base:
+    package: qt6-qtbase
+    source: substitute
+    note: Fedora uses qt6-qt* prefix
+  qt6-declarative:
+    package: qt6-qtdeclarative
+    source: substitute
+    note: Fedora uses qt6-qt* prefix
   qt6-imageformats:
     package: qt6-qtimageformats
     source: substitute
@@ -279,6 +291,10 @@ packages:
     source: substitute
     note: Fedora uses qt6-qt* prefix
   qt6-multimedia-ffmpeg: { package: null, source: drop, note: FFmpeg backend bundled into qt6-qtmultimedia on Fedora }
+  qt6-svg:
+    package: qt6-qtsvg
+    source: substitute
+    note: Fedora uses qt6-qt* prefix
   ripgrep:               { package: ripgrep, source: fedora }
   ruby:                  { package: ruby, source: fedora }
   sddm:                  { package: sddm, source: fedora }

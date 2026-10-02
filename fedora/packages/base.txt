@@ -31,6 +31,8 @@ eza
 fakeroot
 fastfetch
 fd-find
+# Fedora's official FFmpeg build (upstream base package `ffmpeg`)
+ffmpeg-free
 ffmpegthumbnailer
 flatpak
 fontconfig
@@ -115,5 +117,7 @@ neovim
 vim-minimal
 gcc
 make
+# System build-essentials group (upstream base package `base-devel`)
+@development-tools
 # JSON::PP for omarchy-menu-select's perl payload building (missing from dnf perl base)
 perl-JSON-PP

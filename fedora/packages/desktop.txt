@@ -19,6 +19,10 @@ python3-pyxdg
 xdg-desktop-portal-hyprland
 gtk4-layer-shell
 sddm
+# Qt6 runtime used by Omarchy and the first-party Qt6 apps
+qt6-qtbase
+qt6-qtdeclarative
+qt6-qtsvg
 qt6-qtwayland
 qt6-qtimageformats
 qt6-qtmultimedia
