@@ -4,7 +4,7 @@
 # Repack of the upstream release binary (cliamp-linux-amd64), mirroring the
 # Arch PKGBUILD's package layout. No Go toolchain needed.
 Name:           cliamp
-Version:        2.2.0
+Version:        2.3.0
 Release:        1%{?dist}
 Summary:        A retro terminal music player inspired by Winamp 2.x
 
@@ -41,6 +41,9 @@ install -Dm644 LICENSE %{buildroot}%{_datadir}/licenses/%{name}/LICENSE
 %{_datadir}/pixmaps/cliamp.png
 
 %changelog
+* Fri Oct 2 2026 whelanh <brickhousedevelopers@gmail.com> - 2.3.0-1
+- Automatic update to upstream v2.3.0
+
 * Fri Sep 25 2026 whelanh <brickhousedevelopers@gmail.com> - 2.2.0-1
 - Automatic update to upstream v2.2.0
 
