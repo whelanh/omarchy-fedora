@@ -6,14 +6,17 @@
 #   1. refresh Fedora repository metadata (dnf makecache)
 #   2. upgrade Fedora packages (dnf upgrade) — including the first-party
 #      binaries from the whelanh/omarchy COPR, which are now shipped as RPMs
-#   3. sync the Omarchy userspace to the latest upstream quattro
+#   3. (optional) sync the Omarchy userspace to upstream quattro with
+#      OMARCHY_FEDORA_UPDATE_UPSTREAM=1; otherwise re-apply what is committed
 #   4. re-apply the userspace (tree + CLI wiring + compat shims)
 #   5. run pending Omarchy migrations
 #   6. validate the installation
 #
 # For end users this is what `omarchy update` runs (installed by install.sh as a
-# /usr/bin/omarchy-update shim). Steps 3-4 need a git checkout with the
-# `upstream` remote; when absent they are skipped with a notice (see UPDATING.md).
+# /usr/bin/omarchy-update shim). The live upstream pull needs a git checkout
+# with the `upstream` remote plus the git-subtree package, and is opt-in; a
+# non-git install refreshes the userspace from the quattro tarball instead (see
+# UPDATING.md).
 
 set -euo pipefail
 
@@ -130,36 +133,37 @@ omarchy_pkg_update || warn "dnf makecache failed; continuing"
 omarchy_fedora_snapshot
 omarchy_pkg_upgrade || warn "dnf upgrade failed (package conflicts or a transient repo issue); continuing with the userspace sync"
 
-# 3 + 4 — Omarchy userspace.
-if [ "${OMARCHY_FEDORA_UPDATE_UPSTREAM:-1}" != "1" ]; then
-  log "userspace sync disabled (OMARCHY_FEDORA_UPDATE_UPSTREAM=0)"
-elif [ -d "$OMARCHY_ROOT/.git" ] && (cd "$OMARCHY_ROOT" && git remote get-url upstream >/dev/null 2>&1); then
-  log "Syncing the Omarchy userspace to upstream quattro (git subtree)..."
-  if (cd "$OMARCHY_ROOT" && git subtree pull --prefix upstream upstream quattro); then
-    log "Re-applying the Omarchy userspace (idempotent)..."
-    bash "$INSTALL_SH" --update
+# 3 — optional live sync of the vendored upstream/ tree, then 4 — re-apply.
+#
+# The userspace is a *squashed* git subtree (the upstream-sync workflow adds it
+# with `git subtree --squash`), so a live pull must use --squash too; a plain
+# `git subtree pull` fails with "refusing to merge unrelated histories". It also
+# needs the `git subtree` helper, which is the separate git-subtree package on
+# Fedora, not part of stock git. Both made the default-on pull fail on ordinary
+# machines, so the live pull is now opt-in (OMARCHY_FEDORA_UPDATE_UPSTREAM=1,
+# matching UPDATING.md's "development sync") and we always re-apply whatever
+# upstream/ is committed. End users' checkouts advance upstream/ by pulling the
+# reviewed sync merge (or via the upstream-sync workflow), not by omarchy update
+# rewriting it behind their back.
+if [ "${OMARCHY_FEDORA_UPDATE_UPSTREAM:-0}" = "1" ] \
+   && [ -d "$OMARCHY_ROOT/.git" ] \
+   && (cd "$OMARCHY_ROOT" && git remote get-url upstream >/dev/null 2>&1); then
+  if ! (cd "$OMARCHY_ROOT" && git subtree --help >/dev/null 2>&1); then
+    warn "git-subtree is not installed; skipping the live upstream pull (dnf install git-subtree)"
   else
-    log "upstream pull failed (manual review required; see UPSTREAM.md)"
+    log "Syncing the Omarchy userspace to upstream quattro (git subtree pull --squash)..."
+    if ! (cd "$OMARCHY_ROOT" && git subtree pull --prefix upstream --squash upstream quattro \
+            -m "chore(upstream): sync Omarchy quattro"); then
+      warn "upstream pull failed (manual review required; see UPSTREAM.md)"
+    fi
   fi
-elif [ -d "$OMARCHY_ROOT/.git" ]; then
-  # A git checkout without an `upstream` remote. Syncing here would rsync the
-  # tarball into the tracked upstream/ tree and dirty the working copy, so
-  # leave the checkout alone and re-apply whatever is committed. The owner
-  # refreshes upstream/ via the upstream-sync workflow (or by adding an
-  # `upstream` remote), not by running `omarchy update`.
-  log "git checkout without an 'upstream' remote; re-applying the committed userspace"
-  log "  (refresh upstream/ by adding the 'upstream' remote or running the upstream-sync workflow)"
+fi
+
+if [ -d "$OMARCHY_ROOT/.git" ] || omarchy_fedora_sync_userspace_tarball; then
+  log "Re-applying the Omarchy userspace (idempotent)..."
   bash "$INSTALL_SH" --update
 else
-  # No git checkout: install.sh embedded this path, but the user no longer has
-  # a copy of the repo (or never did). Fetch the quattro tarball, refresh the
-  # vendored upstream/ tree, then re-apply via install.sh --update.
-  if omarchy_fedora_sync_userspace_tarball; then
-    log "Re-applying the Omarchy userspace (idempotent)..."
-    bash "$INSTALL_SH" --update
-  else
-    log "userspace sync via tarball failed; continuing with Fedora packages only"
-  fi
+  warn "userspace sync failed; continuing with Fedora packages only"
 fi
 
 # 5 — migrations. Upstream's `omarchy-migrate` runs Arch-specific pacman

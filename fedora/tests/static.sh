@@ -214,6 +214,30 @@ assert src.count('_enable_display_manager') >= 2, '_enable_display_manager must 
 assert 'display-manager.service' in src, 'must account for the display-manager alias'
 "
 
+echo "== Userspace update: squashed subtree + opt-in live pull =="
+# upstream/ is a --squash subtree, so a plain `git subtree pull` fails with
+# "refusing to merge unrelated histories"; it also needs the separate
+# git-subtree package. update.sh must use --squash, gate the live pull behind
+# OMARCHY_FEDORA_UPDATE_UPSTREAM=1, and check for git-subtree.
+t "update.sh pulls the subtree with --squash" python3 -c "
+src = open('fedora/scripts/update.sh').read()
+assert 'git subtree pull --prefix upstream --squash upstream quattro' in src, 'live pull must use --squash'
+assert 'git subtree --help' in src, 'must check git-subtree availability'
+assert 'OMARCHY_FEDORA_UPDATE_UPSTREAM:-0' in src, 'live pull must be opt-in'
+"
+
+echo "== elsewhen migration uses the target user's runtime dir =="
+# The migration runs as root (via sudo) and previously trusted XDG_RUNTIME_DIR
+# from the environment. When that was root's /run/user/0 (no session), the shell
+# ping went to the wrong socket and the migration wrongly reported no running
+# shell. It must derive the runtime dir from the target user's uid.
+t "elsewhen migration targets /run/user/\$uid" python3 -c "
+src = open('fedora/migrations/1790092003-elsewhen-plugin.sh').read()
+assert 'runtime=\"/run/user/\$uid\"' in src, 'must use the target uid runtime dir'
+assert 'XDG_RUNTIME_DIR:-' not in src, 'must not trust the inherited XDG_RUNTIME_DIR'
+assert 'DBUS_SESSION_BUS_ADDRESS' in src, 'must export the target session bus'
+"
+
 echo
 echo "== Result: $PASS passed, $FAIL failed =="
 [ "$FAIL" -eq 0 ] || exit 1

@@ -55,7 +55,11 @@ fi
 
 home="$(getent passwd "$user" | cut -d: -f6)"
 uid="$(id -u "$user")"
-runtime="${XDG_RUNTIME_DIR:-/run/user/$uid}"
+# Always target the user's own runtime dir. This migration runs as root (via
+# sudo), so XDG_RUNTIME_DIR in the environment may belong to root (e.g.
+# /run/user/0, which has no session) - trusting it sent omarchy-shell to the
+# wrong socket and the migration wrongly reported "no running shell".
+runtime="/run/user/$uid"
 shell_json="$home/.config/omarchy/shell.json"
 
 as_user() {
@@ -63,6 +67,7 @@ as_user() {
     HOME="$home" \
     OMARCHY_PATH="$OMARCHY_PATH" \
     XDG_RUNTIME_DIR="$runtime" \
+    DBUS_SESSION_BUS_ADDRESS="unix:path=$runtime/bus" \
     PATH="$OMARCHY_PATH/bin:/usr/bin:/bin" \
     "$@"
 }
@@ -80,7 +85,7 @@ for (( i = 0; i < 100; i++ )); do
   sleep 0.1
 done
 if (( ready == 0 )); then
-  echo "elsewhen: no running shell to place the widget; leaving migration pending" >&2
+  echo "elsewhen: no running shell to place the widget (user $user, runtime $runtime); leaving migration pending" >&2
   exit 1
 fi
 
