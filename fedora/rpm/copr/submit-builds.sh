@@ -6,7 +6,7 @@
 #   fedora/rpm/copr/submit-builds.sh                 # all verified packages, all chroots
 #   fedora/rpm/copr/submit-builds.sh aether ttfx     # only these packages
 #   fedora/rpm/copr/submit-builds.sh --srpms-only    # build SRPMs, no submit
-#   fedora/rpm/copr/submit-builds.sh --chroot fedora-44-x86_64   # only this chroot
+#   fedora/rpm/copr/submit-builds.sh --chroot fedora-45-x86_64   # only this chroot
 #
 # Requires:
 #   - copr-cli (dnf install -y copr-cli) + login (see README.md)

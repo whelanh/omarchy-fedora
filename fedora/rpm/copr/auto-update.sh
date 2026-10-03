@@ -13,7 +13,7 @@
 #   fedora/rpm/copr/auto-update.sh --yes            # no confirmation prompt
 #   fedora/rpm/copr/auto-update.sh --srpms-only     # bump + build SRPMs, no submit
 #   fedora/rpm/copr/auto-update.sh --verify         # container-verify before submit
-#   fedora/rpm/copr/auto-update.sh --chroot fedora-44-x86_64
+#   fedora/rpm/copr/auto-update.sh --chroot fedora-45-x86_64
 #
 # Notes:
 #   - Only packages with `status: verified` in manifest.yaml are considered;

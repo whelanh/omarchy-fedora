@@ -105,7 +105,7 @@ packages:
     license: MIT
     deps: [qt6-base, qt6-declarative, qt6-multimedia, ffmpeg, ffprobe]
     status: verified
-    version: 0.4.0
+    version: 0.5.0
     note: Built in Fedora Rawhide container (v0.4.0); Qt6 trimmer, needs qt6-qtmultimedia-devel.
   omawrite:
     repo: https://github.com/omacom/omawrite

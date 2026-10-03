@@ -4,7 +4,7 @@
 #
 # Usage:
 #   fedora/rpm/copr/create-project.sh                        # rawhide only
-#   fedora/rpm/copr/create-project.sh fedora-44-x86_64 ...   # rawhide + listed
+#   fedora/rpm/copr/create-project.sh fedora-45-x86_64 ...   # rawhide + listed
 #   fedora/rpm/copr/create-project.sh --check                # describe project
 #
 # Requires:

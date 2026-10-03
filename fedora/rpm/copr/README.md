@@ -35,7 +35,7 @@ The token authenticates all `copr-cli` calls below.
 
 ```sh
 bash fedora/rpm/copr/create-project.sh                        # rawhide only
-bash fedora/rpm/copr/create-project.sh fedora-44-x86_64       # rawhide + Fedora 44
+bash fedora/rpm/copr/create-project.sh fedora-45-x86_64       # rawhide + Fedora 45
 ```
 
 This creates `whelanh/omarchy` with:
@@ -45,20 +45,20 @@ This creates `whelanh/omarchy` with:
   release-matched URL per chroot) — required because
   `hyprland-preview-share-picker` needs `gtk4-layer-shell-devel`, which
   official Fedora doesn't ship. It is wired per-chroot, not project-wide, so a
-  Fedora 44 build never sees a rawhide hyprland repo.
+  Fedora 45 build never sees a rawhide hyprland repo.
 
 To review the settings afterwards: `copr-cli get whelanh/omarchy` and
 `copr-cli get-chroot whelanh/omarchy/<chroot>` (or `create-project.sh --check`).
 
-> **Adding a Fedora release later** (e.g. Fedora 44): add its chroot *and* its
+> **Adding a Fedora release later** (e.g. Fedora 45): add its chroot *and* its
 > build repo, then rebuild. `copr-cli modify --chroot` **replaces** the chroot
 > list, so always list every chroot you want:
 >
 > ```sh
 > copr-cli modify whelanh/omarchy \
->   --chroot fedora-rawhide-x86_64 --chroot fedora-44-x86_64
-> copr-cli edit-chroot whelanh/omarchy/fedora-44-x86_64 \
->   --repos https://download.copr.fedorainfracloud.org/results/nett00n/hyprland/fedora-44-x86_64/
+>   --chroot fedora-rawhide-x86_64 --chroot fedora-45-x86_64
+> copr-cli edit-chroot whelanh/omarchy/fedora-45-x86_64 \
+>   --repos https://download.copr.fedorainfracloud.org/results/nett00n/hyprland/fedora-45-x86_64/
 > bash fedora/rpm/copr/submit-builds.sh
 > ```
 
@@ -72,7 +72,7 @@ bash fedora/rpm/copr/submit-builds.sh
 bash fedora/rpm/copr/submit-builds.sh aether ttfx
 
 # only a specific chroot (e.g. a newly added release):
-bash fedora/rpm/copr/submit-builds.sh --chroot fedora-44-x86_64
+bash fedora/rpm/copr/submit-builds.sh --chroot fedora-45-x86_64
 
 # just produce SRPMs (in ~/rpmbuild-omarchy/SRPMS), don't submit:
 bash fedora/rpm/copr/submit-builds.sh --srpms-only
