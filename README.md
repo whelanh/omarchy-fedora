@@ -14,16 +14,16 @@ The upstream Omarchy tree is vendored under [`upstream/`](upstream) via git
 subtree and stays authoritative. **This is not an independent fork of
 Omarchy.**
 
-**This has been sucessfully deployed in Fedora Rawhide and in Fedora 44 
+This has been sucessfully deployed in Fedora Rawhide and in Fedora 44 
 (by [Lukas Dolzer](https://github.com/luke-29)).  Fedora Rawhide, Fedora 44 and
-Fedora 45 "1st party" packages are available in the COPR repo.**
+Fedora 45 "1st party" packages are available in the COPR repo.
 
 ---
 
 ## Status
 
-> **IN DEVELOPMENT.** This has been successfully run on VirtManager VMs
-> and Rawhide and Fedora 44 "bare metal". Most/many features work and
+> **IN DEVELOPMENT.** This has been successfully run on VirtManager VMs,
+> Rawhide and Fedora 44 "bare metal". Most/many features work and
 > the Super keys act as expected.  The update process has also been
 > tested.  However, there are no doubt still some
 > things to be ironed out.  Bug reports are welcome.
@@ -76,8 +76,9 @@ The installer is **idempotent** — running it again is safe.
 
 ## Update
 This repo runs a daily workflow to keep it in line with upstream Omarchy.  Users can
-run *omarchy update* from their terminal to update (it re-runs the installer after
-doing a dnf upgrade).
+run `omarchy update` from their terminal to update (it re-runs the installer after
+doing a dnf upgrade).  You may occasionally get hyprland config errors during an update -- just
+let the update complete and then reboot.
 
 ## Rollback
 In an attempt to emulate Omarchy's Limine rollback structure. The install script installs `snapper`, `btrfs-assistant`, and `grub-btrfs` (from COPR).  Snapshots are created pre and post upgrade and on a time-line (with retention limits). You can boot into a snapshot.  To actually re-set to a snapshot, follow directions for `snapper`.
