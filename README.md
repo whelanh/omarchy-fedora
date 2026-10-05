@@ -14,21 +14,16 @@ The upstream Omarchy tree is vendored under [`upstream/`](upstream) via git
 subtree and stays authoritative. **This is not an independent fork of
 Omarchy.**
 
-**This has been developed for Fedora Rawhide (package mapping was done for Rawhide only).
-However contributor [Lukas Dolzer](https://github.com/luke-29) has successfully 
-installed it on Fedora 44 and Fedora 44 "1st party" packages are now in the COPR repo.**
-
-*Using Rawhide should be done by experienced users who are comfortable fixing
-their systems when bleeding-edge Rawhide packages and inconsistencies create problems.*
+**This has been sucessfully deployed in Fedora Rawhide and in Fedora 44 
+(by [Lukas Dolzer](https://github.com/luke-29)  Fedora Rawhide, Fedora 44 and
+Fedora 45 "1st party" packages are available in the COPR repo.**
 
 ---
 
 ## Status
 
 > **IN DEVELOPMENT.** This has been successfully run on VirtManager VMs
-> that start with the latest nightly Fedora Sway Rawhide image.  It has
-> also been successfully deployed on an Asus ROG laptop (also starting from
-> Fedora Sway Rawhide system).  Most/many features work and
+> and Rawhide and Fedora 44 "bare metal". Most/many features work and
 > the Super keys act as expected.  The update process has also been
 > tested.  However, there are no doubt still some
 > things to be ironed out.  Bug reports are welcome.
@@ -81,6 +76,11 @@ The installer is **idempotent** — running it again is safe.
 > omawrite, omasnap, owe, owe-lockfeed, tensaku, try, ttfx) are built as Fedora
 > RPMs and installed from the `whelanh/omarchy` COPR by the installer (see
 > `fedora/rpm/copr/README.md`). Pass `--no-firstparty` to skip.
+
+## Update
+This repo runs a daily workflow to keep it in line with upstream Omarchy.  Users can
+run *omarchy update* from their terminal to update (it re-runs the installer after
+doing a dnf upgrade).
 
 ## Rollback
 In an attempt to emulate Omarchy's Limine rollback structure. The install script installs `snapper`, `btrfs-assistant`, and `grub-btrfs` (from COPR).  Snapshots are created pre and post upgrade and on a time-line (with retention limits). You can boot into a snapshot.  To actually re-set to a snapshot, follow directions for `snapper`.
