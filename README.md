@@ -15,7 +15,7 @@ subtree and stays authoritative. **This is not an independent fork of
 Omarchy.**
 
 **This has been sucessfully deployed in Fedora Rawhide and in Fedora 44 
-(by [Lukas Dolzer](https://github.com/luke-29)  Fedora Rawhide, Fedora 44 and
+(by [Lukas Dolzer](https://github.com/luke-29)).  Fedora Rawhide, Fedora 44 and
 Fedora 45 "1st party" packages are available in the COPR repo.**
 
 ---
@@ -34,10 +34,7 @@ Fedora 45 "1st party" packages are available in the COPR repo.**
 
 ## Supported target
 
-- Fedora Rawhide **x86_64** (starting with Fedora Sway spin recommended)
-  - It has been reported to have been successfully installed on Fedora 44 as well.
-- systemd
-- Wayland-capable hardware
+- Fedora Rawhide, 44 or 45 **x86_64** (starting with Fedora Sway spin recommended although others have started from KDE)
 
 ## Layout
 
