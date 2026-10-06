@@ -23,7 +23,7 @@ Fedora 45 "1st party" packages are available in the COPR repo.
 ## Status
 
 > **IN DEVELOPMENT.** This has been successfully run on VirtManager VMs,
-> Rawhide and Fedora 44 "bare metal". Most/many features work and
+> and on Rawhide and Fedora 44 "bare metal" machines. Most/many features work and
 > the Super keys act as expected.  The update process has also been
 > tested.  However, there are no doubt still some
 > things to be ironed out.  Bug reports are welcome.
