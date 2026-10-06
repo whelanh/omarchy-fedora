@@ -25,7 +25,7 @@ packages:
     license: MIT
     deps: [webkit2gtk4.1, gtk3]
     status: verified
-    version: 4.31.1
+    version: 4.32.0
     note: Repack of aether-linux-amd64; desktop + aether:// url-handler + icons. Container-built OK.
   cliamp:
     repo: https://github.com/bjarneo/cliamp
@@ -135,7 +135,7 @@ packages:
     license: MIT
     deps: [mpv, ffmpeg-free, socat, wayland-devel, libglvnd-devel, libepoxy-devel, systemd-devel]
     status: verified
-    version: 0.2.8
+    version: 0.2.9
     note: OWE wallpaper engine (owed daemon + owe CLI + owe-render); desktop video backgrounds, feeds the lock screen via owe-lockfeed. Container-built OK.
   owe-lockfeed:
     repo: https://github.com/omacom/owe
@@ -145,7 +145,7 @@ packages:
     license: MIT
     deps: [qt6-qtdeclarative]
     status: verified
-    version: 0.2.8
+    version: 0.2.9
     note: Qt6 QML module Owe.LockFeed from the same omacom/owe tag archive as `owe`; this is the package Omarchy splits out of the AUR owe build. Container-built OK.
   tensaku:
     repo: https://github.com/jondkinney/tensaku
