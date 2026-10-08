@@ -6,7 +6,7 @@
 %global debug_package %{nil}
 
 Name:           monologue
-Version:        0.3.0
+Version:        0.3.1
 Release:        1%{?dist}
 Summary:        Simple, theme-synced webcam recorder for Omarchy
 
@@ -54,5 +54,8 @@ install -Dm644 pkgbuild/monologue.desktop %{buildroot}%{_datadir}/applications/m
 %{_datadir}/applications/monologue.desktop
 
 %changelog
+* Thu Oct 8 2026 whelanh <brickhousedevelopers@gmail.com> - 0.3.1-1
+- Automatic update to upstream v0.3.1
+
 * Mon Sep 28 2026 whelanh <brickhousedevelopers@gmail.com> - 0.3.0-1
 - Initial Fedora package: theme-synced webcam recorder (v0.3.0)

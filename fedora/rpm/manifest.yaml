@@ -95,7 +95,7 @@ packages:
     license: MIT
     deps: [qt6-qtbase, qt6-qtdeclarative, qt6-qtmultimedia, pulseaudio-libs, ffmpeg-free, xdg-desktop-portal]
     status: verified
-    version: 0.3.0
+    version: 0.3.1
     note: Theme-synced webcam recorder with a built-in trim/cut editor; Qt6/qmake6 with libpulse for metering, shells out to ffmpeg/ffprobe. Container-built OK.
   omacalc:
     repo: https://github.com/omacom/omacalc
@@ -155,7 +155,7 @@ packages:
     license: MIT
     deps: [mpv, ffmpeg-free, socat, wayland-devel, libglvnd-devel, libepoxy-devel, systemd-devel]
     status: verified
-    version: 0.2.9
+    version: 0.2.10
     note: OWE wallpaper engine (owed daemon + owe CLI + owe-render); desktop video backgrounds, feeds the lock screen via owe-lockfeed. Container-built OK.
   owe-lockfeed:
     repo: https://github.com/omacom/owe
@@ -165,7 +165,7 @@ packages:
     license: MIT
     deps: [qt6-qtdeclarative]
     status: verified
-    version: 0.2.9
+    version: 0.2.10
     note: Qt6 QML module Owe.LockFeed from the same omacom/owe tag archive as `owe`; this is the package Omarchy splits out of the AUR owe build. Container-built OK.
   tensaku:
     repo: https://github.com/jondkinney/tensaku
