@@ -35,6 +35,12 @@ packages:
     repository: whelanh/omarchy
     rpm: fedora/rpm/cliamp/cliamp.spec
     note: Terminal music player; Go/CGO with ALSA deps, repacked from release binary.
+  disktree-bin:
+    package: disktree-bin
+    source: copr
+    repository: whelanh/omarchy
+    rpm: fedora/rpm/disktree-bin/disktree-bin.spec
+    note: Omarchy disk-usage treemap; Rust/GPUI prebuilt release repacked (AUR disktree-bin). RPM name disktree-bin, Provides disktree.
   elsewhen:
     package: elsewhen
     source: copr
@@ -83,6 +89,12 @@ packages:
     repository: whelanh/omarchy
     rpm: fedora/rpm/omawrite/omawrite.spec
     note: Markdown editor; Qt6/qmake6 with quickcontrols2.
+  omapresent:
+    package: omapresent
+    source: copr
+    repository: whelanh/omarchy
+    rpm: fedora/rpm/omapresent/omapresent.spec
+    note: Markdown presentation app, the successor to hype (which upstream still ships); Qt6 Quick + QtWebEngine, source-built. Installed via whelanh/omarchy even though it is not yet in omarchy-base.packages.
   omasnap:
     package: omasnap
     source: copr

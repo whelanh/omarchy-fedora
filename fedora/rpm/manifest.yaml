@@ -37,6 +37,16 @@ packages:
     status: verified
     version: 2.3.0
     note: Repack of cliamp-linux-amd64; desktop + Cliamp.png. Container-built OK.
+  disktree-bin:
+    repo: https://github.com/tobi/disktree
+    language: rust
+    build: repack-release (upstream ships prebuilt linux-x86_64 binary)
+    binary: disktree
+    license: MIT
+    deps: [hicolor-icon-theme, vulkan-loader]
+    status: verified
+    version: 0.11.0
+    note: Repack of disktree-0.11.0-x86_64-linux.tar.gz (Rust + GPUI disk-usage treemap, the AUR `disktree-bin`); RPM name disktree-bin, Provides disktree. Container-built OK.
   elsewhen:
     repo: https://github.com/omacom/elsewhen
     language: javascript
@@ -106,7 +116,17 @@ packages:
     deps: [qt6-base, qt6-declarative, qt6-multimedia, ffmpeg, ffprobe]
     status: verified
     version: 0.5.0
-    note: Built in Fedora Rawhide container (v0.4.0); Qt6 trimmer, needs qt6-qtmultimedia-devel.
+    note: Built in Fedora Rawhide container (v0.5.0); Qt6 trimmer, needs qt6-qtmultimedia-devel.
+  omapresent:
+    repo: https://github.com/jethrojones/omapresent
+    language: cpp
+    build: qmake6
+    binary: omapresent
+    license: MIT AND LicenseRef-Omarchy
+    deps: [qt6-qtbase, qt6-qtdeclarative, qt6-qtwebengine, qt6-qtwebchannel, qt6-qtmultimedia, xdg-desktop-portal, hicolor-icon-theme]
+    status: verified
+    version: 0.1.3
+    note: Markdown presentation app (successor to hype); Qt6 Quick + QtWebEngine, ships a bundled agent skill + welcome deck and theme-refresh hook. Container-built OK.
   omawrite:
     repo: https://github.com/omacom/omawrite
     language: cpp

@@ -170,9 +170,9 @@ install_repos() {
   # gpu-screen-recorder is part of the desktop; enable its COPR.
   omarchy_fedora_enable_optional_coprs brycensranch/gpu-screen-recorder-git \
     || die "failed to enable gpu-screen-recorder COPR"
-  # First-party Omarchy packages (aether, cliamp, elsewhen, herdr, hype,
-  # hyprland-preview-share-picker, monologue, omacalc, omacut, omawrite,
-  # omasnap, owe, owe-lockfeed, tensaku, try, ttfx) live in the
+  # First-party Omarchy packages (aether, cliamp, disktree-bin, elsewhen, herdr,
+  # hype, hyprland-preview-share-picker, monologue, omacalc, omacut, omapresent,
+  # omawrite, omasnap, owe, owe-lockfeed, tensaku, try, ttfx) live in the
   # whelanh/omarchy COPR (see fedora/rpm/copr/README.md).
   if [ "$INSTALL_FIRSTPARTY" = 1 ]; then
     omarchy_fedora_enable_optional_coprs whelanh/omarchy \
@@ -483,9 +483,10 @@ install_omarchy_tree() {
     sudo chown -R root:root "$dest"
   fi
   log "Omarchy tree installed to $dest"
-  log "NOTE: the 16 first-party packages (aether, cliamp, elsewhen, herdr," \
-       "hype, hyprland-preview-share-picker, monologue, omacalc, omacut," \
-       "omawrite, omasnap, owe, owe-lockfeed, tensaku, try, ttfx) are packaged" \
+  log "NOTE: the 18 first-party packages (aether, cliamp, disktree-bin," \
+       "elsewhen, herdr, hype, hyprland-preview-share-picker, monologue," \
+       "omacalc, omacut, omapresent, omawrite, omasnap, owe, owe-lockfeed," \
+       "tensaku, try, ttfx) are packaged" \
        "under fedora/rpm and ship from the whelanh/omarchy COPR (see" \
        "fedora/rpm/copr/README.md)."
 }

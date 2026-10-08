@@ -6,7 +6,7 @@ in Fedora official/COPR repos. They map to `source: copr` entries in
 `fedora/mappings/packages.yaml` and are distributed via the
 `whelanh/omarchy` COPR.
 
-> **Status: 16 VERIFIED, 0 BLOCKED.** Every package builds cleanly in the
+> **Status: 18 VERIFIED, 0 BLOCKED.** Every package builds cleanly in the
 > Fedora Rawhide container (`manifest.yaml` status `verified`), driven by
 > `build-rpm-in-ci.sh` — the same path the CI `rpm-build` job runs.
 
@@ -42,6 +42,7 @@ FEDORA=1 bash fedora/rpm/build-in-container.sh tensaku
 |---------|------|-------|---------|--------|
 | aether | omacom/aether | prebuilt-repack | MIT | verified |
 | cliamp | bjarneo/cliamp | prebuilt-repack | MIT | verified |
+| disktree-bin | tobi/disktree | prebuilt-repack | MIT | verified |
 | elsewhen | omacom/elsewhen | noarch-repack | MIT | verified |
 | herdr | herdrdev/herdr | prebuilt-repack | Apache-2.0 | verified |
 | hype | omacom/hype | Qt6 / qmake6 | MIT | verified |
@@ -50,6 +51,7 @@ FEDORA=1 bash fedora/rpm/build-in-container.sh tensaku
 | omacalc | omacom/omacalc | Qt6 / qmake6 | MIT | verified |
 | omacut | omacom/omacut | Qt6 / qmake6 | MIT | verified |
 | omawrite | omacom/omawrite | Qt6 / qmake6 | MIT | verified |
+| omapresent | jethrojones/omapresent | Qt6 / qmake6 + QtWebEngine | MIT AND LicenseRef-Omarchy | verified |
 | omasnap | tobi/omasnap | prebuilt-repack | MIT | verified |
 | owe | omacom/owe | meson (C) | MIT | verified |
 | owe-lockfeed | omacom/owe | cmake (Qt6 qml-plugin) | MIT | verified |
@@ -70,14 +72,16 @@ These are intentionally **not** RPMs here:
   already symlinks every `bin/omarchy-*`. An RPM would file-conflict with the
   base install.
 
-## Build notes (the four repacks)
+## Build notes (the repacks)
 
-- **aether / cliamp / herdr** — upstream ships a single prebuilt release
-  binary (`*-linux-amd64` / `*-linux-x86_64`), which is exactly what Omarchy's
-  Arch PKGBUILDs install; the specs repackage the release asset plus the
-  desktop/icon/license bits. `%global debug_package %{nil}` because the
-  prebuilt ELF carries no DWARF. `herdr` uses `herdrdev/herdr` release assets
-  (the `omacom-io/herdr` fork has tags but no release binaries).
+- **aether / cliamp / disktree-bin / herdr / omasnap** — upstream ships a single
+  prebuilt release asset (`*-linux-amd64` / `*-linux-x86_64`, or a full tree),
+  which is exactly what Omarchy's Arch PKGBUILDs install; the specs repackage the
+  release asset plus the desktop/icon/license bits. `%global debug_package
+  %{nil}` because the prebuilt ELF carries no DWARF. `herdr` uses
+  `herdrdev/herdr` release assets (the `omacom-io/herdr` fork has tags but no
+  release binaries); `disktree-bin` mirrors the AUR name and adds
+  `Provides: disktree`.
 - **tensaku** — the `tensaku-v0.28.0-x86_64.tar.gz` release ships the full
   install tree (`bin/` + `share/` with desktop, hicolor svg, man page,
   completions, and MPL licenses), so the spec just stage-extracts it into the
