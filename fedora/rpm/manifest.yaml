@@ -127,6 +127,26 @@ packages:
     status: verified
     version: 0.1.3
     note: Markdown presentation app (successor to hype); Qt6 Quick + QtWebEngine, ships a bundled agent skill + welcome deck and theme-refresh hook. Container-built OK.
+  omarchy-emacs:
+    repo: https://github.com/scottjones/omarchy-emacs
+    language: emacs-lisp
+    build: noarch-repack (config + helper scripts; no compile)
+    binary: null
+    license: MIT
+    deps: [emacs, bash]
+    status: verified
+    version: 1.10.1
+    note: Omarchy Emacs integration (theme/font sync) behind the SUPER+SPACE Install > Editor > Emacs row; installs /usr/bin/omarchy-* helpers + /usr/share/omarchy-emacs. Opt-in, not in the default install set. Container-built OK.
+  voxtype-bin:
+    repo: https://github.com/peteonrails/voxtype
+    language: rust
+    build: repack-release (upstream prebuilt Whisper + OSD binaries)
+    binary: voxtype
+    license: MIT
+    deps: [alsa-lib, curl, glibc, libgcc]
+    status: verified
+    version: 1.1.0
+    note: Dictation backend for the SUPER+SPACE Install > AI > Dictation row (RPM name voxtype-bin, Provides voxtype); repacks only the Whisper (CPU/Vulkan) + OSD binaries, not upstream's ONNX/CUDA/MIGraphX payload. Opt-in, not in the default install set. Container-built OK.
   omawrite:
     repo: https://github.com/omacom/omawrite
     language: cpp
