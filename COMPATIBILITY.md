@@ -129,6 +129,18 @@ Caveats:
   (`--no-firstparty` to skip); all are `verified` in `fedora/rpm/manifest.yaml`.
 - `gum` and `git-delta` were added to `fedora/packages/base.txt` as
   dependencies of the CLI layer.
+- The SUPER+SPACE **Install** rows call `omarchy-pkg-add`/`-present` with
+  Arch/AUR names. `fedora/mappings/menu-packages.conf` (read at runtime by
+  `fedora/scripts/lib/pkg.sh`) translates those to Fedora package names, COPRs,
+  vendor repos/direct RPMs, or Flathub, so the menu rows resolve on Fedora.
+  Native sources are tried first with an automatic Flathub fallback (vendor and
+  COPR packages generally target stable Fedora, so rawhide lands on Flatpak).
+  When a Flatpak is installed, the shim best-effort applies the later native
+  integration upstream expects: a `/usr/bin/<cmd>` launcher, a NoDisplay desktop
+  id alias, and (for Chromium-family browsers) a `flatpak override` bind-mount
+  of the host machine-policy dir so theme `color.json` applies. Unlisted names
+  pass through to dnf unchanged; apps with no Fedora/Flathub source are marked
+  `unavailable` and skipped with a warning instead of failing the script.
 
 ## Known incompatibilities / open work
 

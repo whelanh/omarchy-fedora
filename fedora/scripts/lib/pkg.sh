@@ -32,6 +32,53 @@
 if [ -n "${OMARCHY_FEDORA_PKG_LIB:-}" ]; then return 0 2>/dev/null || exit 0; fi
 OMARCHY_FEDORA_PKG_LIB=1
 
+# --- Menu package-name translation ----------------------------------------
+# The Omarchy SUPER+SPACE menu install rows call omarchy-pkg-add/-present with
+# Arch/AUR package names. Map those to Fedora strategies (dnf name, COPR, or
+# Flathub) via fedora/mappings/menu-packages.conf. Unlisted names pass through
+# to dnf unchanged. Parsed in bash so the runtime shim needs no Python/PyYAML.
+_PKG_LIB_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+MENU_PACKAGES_CONF="$_PKG_LIB_DIR/../../mappings/menu-packages.conf"
+
+declare -A _OMARCHY_MENU_SRC=() _OMARCHY_MENU_PKGS=() _OMARCHY_MENU_REPO=() \
+  _OMARCHY_MENU_CMD=() _OMARCHY_MENU_DESKTOP=() _OMARCHY_MENU_FALLBACK=()
+_OMARCHY_MENU_LOADED=""
+
+_omarchy_menu_load() {
+  [ -n "$_OMARCHY_MENU_LOADED" ] && return 0
+  _OMARCHY_MENU_LOADED=1
+  [ -r "$MENU_PACKAGES_CONF" ] || return 0
+  local line name src pkgs repo cmd desktop fallback
+  while IFS= read -r line || [ -n "$line" ]; do
+    line="${line%%#*}"
+    [ -n "${line//[[:space:]]/}" ] || continue
+    IFS='|' read -r name src pkgs repo cmd desktop fallback <<<"$line"
+    name="${name//[[:space:]]/}"
+    [ -n "$name" ] || continue
+    _OMARCHY_MENU_SRC["$name"]="$src"
+    _OMARCHY_MENU_PKGS["$name"]="$pkgs"
+    _OMARCHY_MENU_REPO["$name"]="$repo"
+    _OMARCHY_MENU_CMD["$name"]="$cmd"
+    _OMARCHY_MENU_DESKTOP["$name"]="$desktop"
+    _OMARCHY_MENU_FALLBACK["$name"]="$fallback"
+  done < "$MENU_PACKAGES_CONF"
+}
+
+# Resolve an Arch/AUR name to "<source>|<packages>|<repo>|<cmd>|<desktop>|<fallback>".
+# Unlisted names resolve as "fedora|<name>||||".
+_omarchy_pkg_resolve() {
+  _omarchy_menu_load
+  local name="$1"
+  if [ -z "${_OMARCHY_MENU_SRC[$name]+x}" ]; then
+    printf 'fedora|%s||||\n' "$name"
+  else
+    printf '%s|%s|%s|%s|%s|%s\n' \
+      "${_OMARCHY_MENU_SRC[$name]}" "${_OMARCHY_MENU_PKGS[$name]}" \
+      "${_OMARCHY_MENU_REPO[$name]}" "${_OMARCHY_MENU_CMD[$name]}" \
+      "${_OMARCHY_MENU_DESKTOP[$name]}" "${_OMARCHY_MENU_FALLBACK[$name]}"
+  fi
+}
+
 # --- Locale / environment -------------------------------------------------
 
 # Force C locale so error messages are parseable and stable.
@@ -58,38 +105,170 @@ _omarchy_dnf() {
   fi
 }
 
+# --- Flatpak helpers ------------------------------------------------------
+# Run flatpak as root (system install) or via sudo when unprivileged.
+_omarchy_flatpak() {
+  if (( EUID == 0 )); then
+    flatpak "$@"
+  else
+    sudo flatpak "$@"
+  fi
+}
+
+# Install Flathub app ids system-wide, ensuring the flathub remote exists.
+_omarchy_pkg_flatpak_install() {
+  if ! command -v flatpak >/dev/null 2>&1; then
+    echo "omarchy: flatpak is not installed; cannot install: $*" >&2
+    return 1
+  fi
+  _omarchy_flatpak remote-add --if-not-exists flathub \
+    https://flathub.org/repo/flathub.flatpakrepo >/dev/null 2>&1 || true
+  _omarchy_flatpak install -y --noninteractive flathub "$@"
+}
+
+# Write a system file (with sudo when unprivileged). Reads content on stdin.
+_omarchy_write_system_file() {
+  local path="$1" mode="${2:-0644}"
+  if (( EUID == 0 )); then
+    cat > "$path" && chmod "$mode" "$path"
+  else
+    sudo tee "$path" >/dev/null && sudo chmod "$mode" "$path"
+  fi
+}
+
+# Best-effort Flatpak integration so upstream's later native-integration steps
+# have something to act on: expose the command upstream launches via a /usr/bin
+# wrapper, alias the desktop id upstream expects, and (for Chromium-family
+# browsers) bind-mount the host machine-policy dir into the sandbox so
+# `omarchy-theme-set-browser` color.json applies. All are idempotent and
+# non-fatal: a failure must not break the install.
+_omarchy_pkg_flatpak_integrate() {
+  local cmd="$1" desktop="$2" appid="$3"
+  case "$appid" in
+    com.google.Chrome)  _omarchy_flatpak override --system --filesystem=/etc/opt/chrome:ro "$appid" >/dev/null 2>&1 || true ;;
+    com.microsoft.Edge) _omarchy_flatpak override --system --filesystem=/etc/opt/edge:ro "$appid" >/dev/null 2>&1 || true ;;
+    com.brave.Browser)  _omarchy_flatpak override --system --filesystem=/etc/brave:ro "$appid" >/dev/null 2>&1 || true ;;
+  esac
+  if [ -n "$cmd" ]; then
+    printf '#!/bin/sh\n# omarchy: Flatpak launcher for %s (installed by the Omarchy Fedora layer).\nexec /usr/bin/flatpak run %s "$@"\n' \
+      "$appid" "$appid" \
+      | _omarchy_write_system_file "/usr/bin/$cmd" 0755 || true
+  fi
+  if [ -n "$desktop" ]; then
+    _omarchy_write_system_file "/usr/share/applications/$desktop" 0644 <<EOF || true
+[Desktop Entry]
+Type=Application
+Name=${cmd:-$appid}
+Exec=/usr/bin/flatpak run $appid %U
+Terminal=false
+NoDisplay=true
+EOF
+  fi
+}
+
+# Add a vendor repo (repo=.repo URL) or install a direct RPM (repo=URL).
+_omarchy_pkg_native_install() {
+  local source="$1" pkgs="$2" repo="$3"
+  case "$source" in
+    rpm)
+      _omarchy_dnf install -y "$repo"
+      ;;
+    repo)
+      if dnf --version 2>&1 | grep -q '^dnf5'; then
+        _omarchy_dnf config-manager addrepo --from-repofile "$repo" >/dev/null 2>&1 \
+          || return 1
+      else
+        _omarchy_dnf config-manager --add-repo "$repo" >/dev/null 2>&1 || return 1
+      fi
+      _omarchy_dnf install -y --skip-unavailable $pkgs
+      ;;
+    copr)
+      omarchy_pkg_enable_repo copr "$repo" >/dev/null 2>&1 || return 1
+      _omarchy_dnf install -y --skip-unavailable $pkgs
+      ;;
+    *)
+      _omarchy_dnf install -y --skip-unavailable $pkgs
+      ;;
+  esac
+}
+
 # --- is_installed ---------------------------------------------------------
-# Success (0) if the single named package is installed, failure otherwise.
+# Success (0) if the named package is installed. The name is translated through
+# the menu map: native rpm first, then the Flathub fallback.
 omarchy_pkg_is_installed() {
-  local pkg
-  pkg="$(omarchy_pkg_normalize "$1")" || return 2
-  rpm -q "$pkg" >/dev/null 2>&1
+  local name src pkgs repo cmd desktop fb p
+  name="$(omarchy_pkg_normalize "$1")" || return 2
+  IFS='|' read -r src pkgs repo cmd desktop fb < <(_omarchy_pkg_resolve "$name")
+  case "$src" in
+    flatpak) flatpak info "$pkgs" >/dev/null 2>&1 ;;
+    unavailable) return 1 ;;
+    *)
+      local all=1
+      for p in $pkgs; do
+        rpm -q "$p" >/dev/null 2>&1 || { all=0; break; }
+      done
+      (( all )) && return 0
+      [ -n "$fb" ] && flatpak info "$fb" >/dev/null 2>&1 && return 0
+      return 1
+      ;;
+  esac
 }
 
 # --- install --------------------------------------------------------------
-# Installs the named packages if any are missing. Idempotent: returns success
-# if all are already installed without invoking dnf.
+# Installs the named packages if any are missing. Names are translated through
+# the menu map (dnf / COPR / vendor repo / direct RPM / Flatpak), with a Flathub
+# fallback for native sources. Idempotent.
 omarchy_pkg_install() {
-  local missing=() pkg
-  for pkg in "$@"; do
-    if ! omarchy_pkg_is_installed "$pkg"; then
-      missing+=("$pkg")
+  local name src pkgs repo cmd desktop fb p s app c d
+  local -a flat_specs=()
+  local rc=0
+
+  for name in "$@"; do
+    IFS='|' read -r src pkgs repo cmd desktop fb < <(_omarchy_pkg_resolve "$name")
+    case "$src" in
+      unavailable)
+        echo "omarchy: '$name' has no Fedora/Flathub source; skipping" >&2
+        continue
+        ;;
+      flatpak)
+        flatpak info "$pkgs" >/dev/null 2>&1 || flat_specs+=("$pkgs|$cmd|$desktop")
+        continue
+        ;;
+    esac
+
+    # Native source. Skip when already installed.
+    local need=0
+    for p in $pkgs; do rpm -q "$p" >/dev/null 2>&1 || need=1; done
+    (( !need )) && continue
+
+    if _omarchy_pkg_native_install "$src" "$pkgs" "$repo"; then
+      local ok=1
+      for p in $pkgs; do rpm -q "$p" >/dev/null 2>&1 || ok=0; done
+      (( ok )) && continue
+    fi
+
+    if [ -n "$fb" ]; then
+      echo "omarchy: native install failed for '$name'; falling back to Flatpak $fb" >&2
+      flat_specs+=("$fb|$cmd|$desktop")
+    else
+      echo "omarchy: failed to install '$name'" >&2
+      rc=1
     fi
   done
 
-  if (( ${#missing[@]} == 0 )); then
-    return 0
+  if (( ${#flat_specs[@]} > 0 )); then
+    local -a apps=()
+    for s in "${flat_specs[@]}"; do
+      IFS='|' read -r app c d <<<"$s"
+      apps+=("$app")
+    done
+    _omarchy_pkg_flatpak_install "${apps[@]}" || rc=1
+    for s in "${flat_specs[@]}"; do
+      IFS='|' read -r app c d <<<"$s"
+      _omarchy_pkg_flatpak_integrate "$c" "$d" "$app" || true
+    done
   fi
 
-  _omarchy_dnf install -y --skip-unavailable "${missing[@]}"
-  local rc=$?
-
-  # Distinguish package-not-found from transaction failure. dnf returns 1
-  # for "no match for argument"; --skip-unavailable turns those into warnings
-  # so a single stale package name cannot abort the entire transaction.
-  if (( rc != 0 )); then
-    echo "omarchy: dnf install failed for: ${missing[*]}" >&2
-  fi
   return $rc
 }
 
@@ -105,20 +284,33 @@ omarchy_pkg_install_file() {
 }
 
 # --- remove ---------------------------------------------------------------
-# Remove the named packages only if installed. Idempotent.
+# Remove the named packages only if installed. Names are translated through the
+# menu map (dnf / Flatpak, including the fallback). Idempotent.
 omarchy_pkg_remove() {
-  local installed=() pkg
-  for pkg in "$@"; do
-    if omarchy_pkg_is_installed "$pkg"; then
-      installed+=("$pkg")
-    fi
+  local name src pkgs repo cmd desktop fb p
+  local -a dnf_installed=() flatpaks=()
+
+  for name in "$@"; do
+    IFS='|' read -r src pkgs repo cmd desktop fb < <(_omarchy_pkg_resolve "$name")
+    case "$src" in
+      unavailable) ;;
+      flatpak) flatpak info "$pkgs" >/dev/null 2>&1 && flatpaks+=("$pkgs") ;;
+      *)
+        for p in $pkgs; do
+          rpm -q "$p" >/dev/null 2>&1 && dnf_installed+=("$p")
+        done
+        [ -n "$fb" ] && flatpak info "$fb" >/dev/null 2>&1 && flatpaks+=("$fb")
+        ;;
+    esac
   done
 
-  if (( ${#installed[@]} == 0 )); then
-    return 0
+  if (( ${#dnf_installed[@]} > 0 )); then
+    _omarchy_dnf remove -y "${dnf_installed[@]}"
   fi
-
-  _omarchy_dnf remove -y "${installed[@]}"
+  if (( ${#flatpaks[@]} > 0 )); then
+    _omarchy_flatpak uninstall -y "${flatpaks[@]}"
+  fi
+  return 0
 }
 
 # --- update (refresh metadata) --------------------------------------------
@@ -231,10 +423,14 @@ omarchy_pkg_present() {
 }
 
 # omarchy-pkg-add: install the named packages if missing, then verify.
+# Entries the menu map marks `unavailable` are skipped with a warning rather
+# than failing the whole install (some Omarchy install scripts use `set -e`).
 omarchy_pkg_add() {
   omarchy_pkg_install "$@" || return 1
-  local pkg
+  local pkg src pkgs repo cmd desktop fb
   for pkg in "$@"; do
+    IFS='|' read -r src pkgs repo cmd desktop fb < <(_omarchy_pkg_resolve "$pkg")
+    [ "$src" = unavailable ] && continue
     if ! omarchy_pkg_is_installed "$pkg"; then
       printf '\033[31mError: Package '\''%s'\'' did not install\033[0m\n' "$pkg" >&2
       return 1

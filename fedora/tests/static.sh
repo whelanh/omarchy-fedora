@@ -76,6 +76,53 @@ for line in open('upstream/install/omarchy-base.packages'):
 assert not missing, 'mapped but not installed: %r' % missing
 "
 
+echo "== Menu package translation map =="
+# The SUPER+SPACE Install rows call omarchy-pkg-* with Arch/AUR names; the map
+# (fedora/mappings/menu-packages.conf) translates them to Fedora strategies.
+t "menu-packages.conf parses" python3 -c "
+seen = {}
+valid = {'fedora', 'copr', 'repo', 'rpm', 'flatpak', 'unavailable'}
+for i, line in enumerate(open('fedora/mappings/menu-packages.conf'), 1):
+    line = line.split('#')[0].strip()
+    if not line:
+        continue
+    parts = line.split('|')
+    assert len(parts) == 7, ('bad column count', i, line)
+    name, src, pkgs, repo, cmd, desktop, fallback = parts
+    assert name and ' ' not in name, ('bad name', i, line)
+    assert src in valid, ('bad source', i, line)
+    assert name not in seen, ('duplicate', name)
+    seen[name] = src
+    if src in ('fedora', 'copr', 'repo', 'rpm'):
+        assert pkgs, ('missing package', name)
+    if src == 'copr':
+        assert repo and '/' in repo, ('missing copr repo', name)
+    if src in ('repo', 'rpm'):
+        assert repo.startswith('http'), ('missing url', name)
+    if src == 'flatpak':
+        assert pkgs and '.' in pkgs, ('bad flatpak app id', name)
+    if fallback:
+        assert '.' in fallback, ('bad fallback id', name)
+assert seen, 'empty map'
+print(len(seen), 'menu entries')
+"
+t "shim translates a Flathub app" bash -c '
+  . fedora/scripts/lib/pkg.sh
+  [[ "$(_omarchy_pkg_resolve signal-desktop)" == "flatpak|org.signal.Signal||signal-desktop|signal-desktop.desktop|" ]]
+'
+t "shim carries a native fallback" bash -c '
+  . fedora/scripts/lib/pkg.sh
+  [[ "$(_omarchy_pkg_resolve google-chrome)" == "rpm|google-chrome-stable|https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm|google-chrome-stable|google-chrome.desktop|com.google.Chrome" ]]
+'
+t "shim translates a Fedora name mismatch" bash -c '
+  . fedora/scripts/lib/pkg.sh
+  [[ "$(_omarchy_pkg_resolve vim)" == "fedora|vim-enhanced||||" ]]
+'
+t "shim passes through unmapped names" bash -c '
+  . fedora/scripts/lib/pkg.sh
+  [[ "$(_omarchy_pkg_resolve tailscale)" == "fedora|tailscale||||" ]]
+'
+
 echo "== First-party RPM scaffold: manifest + spec + build helper =="
 t "fedora/rpm/manifest.yaml parses" python3 -c "
 import glob, os, yaml
