@@ -267,8 +267,8 @@ first runs `omarchy-provision-user || true` so finalize catches up if it
 never ran, then handles the steps that need a running graphical session
 and/or a working user systemd instance:
 
-- `omarchy-hook-install post-update` for the three shipped hooks
-  (`install-voxtype.hook`, `setup-fingerprint.hook`, `setup-agent.hook`).
+- `omarchy-hook-install post-update` for the two shipped hooks
+  (`setup-fingerprint.hook`, `setup-agent.hook`).
 - `install/user/first-run/enable-user-units.sh` — daemon-reload, then
   `systemctl --user enable --now` the shipped user units (`bt-agent`,
   `omarchy-sleep-lock`, `omarchy-recover-internal-monitor`,
