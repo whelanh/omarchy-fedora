@@ -33,6 +33,10 @@ PY
     cd "$topdir/SOURCES"
     python3 - "$spec" <<'PY'
 import re,sys,urllib.request,os
+# Some vendors block the default Python-urllib User-Agent; use a browser one.
+_opener = urllib.request.build_opener()
+_opener.addheaders = [('User-Agent', 'Mozilla/5.0')]
+urllib.request.install_opener(_opener)
 spec=open(sys.argv[1]).read()
 def f(k):
     m=re.search(r'^%s:\s*(\S+)'%k,spec,re.M); return m.group(1) if m else ''
