@@ -1,14 +1,14 @@
 # whelanh/omarchy COPR publishing
 
-This directory holds the tooling that publishes the 18 first-party Omarchy
+This directory holds the tooling that publishes the 19 first-party Omarchy
 RPMs (specs in `fedora/rpm/<pkg>/`) to the **`whelanh/omarchy`** COPR, so a
 stock Fedora install gets them with a plain `dnf install` — no local builds.
 
-## The 18 packages
+## The 19 packages
 
 aether, cliamp, disktree-bin, elsewhen, herdr, hype, hyprland-preview-share-picker,
 monologue, omacalc, omacut, omapresent, omawrite, omasnap, owe, owe-lockfeed,
-tensaku, try (tobi-try), ttfx. All are `status: verified` in
+superwhisper-bin, tensaku, try (tobi-try), ttfx. All are `status: verified` in
 `fedora/rpm/manifest.yaml` and built green end-to-end on `fedora:rawhide`
 via `fedora/rpm/build-rpm-in-ci.sh`.
 
@@ -94,7 +94,8 @@ already does when `--with-firstparty` is on, default):
 sudo dnf copr enable whelanh/omarchy
 sudo dnf install aether cliamp disktree-bin elsewhen herdr hype \
                  hyprland-preview-share-picker monologue omacalc omacut \
-                 omapresent omawrite omasnap owe owe-lockfeed tensaku try ttfx
+                 omapresent omawrite omasnap owe owe-lockfeed superwhisper-bin \
+                 tensaku try ttfx
 ```
 
 `fedora/scripts/lib/deps.sh` exposes
@@ -153,9 +154,10 @@ key, and is fully scriptable from this repo.
 
 ## Security / trust notes
 
-- Every repack (aether, cliamp, disktree-bin, herdr, omasnap, tensaku) installs
-  the byte-for-byte upstream release binary; the spec pins the exact version +
-  Source URLs.
+- Every repack (aether, cliamp, disktree-bin, herdr, omasnap, superwhisper-bin,
+  tensaku) installs the byte-for-byte upstream release binary; the spec pins the
+  exact version + Source URLs. `superwhisper-bin` additionally verifies the
+  vendor's Minisign signature before extraction.
 - `hyprland-preview-share-picker` is compiled from source on the versioned
   tag with hyprland-protocols vendored at a pinned commit.
 - Qt trio + ttfx + try build from their upstream tags in the REMOTE COPR

@@ -113,6 +113,12 @@ packages:
     repository: whelanh/omarchy
     rpm: fedora/rpm/owe-lockfeed/owe-lockfeed.spec
     note: Qt6 QML module Owe.LockFeed for the lock screen; same omacom/owe source as `owe`, no AUR counterpart.
+  superwhisper-bin:
+    package: superwhisper-bin
+    source: copr
+    repository: whelanh/omarchy
+    rpm: fedora/rpm/superwhisper-bin/superwhisper-bin.spec
+    note: Proprietary local/cloud voice dictation (Superwhisper); repacks the vendor's Minisign-signed Linux archive under /opt. Upstream lists it in omarchy-base.packages, so it is in the default first-party set.
   tensaku:
     package: tensaku
     source: copr

@@ -113,7 +113,7 @@ desktop session — they will not work from a bare SSH/tty.
 
 ## 5. Build and install the verified first-party RPMs
 
-All `status: verified` packages in `fedora/rpm/manifest.yaml` (currently 18,
+All `status: verified` packages in `fedora/rpm/manifest.yaml` (currently 19,
 e.g. `aether`, `hype`, `monologue`, `omacalc`, `ttfx`, `try`) build cleanly in
 a Fedora Rawhide container. Two ways to build them:
 

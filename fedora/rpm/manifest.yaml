@@ -147,6 +147,16 @@ packages:
     status: verified
     version: 1.1.0
     note: Dictation backend for the SUPER+SPACE Install > AI > Dictation row (RPM name voxtype-bin, Provides voxtype); repacks only the Whisper (CPU/Vulkan) + OSD binaries, not upstream's ONNX/CUDA/MIGraphX payload. Opt-in, not in the default install set. Container-built OK.
+  superwhisper-bin:
+    repo: https://github.com/superultrainc/superwhisper-linux-releases
+    language: binary
+    build: repack-release (vendor Minisign-signed tarball + omacom/omarchy-pkgs files)
+    binary: superwhisper
+    license: LicenseRef-proprietary AND MIT
+    deps: [gtk4, gtk4-layer-shell, python3-gobject, pipewire-pulseaudio, foot]
+    status: verified
+    version: 1.0.0
+    note: Proprietary Superwhisper dictation; verifies the vendor Minisign signature then installs under /opt/superwhisper (launcher, user service, desktop entries, fcitx5 addon, fonts/icons). Upstream lists it in omarchy-base.packages, so it is in the default first-party set. Container-built OK.
   omawrite:
     repo: https://github.com/omacom/omawrite
     language: cpp

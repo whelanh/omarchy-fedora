@@ -6,7 +6,7 @@ in Fedora official/COPR repos. They map to `source: copr` entries in
 `fedora/mappings/packages.yaml` and are distributed via the
 `whelanh/omarchy` COPR.
 
-> **Status: 18 VERIFIED, 0 BLOCKED.** Every package builds cleanly in the
+> **Status: 19 VERIFIED, 0 BLOCKED.** Every package builds cleanly in the
 > Fedora Rawhide container (`manifest.yaml` status `verified`), driven by
 > `build-rpm-in-ci.sh` — the same path the CI `rpm-build` job runs.
 
@@ -55,6 +55,7 @@ FEDORA=1 bash fedora/rpm/build-in-container.sh tensaku
 | omasnap | tobi/omasnap | prebuilt-repack | MIT | verified |
 | owe | omacom/owe | meson (C) | MIT | verified |
 | owe-lockfeed | omacom/owe | cmake (Qt6 qml-plugin) | MIT | verified |
+| superwhisper-bin | superultrainc/… | vendor-repack (Minisign) | LicenseRef-proprietary AND MIT | verified |
 | tensaku | jondkinney/tensaku | prebuilt-tarball repack | MPL-2.0 | verified |
 | tobi-try | tobi/try | Ruby gem | MIT | verified |
 | ttfx | omacom/ttfx | cargo | MIT | verified |
@@ -82,6 +83,11 @@ These are intentionally **not** RPMs here:
   `herdrdev/herdr` release assets (the `omacom-io/herdr` fork has tags but no
   release binaries); `disktree-bin` mirrors the AUR name and adds
   `Provides: disktree`.
+- **superwhisper-bin** — proprietary; repacks the vendor's portable x86_64
+  Linux archive under `/opt/superwhisper`, but only after verifying its Minisign
+  signature against the vendor key checked into `omacom/omarchy-pkgs`
+  (`linux-release.pub`). Mirrors Omarchy's PKGBUILD (launcher, user service,
+  desktop entries, fcitx5 addon, fonts/icons) and its Qt 6.12 palette patch.
 - **tensaku** — the `tensaku-v0.28.0-x86_64.tar.gz` release ships the full
   install tree (`bin/` + `share/` with desktop, hicolor svg, man page,
   completions, and MPL licenses), so the spec just stage-extracts it into the

@@ -41,7 +41,7 @@ it up.)
 ### 3. `check-updates.sh` (two modes)
 
 ```sh
-# version drift for the 18 first-party COPR packages
+# version drift for the 19 first-party COPR packages
 bash fedora/rpm/copr/check-updates.sh
 
 # package add/remove drift vs our mapping
@@ -72,7 +72,7 @@ Most package changes are **not** COPR builds. Resolve a package in this order:
 | 1 | **Fedora official** | add a `packages.yaml` entry (`source: fedora`) + a line in a `fedora/packages/*.txt` |
 | 2 | **Existing COPR / RPM Fusion** (`nett00n/hyprland`, `atim/*`, RPM Fusion) | same, plus the repo is already enabled |
 | 3 | **Flathub** | `source: flatpak` with the app id |
-| 4 | **Omarchy's own first-party binary** (aether, cliamp, disktree-bin, elsewhen, herdr, hype, hyprland-preview-share-picker, monologue, omacalc, omacut, omapresent, omawrite, omasnap, owe, owe-lockfeed, tensaku, try, ttfx, and future Omarchy-authored tools) | write a SPEC under `fedora/rpm/`, mark it `verified`, build + submit to `whelanh/omarchy` |
+| 4 | **Omarchy's own first-party binary** (aether, cliamp, disktree-bin, elsewhen, herdr, hype, hyprland-preview-share-picker, monologue, omacalc, omacut, omapresent, omawrite, omasnap, owe, owe-lockfeed, superwhisper-bin, tensaku, try, ttfx, and future Omarchy-authored tools) | write a SPEC under `fedora/rpm/`, mark it `verified`, build + submit to `whelanh/omarchy` |
 
 Only row 4 requires building in the `whelanh/omarchy` COPR. Everything else is a
 mapping + package-list entry. (Examples already shipped this way: `qrencode`,
