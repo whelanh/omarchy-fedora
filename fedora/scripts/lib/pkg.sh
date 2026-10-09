@@ -192,6 +192,28 @@ _omarchy_pkg_native_install() {
   esac
 }
 
+# --- group specs ----------------------------------------------------------
+# Fedora environment groups are valid dnf install specs ("@development-tools")
+# but not rpm package names, so their presence must be checked via dnf.
+_omarchy_pkg_is_group() {
+  case "$1" in @*) return 0 ;; *) return 1 ;; esac
+}
+
+_omarchy_pkg_group_installed() {
+  local grp="${1#@}"
+  dnf -q group list --installed 2>/dev/null | awk '{print $1}' | grep -qxF -- "$grp"
+}
+
+# Success if one resolved dnf/rpm name is present on the system (group-aware).
+_omarchy_pkg_present_root() {
+  local p="$1"
+  if _omarchy_pkg_is_group "$p"; then
+    _omarchy_pkg_group_installed "$p"
+  else
+    rpm -q "$p" >/dev/null 2>&1
+  fi
+}
+
 # --- is_installed ---------------------------------------------------------
 # Success (0) if the named package is installed. The name is translated through
 # the menu map: native rpm first, then the Flathub fallback.
@@ -205,7 +227,7 @@ omarchy_pkg_is_installed() {
     *)
       local all=1
       for p in $pkgs; do
-        rpm -q "$p" >/dev/null 2>&1 || { all=0; break; }
+        _omarchy_pkg_present_root "$p" || { all=0; break; }
       done
       (( all )) && return 0
       [ -n "$fb" ] && flatpak info "$fb" >/dev/null 2>&1 && return 0
@@ -238,12 +260,12 @@ omarchy_pkg_install() {
 
     # Native source. Skip when already installed.
     local need=0
-    for p in $pkgs; do rpm -q "$p" >/dev/null 2>&1 || need=1; done
+    for p in $pkgs; do _omarchy_pkg_present_root "$p" || need=1; done
     (( !need )) && continue
 
     if _omarchy_pkg_native_install "$src" "$pkgs" "$repo"; then
       local ok=1
-      for p in $pkgs; do rpm -q "$p" >/dev/null 2>&1 || ok=0; done
+      for p in $pkgs; do _omarchy_pkg_present_root "$p" || ok=0; done
       (( ok )) && continue
     fi
 
@@ -288,7 +310,7 @@ omarchy_pkg_install_file() {
 # menu map (dnf / Flatpak, including the fallback). Idempotent.
 omarchy_pkg_remove() {
   local name src pkgs repo cmd desktop fb p
-  local -a dnf_installed=() flatpaks=()
+  local -a dnf_installed=() dnf_groups=() flatpaks=()
 
   for name in "$@"; do
     IFS='|' read -r src pkgs repo cmd desktop fb < <(_omarchy_pkg_resolve "$name")
@@ -297,13 +319,20 @@ omarchy_pkg_remove() {
       flatpak) flatpak info "$pkgs" >/dev/null 2>&1 && flatpaks+=("$pkgs") ;;
       *)
         for p in $pkgs; do
-          rpm -q "$p" >/dev/null 2>&1 && dnf_installed+=("$p")
+          if _omarchy_pkg_is_group "$p"; then
+            _omarchy_pkg_group_installed "$p" && dnf_groups+=("${p#@}")
+          else
+            rpm -q "$p" >/dev/null 2>&1 && dnf_installed+=("$p")
+          fi
         done
         [ -n "$fb" ] && flatpak info "$fb" >/dev/null 2>&1 && flatpaks+=("$fb")
         ;;
     esac
   done
 
+  if (( ${#dnf_groups[@]} > 0 )); then
+    _omarchy_dnf group remove -y "${dnf_groups[@]}"
+  fi
   if (( ${#dnf_installed[@]} > 0 )); then
     _omarchy_dnf remove -y "${dnf_installed[@]}"
   fi
