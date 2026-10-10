@@ -177,7 +177,7 @@ omarchy_fedora_install_applications() {
 }
 
 # Install the first-party Omarchy packages from the whelanh/omarchy COPR
-# (aether, cliamp, disktree-bin, elsewhen, herdr, hype,
+# (aether, cliamp, disktree-bin, elsewhen, gliff, herdr, hype,
 # hyprland-preview-share-picker, monologue, omacalc, omacut, omapresent,
 # omawrite, omasnap, owe, owe-lockfeed, superwhisper-bin, tensaku, tobi-try,
 # ttfx).

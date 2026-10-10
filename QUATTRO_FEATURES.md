@@ -9,7 +9,7 @@ out of scope.
 |---|---|---|---|---|
 | Hyprland | yes | yes | PASS | installed (official Rawhide); needs session/driver validation in VM |
 | Quickshell | yes | yes | PASS | installed (COPR/rawhide); shell integration pending |
-| Omarchy CLI | yes | yes | PASS | first-party binaries/plugins packaged in the `whelanh/omarchy` COPR (19 verified) |
+| Omarchy CLI | yes | yes | PASS | first-party binaries/plugins packaged in the `whelanh/omarchy` COPR (20 verified) |
 | Themes | yes | yes | PASS | config tree copied |
 | Web apps | yes | yes | PASS | |
 | Notifications | yes |yes | PASS | |

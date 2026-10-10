@@ -69,9 +69,9 @@ sudo systemctl reboot
 The installer is **idempotent** — running it again is safe.
 
 > Note: Omarchy's first-party binaries and plugins (aether, cliamp, disktree-bin,
-> elsewhen, herdr, hype, hyprland-preview-share-picker, monologue, omacalc,
-> omacut, omapresent, omawrite, omasnap, owe, owe-lockfeed, superwhisper-bin,
-> tensaku, try, ttfx)
+> elsewhen, gliff, herdr, hype, hyprland-preview-share-picker, monologue,
+> omacalc, omacut, omapresent, omawrite, omasnap, owe, owe-lockfeed,
+> superwhisper-bin, tensaku, try, ttfx)
 > are built as Fedora
 > RPMs and installed from the `whelanh/omarchy` COPR by the installer (see
 > `fedora/rpm/copr/README.md`). Pass `--no-firstparty` to skip.

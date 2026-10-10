@@ -57,6 +57,16 @@ packages:
     status: verified
     version: 1.0.0
     note: World clock shell plugin; arch=any QML/JS/Python from the v1.0.0 tag archive, installed to /usr/share/omarchy/shell/plugins/omacom.elsewhen (the shell's first-party plugin directory). No `omarchy` Requires (the port owns that tree).
+  gliff:
+    repo: https://github.com/omacom/gliff
+    language: rust
+    build: cargo-release (crates.io deps vendored for offline COPR build)
+    binary: gliff, gliff-server, gliff-probe
+    license: MIT AND BSD-2-Clause
+    deps: [dbus, openssh, vulkan-loader, gtk4, libadwaita, libva, libdrm, nasm]
+    status: verified
+    version: 0.3.0
+    note: Hyprland remote desktop over SSH (GPU H.264 4:4:4); Rust workspace with gliff + gliff-server + gliff-probe. Crates vendored via fedora/rpm/vendor-rust.sh; cargo build --offline --locked. Container-built OK.
   herdr:
     repo: https://github.com/herdrdev/herdr
     language: rust

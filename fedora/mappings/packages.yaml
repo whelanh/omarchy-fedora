@@ -47,6 +47,12 @@ packages:
     repository: whelanh/omarchy
     rpm: fedora/rpm/elsewhen/elsewhen.spec
     note: World clock shell plugin; noarch QML/JS/Python, no compile. The config seed links it into ~/.config/omarchy/plugins.
+  gliff:
+    package: gliff
+    source: copr
+    repository: whelanh/omarchy
+    rpm: fedora/rpm/gliff/gliff.spec
+    note: Hyprland remote desktop over SSH (GPU H.264, 4:4:4); Rust workspace (gliff + gliff-server + gliff-probe), crates.io deps vendored for offline COPR build.
   herdr:
     package: herdr
     source: copr
@@ -340,6 +346,7 @@ packages:
   udiskie:               { package: udiskie, source: fedora }
   ufw:                   { package: ufw, source: fedora }
   unzip:                 { package: unzip, source: fedora }
+  usbguard:              { package: usbguard, source: fedora }
   vi:
     package: vim-minimal
     source: substitute

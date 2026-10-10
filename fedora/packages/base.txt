@@ -86,6 +86,7 @@ tree-sitter-cli
 udiskie
 ufw
 unzip
+usbguard
 vips
 vips-tools
 whois
