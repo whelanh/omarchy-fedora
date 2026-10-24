@@ -6,7 +6,7 @@
 # (the AUR has only omasnap-bin), so the release asset is the artifact, as
 # with aether/herdr. `!strip`/`!debug` in the AUR: the binary is unstripped.
 Name:           omasnap
-Version:        1.21.0
+Version:        1.22.0
 Release:        1%{?dist}
 Summary:        Native Wayland screenshot and annotation editor for Omarchy
 
@@ -49,5 +49,8 @@ install -Dm644 %{SOURCE1} %{buildroot}%{_datadir}/licenses/omasnap/LICENSE
 %{_datadir}/licenses/omasnap/
 
 %changelog
+* Sat Oct 24 2026 whelanh <brickhousedevelopers@gmail.com> - 1.22.0-1
+- Automatic update to upstream v1.22.0
+
 * Tue Sep 22 2026 whelanh <brickhousedevelopers@gmail.com> - 1.21.0-1
 - Initial Fedora package: repack of upstream v1.21.0 Arch x86_64 release
