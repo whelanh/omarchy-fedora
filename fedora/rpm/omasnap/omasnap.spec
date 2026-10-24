@@ -1,47 +1,51 @@
 # Omarchy Quattro - omasnap (screenshot + annotation editor)
-# Upstream: https://github.com/tobi/omasnap (C++/Qt6; prebuilt release only)
+# Upstream: https://github.com/tobi/omasnap (C++/Qt6, CMake)
 %global debug_package %{nil}
-# Repack of the upstream Arch x86_64 release tarball (already a /usr tree),
-# mirroring the AUR omasnap-bin package. Upstream publishes no source build
-# (the AUR has only omasnap-bin), so the release asset is the artifact, as
-# with aether/herdr. `!strip`/`!debug` in the AUR: the binary is unstripped.
+# Built from upstream source. The Arch release tarball is a prebuilt binary
+# linked against Arch's Qt 6.12, which no Fedora release provides (F44/45/46
+# ship Qt 6.11), so repacking it produces an uninstallable package. Upstream's
+# CMake only requires Qt >= 6.8.
 Name:           omasnap
 Version:        1.22.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Native Wayland screenshot and annotation editor for Omarchy
 
 License:        MIT
 URL:            https://github.com/tobi/omasnap
-Source0:        %{url}/releases/download/v%{version}/omasnap-%{version}-archlinux-x86_64.tar.gz
-Source1:        https://raw.githubusercontent.com/tobi/omasnap/v%{version}/LICENSE
-
-BuildArch:      x86_64
+Source0:        %{url}/archive/v%{version}/omasnap-%{version}.tar.gz
 
 Requires:       hyprland
 Requires:       layer-shell-qt
 Requires:       wl-clipboard
 Requires:       qt6-qtbase
+Requires:       xdg-utils
 Recommends:     tesseract
 Suggests:       tesseract-langpack-eng
+
+BuildRequires:  cmake
+BuildRequires:  gcc-c++
+BuildRequires:  ninja-build
+BuildRequires:  pkgconf-pkg-config
+BuildRequires:  qt6-qtbase-devel
+BuildRequires:  layer-shell-qt-devel
+BuildRequires:  wayland-devel
+BuildRequires:  wayland-protocols-devel
+BuildRequires:  libdeflate-devel
 
 %description
 Omasnap is a native Wayland screenshot and annotation editor for Omarchy and
 Hyprland. It supersedes Satty/Tensaku for the screenshot and imv "edit" flows.
 
 %prep
-# Filesystem-tree tarball (usr/...), not a source archive: no compile step.
-%setup -q -c -T
-tar xf %{SOURCE0} -C .
+%setup -q
 
 %build
+%cmake -DCMAKE_BUILD_TYPE=Release
+%cmake_build
 
 %install
-install -Dm755 usr/bin/omasnap %{buildroot}%{_bindir}/omasnap
-install -Dm644 usr/share/applications/omasnap.desktop \
-  %{buildroot}%{_datadir}/applications/omasnap.desktop
-install -d %{buildroot}%{_datadir}/licenses/omasnap
-install -m644 usr/share/licenses/omasnap/*.txt %{buildroot}%{_datadir}/licenses/omasnap/
-install -Dm644 %{SOURCE1} %{buildroot}%{_datadir}/licenses/omasnap/LICENSE
+%cmake_install
+install -Dm644 LICENSE %{buildroot}%{_datadir}/licenses/omasnap/LICENSE
 
 %files
 %{_bindir}/omasnap
@@ -49,6 +53,11 @@ install -Dm644 %{SOURCE1} %{buildroot}%{_datadir}/licenses/omasnap/LICENSE
 %{_datadir}/licenses/omasnap/
 
 %changelog
+* Sat Oct 24 2026 whelanh <brickhousedevelopers@gmail.com> - 1.22.0-2
+- Build from upstream source instead of the prebuilt Arch release tarball
+- Fixes an unsatisfiable libQt6Core.so.6(Qt_6.12) requirement: the Arch
+  binary is linked against Qt 6.12, while Fedora 44/45/46 ship Qt 6.11
+
 * Sat Oct 24 2026 whelanh <brickhousedevelopers@gmail.com> - 1.22.0-1
 - Automatic update to upstream v1.22.0
 

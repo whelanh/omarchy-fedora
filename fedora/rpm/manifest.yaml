@@ -202,10 +202,10 @@ packages:
   omasnap:
     repo: https://github.com/tobi/omasnap
     language: cpp
-    build: repack-release (prebuilt Arch x86_64 /usr tree, no compile)
+    build: cmake (upstream source; no prebuilt Arch binary)
     binary: omasnap
     license: MIT
-    deps: [hyprland, layer-shell-qt, wl-clipboard, qt6-qtbase]
+    deps: [hyprland, layer-shell-qt, wl-clipboard, qt6-qtbase, xdg-utils]
     status: verified
     version: 1.22.0
     note: Repack of omasnap-1.21.0-archlinux-x86_64.tar.gz (mirrors AUR omasnap-bin); screenshot/annotation editor that supersedes tensaku. Container-built OK.
