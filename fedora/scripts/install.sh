@@ -99,7 +99,7 @@ verify_fedora() {
     fedora) ;;
     *) die "This installer targets Fedora (found ID=$ID). Aborting." ;;
   esac
-  log "Detected Fedora ${VERSION_ID:-?} ($VARIANT_ID) on ${ID_LIKE:-}"
+  log "Detected Fedora ${VERSION_ID:-?} (${VARIANT_ID:-?}) on ${ID_LIKE:-}"
 }
 
 verify_arch() {
