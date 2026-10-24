@@ -101,7 +101,12 @@ zbar
 zoxide
 
 # fonts / icons
-fontawesome-7-free-fonts
+# Font Awesome package names are release-specific (FA6 on F44, FA7 on F45+);
+# these meta packages exist on every supported release. -all pulls the free +
+# brands desktop fonts, -web ships the woff2/CSS assets (upstream's
+# woff2-font-awesome).
+fontawesome-fonts-all
+fontawesome-fonts-web
 google-noto-color-emoji-fonts
 google-noto-sans-cjk-fonts
 google-noto-sans-fonts

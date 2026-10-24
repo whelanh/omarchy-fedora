@@ -397,9 +397,9 @@ packages:
     source: substitute
     note: Fedora packages JetBrains Mono; Nerd Fonts variant may need a nerd-fonts COPR/fonts package
   woff2-font-awesome:
-    package: fontawesome-7-free-fonts
+    package: fontawesome-fonts-web
     source: substitute
-    note: Fedora revamped fontawesome-fonts; current package is fontawesome-7-free-fonts
+    note: Font Awesome is FA6 on Fedora 44 and FA7 on F45+; fontawesome-fonts-web ships the woff2 files on every supported release
   yaru-icon-theme:       { package: yaru-icon-theme, source: fedora }
 
   # --- libvips / postgresql-libs name differences ---
