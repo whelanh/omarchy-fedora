@@ -87,6 +87,9 @@ resolve_target_user() {
 # mise user-toolchain setup (agent CLIs), used by configure_user on fresh
 # installs. See fedora/scripts/lib/mise.sh.
 . "$SCRIPT_DIR/lib/mise.sh"
+# Bundled application icons -> /usr/share/icons/hicolor, so the shipped
+# launchers' Icon= keys resolve. See fedora/scripts/lib/app-icons.sh.
+. "$SCRIPT_DIR/lib/app-icons.sh"
 
 # ---------------------------------------------------------------------------
 # Phase A - Prerequisite verification
@@ -1512,6 +1515,7 @@ main() {
   install_snapper
   install_grub_btrfs
   install_omarchy_tree
+  omarchy_fedora_install_app_icons
   install_omarchy_user_units
   install_omarchy_session
   install_omarchy_sddm_config

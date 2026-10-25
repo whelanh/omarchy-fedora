@@ -439,6 +439,39 @@ assert '1000' in src, 'must cover uid>=1000 users'
 assert 'runuser -u' in src, 'must edit user files as the user'
 "
 
+echo "== Bundled application icons reach the hicolor theme =="
+# Upstream's omarchy-settings package installs applications/icons/* into
+# /usr/share/icons/hicolor/{48x48,256x256,scalable}/apps under safe_icon_name()
+# names, which is exactly what the shipped launchers' Icon= keys reference. The
+# port copies the tree and the launchers, so missing the packaging step left
+# every bundled web app (X, YouTube, Discord, ...) on the generic gear icon.
+t "install.sh installs bundled app icons" python3 -c "
+lib = open('fedora/scripts/lib/app-icons.sh').read()
+assert 'omarchy_fedora_install_app_icons()' in lib, 'must define the icon step'
+assert '256x256/apps' in lib and '48x48/apps' in lib, 'must use the hicolor sizes upstream uses'
+assert 'mktemp -d' in lib, 'must stage, so a partial render never lands in the theme'
+src = open('fedora/scripts/install.sh').read()
+assert 'lib/app-icons.sh' in src, 'install.sh must source the lib'
+assert '\n  omarchy_fedora_install_app_icons\n' in src, 'install.sh must call it from main'
+"
+t "bundled icons cover the launchers' Icon= keys" python3 -c "
+import glob, os, re
+def safe(name):
+    name = re.sub(r'[^A-Za-z0-9]+', '-', name.lower()).strip('-')
+    return name
+icons = {safe(os.path.splitext(os.path.basename(p))[0])
+         for p in glob.glob('upstream/applications/icons/*')}
+# foot and mpv are real programs whose icons come from their own packages.
+system = {'foot', 'mpv'}
+wanted = set()
+for d in glob.glob('upstream/applications/*.desktop'):
+    m = re.search(r'^Icon=(.+)\$', open(d).read(), re.M)
+    if m:
+        wanted.add(m.group(1).strip())
+missing = wanted - system - icons
+assert not missing, 'launchers reference icons the tree never installs: %s' % sorted(missing)
+"
+
 echo
 echo "== Result: $PASS passed, $FAIL failed =="
 [ "$FAIL" -eq 0 ] || exit 1
