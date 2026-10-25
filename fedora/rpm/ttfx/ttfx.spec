@@ -2,7 +2,7 @@
 # Upstream: https://github.com/omacom/ttfx (pure Rust, v0.3.2)
 # Verified against upstream Cargo.toml (package name + single bin `ttfx`).
 Name:           ttfx
-Version:        0.5.0
+Version:        0.5.1
 Release:        1%{?dist}
 Summary:        Terminal text-effects engine for Omarchy
 
@@ -38,6 +38,9 @@ cargo test --release --offline --locked >/dev/null 2>&1 || true
 %{_bindir}/ttfx
 
 %changelog
+* Sun Oct 25 2026 whelanh <brickhousedevelopers@gmail.com> - 0.5.1-1
+- Automatic update to upstream v0.5.1
+
 * Mon Sep 28 2026 whelanh <brickhousedevelopers@gmail.com> - 0.5.0-1
 - Automatic update to upstream v0.5.0
 
