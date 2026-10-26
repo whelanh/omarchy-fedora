@@ -7,6 +7,32 @@ set -euo pipefail
 
 RPM_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 
+# Resolve a SPEC's BuildRequires, retrying a few times.
+#
+# dnf occasionally downloads one package from a mirror that is merely slow:
+# run 40267322786 lost the owe leg to a codecs.fedoraproject.org/openh264 fetch
+# that crawled below 1 KB/s and timed out, which is a transient network fault,
+# not a dependency problem. Each retry reuses every package already cached, so
+# it only re-fetches what failed, and the failure is still reported with dnf's
+# own reason (never swallowed) when all attempts are exhausted.
+dnf_builddep_retry() {
+  local spec="$1" attempt
+  for attempt in 1 2 3; do
+    if dnf -y --setopt=retries=5 --setopt=timeout=60 builddep "$spec"; then
+      return 0
+    fi
+    if (( attempt == 3 )); then
+      break
+    fi
+    echo "omarchy: dnf builddep attempt $attempt/3 failed for" \
+      "$(basename "$spec"); retrying in $((attempt * 15))s" >&2
+    sleep $((attempt * 15))
+  done
+  echo "omarchy: dnf builddep could not resolve BuildRequires for" \
+    "$(basename "$spec") after 3 attempts (see dnf's reason above)" >&2
+  return 1
+}
+
 build_one() {
   local pkg="$1" spec="$2"
   echo "== building $pkg =="
@@ -58,13 +84,7 @@ for m in re.finditer(r'^Source\d*:\s*(\S+)',spec,re.M):
 PY
   )
 
-  # Resolve BuildRequires. Do NOT swallow the output: when a dep can't be
-  # resolved (e.g. a COPR or Fedora repo is momentarily incomplete), dnf's
-  # reason is the useful part, and hiding it left only rpmbuild's cryptic
-  # "Failed build dependencies" list behind.
-  if ! dnf -y builddep "$topdir/SPECS/$pkg.spec"; then
-    echo "omarchy: dnf builddep reported unresolved BuildRequires for $pkg" >&2
-  fi
+  dnf_builddep_retry "$topdir/SPECS/$pkg.spec" || return 1
   # Rust packages build offline from a vendored crates.io tarball; generate it
   # here (network + cargo are available in this container after builddep).
   . "$RPM_DIR/vendor-rust.sh"

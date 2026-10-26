@@ -66,6 +66,9 @@ nss-mdns
 pamixer
 plocate
 plymouth
+# Stands in for upstream's omarchy-power-profiles-daemon fork, whose extra
+# drivers are ARM-only (cppc_cpufreq, RTX Spark/N1x, Snapdragon X); this port
+# is x86_64-only. See fedora/mappings/packages.yaml.
 power-profiles-daemon
 python3-gobject
 python3-poetry-core

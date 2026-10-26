@@ -135,7 +135,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install build tools
-        run: dnf -y install rpm-build dnf-plugins-core python3-pyyaml
+        # The same retry rationale as dnf_builddep_retry in
+        # build-rpm-in-ci.sh: a single slow mirror must not redden a matrix leg.
+        run: dnf -y --setopt=retries=5 --setopt=timeout=60 install rpm-build dnf-plugins-core python3-pyyaml
       # Some verified specs need devel packages official Fedora doesn't ship:
       # omarchy-hyprland-titlebars builds against hyprland-devel from this COPR
       # (the same per-chroot build repo the whelanh/omarchy COPR project sets).

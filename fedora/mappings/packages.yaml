@@ -304,6 +304,18 @@ packages:
   pinta:                 { package: com.github.PintaProject.Pinta, source: flatpak, note: not in Fedora official; Flathub app }
   plocate:               { package: plocate, source: fedora }
   plymouth:              { package: plymouth, source: fedora }
+  # Upstream replaced stock power-profiles-daemon with its own fork
+  # (omarchy-power-profiles-daemon, pkgrel 3): stock PPD registers no
+  # cppc_cpufreq driver, so profiles are placeholders on ARM laptops, and the
+  # fork adds NVIDIA RTX Spark (N1x) and Snapdragon X profiles on top. Those
+  # are ARM SoCs, and this port is x86_64-only (install.sh refuses other
+  # arches), where Fedora's stock package already drives intel_pstate /
+  # amd_pstate. So map to the stock build rather than carrying a third-party
+  # PPD in the COPR; revisit if aarch64 support is added.
+  omarchy-power-profiles-daemon:
+    package: power-profiles-daemon
+    source: substitute
+    note: Same 0.30 upstream release as Omarchy's fork; the fork only adds ARM drivers (cppc_cpufreq, RTX Spark/N1x, Snapdragon X), which this x86_64-only port cannot use.
   power-profiles-daemon: { package: power-profiles-daemon, source: fedora }
   python-gobject:
     package: python3-gobject
