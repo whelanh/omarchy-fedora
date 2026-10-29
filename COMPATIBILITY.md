@@ -29,7 +29,7 @@ mapped.
 |---|---|
 | fedora (official) | ~120 |
 | substitute | ~30 |
-| copr | ~11 + 24 first-party |
+| copr | ~11 + 25 first-party |
 | external (mise) | 1 |
 | unavailable | ~19 |
 | drop (Arch-only) | ~8 |
@@ -93,7 +93,7 @@ default agents) are **not** RPMs — upstream installs them through mise at user
 setup (`install/user/mise.sh` → `omarchy-mise-install`), and the Fedora layer
 does the same (`fedora/scripts/lib/mise.sh`).
 
-**Status — 24 verified, 2 retired, 0 blocked.** Every verified package builds
+**Status — 25 verified, 2 retired, 0 blocked.** Every verified package builds
 cleanly in a Fedora Rawhide container and is published from the
 `whelanh/omarchy` COPR. The default installer enables that COPR and installs
 the set (disable with `install.sh --no-firstparty`).
@@ -136,7 +136,7 @@ session — no package manager. The installer wires them onto PATH by symlinking
 Caveats:
 - `omarchy plugin enable/disable` talk to the running shell via
   `omarchy-shell shell enablePlugin`, so Quickshell must be running.
-- The 24 first-party binary packages are built and published from the
+- The 25 first-party binary packages are built and published from the
   `whelanh/omarchy` COPR and installed by the default installer
   (`--no-firstparty` to skip); all are `verified` in `fedora/rpm/manifest.yaml`.
   (`elsewhen` is retired and no longer installed or published.)

@@ -41,7 +41,7 @@ it up.)
 ### 3. `check-updates.sh` (three modes)
 
 ```sh
-# version drift for the 24 first-party COPR packages
+# version drift for the 25 first-party COPR packages
 bash fedora/rpm/copr/check-updates.sh
 
 # package add/remove drift vs our mapping

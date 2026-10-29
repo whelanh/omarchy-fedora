@@ -107,6 +107,12 @@ packages:
     repository: whelanh/omarchy
     rpm: fedora/rpm/omarchy-hyprland-titlebars/omarchy-hyprland-titlebars.spec
     note: Hyprland plugin for Omarchy's floating-window titlebars; cmake, built against hyprland-devel from nett00n/hyprland. Must be rebuilt when Hyprland changes.
+  omarchy-screensaver:
+    package: omarchy-screensaver
+    source: copr
+    repository: whelanh/omarchy
+    rpm: fedora/rpm/omarchy-screensaver/omarchy-screensaver.spec
+    note: Native Wayland screensaver overlay (layer-shell + ttfx effects); Rust, crates vendored. Installed off PATH at /usr/lib/omarchy-screensaver/omarchy-screensaver, which omarchy-launch-screensaver execs.
   omasnap:
     package: omasnap
     source: copr
@@ -349,6 +355,7 @@ packages:
     source: substitute
     note: Fedora uses qt6-qt* prefix
   ripgrep:               { package: ripgrep, source: fedora }
+  rtkit:                 { package: rtkit, source: fedora }
   ruby:                  { package: ruby, source: fedora }
   sddm:                  { package: sddm, source: fedora }
   slurp:                 { package: slurp, source: fedora }

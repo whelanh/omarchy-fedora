@@ -269,3 +269,13 @@ packages:
     status: verified
     version: 0.5.1
     note: Built in Fedora Rawhide container (v0.3.2); pure Rust. Crates vendored via fedora/rpm/vendor-rust.sh; cargo build --offline --locked.
+  omarchy-screensaver:
+    repo: https://github.com/omacom/omarchy-screensaver
+    language: rust
+    build: cargo-release (crates.io + ttfx git dep vendored for offline COPR build)
+    binary: omarchy-screensaver
+    license: MIT
+    deps: [libxkbcommon, fontconfig]
+    status: verified
+    version: 1.3.1
+    note: Native Wayland screensaver; one wlr-layer-shell overlay per display rendering the branding text with ttfx effects. Installed off PATH at /usr/lib/omarchy-screensaver/omarchy-screensaver like upstream's package, which omarchy-launch-screensaver execs. Crates and the ttfx git dependency vendored via fedora/rpm/vendor-rust.sh; cargo build --offline --locked.

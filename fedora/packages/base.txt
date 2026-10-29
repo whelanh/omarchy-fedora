@@ -76,6 +76,9 @@ qemu-user-static
 qrencode
 ripgrep
 rsync
+# RealtimeKit: realtime priority for PipeWire/audio threads (upstream added it
+# to omarchy-base.packages alongside the new screensaver).
+rtkit
 ruby
 slurp
 socat

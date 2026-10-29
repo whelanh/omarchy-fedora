@@ -46,15 +46,12 @@ PY
   [ -d "$srcdir" ] || srcdir="$(find "$work" -maxdepth 1 -mindepth 1 -type d | head -1)"
   (
     cd "$srcdir"
-    cargo vendor vendor/ >/dev/null \
-      && mkdir -p .cargo \
-      && printf '%s\n' \
-          '[source.crates-io]' \
-          'replace-with = "vendored-sources"' \
-          '' \
-          '[source.vendored-sources]' \
-          'directory = "vendor"' \
-          > .cargo/config.toml
+    mkdir -p .cargo
+    # Keep cargo vendor's own printed config verbatim. It maps crates.io *and*
+    # every git dependency to the vendored copy -- omarchy-screensaver pulls
+    # ttfx from git, which a hand-written crates.io-only config would not
+    # resolve, breaking the offline (--offline --locked) COPR build.
+    cargo vendor vendor/ > .cargo/config.toml
   ) || { echo "vendor: cargo vendor failed for $name" >&2; return 1; }
 
   tar cJf "$out" -C "$srcdir" vendor .cargo
