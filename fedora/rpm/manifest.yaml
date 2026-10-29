@@ -177,7 +177,7 @@ packages:
     license: LicenseRef-proprietary AND MIT
     deps: [gtk4, gtk4-layer-shell, python3-gobject, pipewire-pulseaudio, foot]
     status: verified
-    version: 1.1.1
+    version: 1.1.2
     note: Proprietary Superwhisper dictation; verifies the vendor Minisign signature then installs under /opt/superwhisper (launcher, user service, desktop entries, fcitx5 addon, fonts/icons). Upstream lists it in omarchy-base.packages, so it is in the default first-party set. Container-built OK.
   signed:
     repo: https://github.com/omacom/signed
@@ -207,7 +207,7 @@ packages:
     license: MIT
     deps: [hyprland, layer-shell-qt, wl-clipboard, qt6-qtbase, xdg-utils]
     status: verified
-    version: 1.23.0
+    version: 1.24.0
     note: Repack of omasnap-1.21.0-archlinux-x86_64.tar.gz (mirrors AUR omasnap-bin); screenshot/annotation editor that supersedes tensaku. Container-built OK.
   openai-codex-desktop:
     repo: https://chatgpt.com/codex/

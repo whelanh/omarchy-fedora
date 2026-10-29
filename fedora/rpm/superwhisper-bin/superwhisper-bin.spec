@@ -10,7 +10,7 @@
 %global __brp_check_rpaths %{nil}
 
 Name:           superwhisper-bin
-Version:        1.1.1
+Version:        1.1.2
 Release:        1%{?dist}
 Summary:        Local and cloud voice dictation with Superwhisper
 
@@ -134,6 +134,9 @@ sed 's|@LIBRARY@|/opt/superwhisper/lib/fcitx5/libsuperwhisper-fcitx5|' \
 /opt/superwhisper
 
 %changelog
+* Wed Oct 28 2026 whelanh <brickhousedevelopers@gmail.com> - 1.1.2-1
+- Automatic update to upstream v1.1.2
+
 * Sat Oct 24 2026 whelanh <brickhousedevelopers@gmail.com> - 1.1.1-1
 - Automatic update to upstream v1.1.1
 

@@ -6,7 +6,7 @@
 # ship Qt 6.11), so repacking it produces an uninstallable package. Upstream's
 # CMake only requires Qt >= 6.8.
 Name:           omasnap
-Version:        1.23.0
+Version:        1.24.0
 Release:        1%{?dist}
 Summary:        Native Wayland screenshot and annotation editor for Omarchy
 
@@ -53,6 +53,9 @@ install -Dm644 LICENSE %{buildroot}%{_datadir}/licenses/omasnap/LICENSE
 %{_datadir}/licenses/omasnap/
 
 %changelog
+* Wed Oct 28 2026 whelanh <brickhousedevelopers@gmail.com> - 1.24.0-1
+- Automatic update to upstream v1.24.0
+
 * Sun Oct 25 2026 whelanh <brickhousedevelopers@gmail.com> - 1.23.0-1
 - Automatic update to upstream v1.23.0
 
