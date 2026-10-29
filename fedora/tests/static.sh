@@ -214,6 +214,29 @@ assert m and str(m.group(1)) == str(man), 'drift'
 "
 done
 
+echo "== omarchy-screensaver binary path =="
+# Omarchy's bin/omarchy-launch-screensaver execs the literal path
+# /usr/lib/omarchy-screensaver/omarchy-screensaver. Arch has no libexec split, so
+# upstream packages it under /usr/lib; Fedora's %{_libexecdir} is /usr/libexec,
+# and 1.3.1-1 shipped the binary there, where the launcher never looks. Guard
+# the destination (and cross-check the launcher once the vendored tree has it).
+t "screensaver installs outside %{_libexecdir}" python3 -c "
+import re
+spec = open('fedora/rpm/omarchy-screensaver/omarchy-screensaver.spec').read()
+body = spec.split('%install', 1)[1].split('%changelog')[0]
+# comments may mention the macro freely; only real directives count
+code = '\n'.join(l for l in body.splitlines() if not l.lstrip().startswith('#'))
+dest = '%{_prefix}/lib/omarchy-screensaver/omarchy-screensaver'
+assert '%{_libexecdir}' not in code, 'libexecdir is /usr/libexec on Fedora; launcher execs /usr/lib/...'
+assert code.count(dest) >= 2, 'install + %files must both use ' + dest
+try:
+    launcher = open('upstream/bin/omarchy-launch-screensaver').read()
+except FileNotFoundError:
+    launcher = ''
+# cross-check once the vendored tree carries upstream's exec-style launcher
+for m in re.finditer(r'^exec (/\S+)', launcher, re.M):
+    assert m.group(1) == '/usr/lib/omarchy-screensaver/omarchy-screensaver', m.group(1)
+"
 echo "== Elsewhen retired upstream (in-tree omarchy.elsewhen) =="
 # Upstream moved Elsewhen in-tree as omarchy.elsewhen and drops the separate
 # package (upstream/migrations/1790528634.sh). The Fedora elsewhen RPM installed

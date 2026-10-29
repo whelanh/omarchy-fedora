@@ -5,13 +5,17 @@
 #
 # Upstream (both omarchy-pkgs and the README) installs the binary OFF PATH at
 # /usr/lib/omarchy-screensaver/omarchy-screensaver, and Omarchy's
-# omarchy-launch-screensaver execs exactly that path.
+# omarchy-launch-screensaver execs exactly that path -- it is hardcoded in
+# bin/omarchy-launch-screensaver, which ships in the omarchy tree and not in
+# this package. Arch has no libexec split, so upstream's /usr/lib is deliberate;
+# Fedora's libexecdir would be /usr/libexec and the launcher would not find the
+# binary. Hence the /usr/lib install below (written as prefix+lib).
 %global debug_package %{nil}
 %global _lto_cflags %{nil}
 
 Name:           omarchy-screensaver
 Version:        1.3.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Native Wayland screensaver for Omarchy
 
 License:        MIT
@@ -46,15 +50,22 @@ cargo build --release --offline --locked
 
 %install
 # Upstream's name for the built binary is omarchy-launch-screensaver; Omarchy
-# invokes it as /usr/lib/omarchy-screensaver/omarchy-screensaver.
+# invokes it as /usr/lib/omarchy-screensaver/omarchy-screensaver (see the header:
+# libexecdir is /usr/libexec on Fedora and would break the launcher).
 install -Dm755 target/release/omarchy-launch-screensaver \
-  %{buildroot}%{_libexecdir}/omarchy-screensaver/omarchy-screensaver
+  %{buildroot}%{_prefix}/lib/omarchy-screensaver/omarchy-screensaver
 
 %files
 %license LICENSE
 %doc README.md
-%{_libexecdir}/omarchy-screensaver/omarchy-screensaver
+%{_prefix}/lib/omarchy-screensaver/omarchy-screensaver
 
 %changelog
+* Thu Oct 29 2026 whelanh <brickhousedevelopers@gmail.com> - 1.3.1-2
+- Install to /usr/lib/omarchy-screensaver, not libexecdir: upstream's
+  omarchy-launch-screensaver execs /usr/lib/omarchy-screensaver/omarchy-screensaver
+  and Fedora's libexecdir is /usr/libexec, so 1.3.1-1 installed a binary the
+  launcher could not find
+
 * Thu Oct 29 2026 whelanh <brickhousedevelopers@gmail.com> - 1.3.1-1
 - Initial Fedora package of upstream v1.3.1 (native Wayland screensaver)
