@@ -194,6 +194,12 @@ REPO_RE = re.compile(r"https://github\.com/([^/]+)/([^/]+?)(?:\.git)?/?$")
 d = yaml.safe_load(open(manifest_path))
 pkgs = d["packages"]
 
+# `hold:` pins a package at its packaged version, with the reason as its value.
+# Use it when upstream's new release needs something we cannot get yet (a newer
+# hyprland, a distro that does not ship the library, ...): bumping anyway just
+# fails the COPR build on every run. Drop the key once the blocker clears.
+held = {n: str(p["hold"]).strip() for n, p in sorted(pkgs.items()) if p.get("hold")}
+
 # verified packages grouped by their upstream repo
 by_repo = {}
 for name, p in sorted(pkgs.items()):
@@ -223,8 +229,11 @@ for repo, names in sorted(by_repo.items()):
 
     # Bump any repo member that is behind the latest tag. Members that share a
     # repo normally move in lockstep, so this keeps owe + owe-lockfeed together
-    # while never downgrading a member that is somehow ahead.
+    # while never downgrading a member that is somehow ahead. Held members are
+    # skipped: their blocker is a dependency, not a version bump.
     for n in names:
+        if n in held:
+            continue
         if semver(cur[n]) < semver(newver):
             plan.append((n, newver, cur[n], tag))
 
@@ -240,6 +249,12 @@ if plan:
         print(f"{name:35} {oldver:>10} {newver:>10}  BUMP -> {newver}-1")
 else:
     print("all verified packages current")
+
+if held:
+    print()
+    print("held at the packaged version (blocked on a dependency, not a version):")
+    for name, why in held.items():
+        print(f"  {name}: {why}")
 
 if drift:
     print()

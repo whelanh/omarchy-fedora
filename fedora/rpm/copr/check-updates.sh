@@ -152,9 +152,15 @@ PY
 fi
 
 python3 - "$MANIFEST" <<'PY'
-import json, re, sys, urllib.request, yaml
+import json, os, re, sys, urllib.request, yaml
 
 UA = {"User-Agent": "omarchy-fedora-check", "Accept": "application/vnd.github+json"}
+# Same token support as auto-update.sh: without it this report is capped at 60
+# unauthenticated requests/hour (~2 per upstream repo) and mostly prints
+# "(unknown)" for every package.
+_token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
+if _token:
+    UA["Authorization"] = f"Bearer {_token}"
 
 def gh_get(url):
     req = urllib.request.Request(url, headers=UA)
@@ -177,19 +183,27 @@ def is_prerelease(v):
     return bool(_PRERE.search(str(v)))
 
 def latest_github(owner, repo):
+    # Must agree with auto-update.sh, which is the thing that acts on this
+    # report: prefer the maintainer's "latest release" (GitHub omits
+    # prereleases from it), and only fall back to tags when there is none.
+    # Unioning /releases with /tags made a prerelease tagged `v0.3.0` (no "rc"
+    # in the name) win the semver comparison and show up as OUTDATED even
+    # though the updater -- correctly -- never bumps to it.
+    try:
+        data = gh_get(f"https://api.github.com/repos/{owner}/{repo}/releases/latest")
+        if isinstance(data, dict) and data.get("tag_name"):
+            return data["tag_name"]
+    except Exception:
+        pass
     cand = set()
-    for path in ("/releases/latest", "/tags?per_page=50"):
-        try:
-            data = gh_get(f"https://api.github.com/repos/{owner}/{repo}{path}")
-            if isinstance(data, dict):
-                if data.get("tag_name"):
-                    cand.add(data["tag_name"])
-            elif isinstance(data, list):
-                for t in data:
-                    if t.get("name"):
-                        cand.add(t["name"])
-        except Exception:
-            pass
+    try:
+        data = gh_get(f"https://api.github.com/repos/{owner}/{repo}/tags?per_page=50")
+        if isinstance(data, list):
+            for t in data:
+                if t.get("name"):
+                    cand.add(t["name"])
+    except Exception:
+        pass
     stable = [c for c in cand if not is_prerelease(c)]
     pool = stable or list(cand)
     return max(pool, key=semver) if pool else None
@@ -205,16 +219,23 @@ for name, p in sorted(d["packages"].items()):
     ver = str(p.get("version", ""))
     m = re.match(r"https://github\.com/([^/]+)/([^/]+)", repo)
     latest = latest_github(m.group(1), m.group(2)) if m else None
-    rows.append((name, ver, latest))
+    rows.append((name, ver, latest, str(p.get("hold") or "").strip()))
 
 print(f"{'package':35} {'packaged':>10} {'latest':>10}  status")
 print("-" * 72)
 stale = 0
-for name, ver, latest in rows:
+held_ahead = 0
+for name, ver, latest, hold in rows:
     if latest is None:
         print(f"{name:35} {ver:>10} {'?':>10}  (unknown)")
         continue
     behind = semver(latest) > semver(ver)
+    if behind and hold:
+        # Deliberately pinned: upstream is ahead but needs a dependency we can't
+        # get yet (see the hold: reason in manifest.yaml). Not out of date.
+        held_ahead += 1
+        print(f"{name:35} {ver:>10} {latest:>10}  HELD ({hold})")
+        continue
     if behind:
         stale += 1
         print(f"{name:35} {ver:>10} {latest:>10}  OUTDATED")
@@ -226,5 +247,7 @@ if stale:
     print("  bash fedora/rpm/copr/submit-builds.sh <pkg>")
 else:
     print("all packages current")
+if held_ahead:
+    print(f"{held_ahead} held package(s) behind upstream by design (see hold: in manifest.yaml)")
 sys.exit(1 if stale else 0)
 PY

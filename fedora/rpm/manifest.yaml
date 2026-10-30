@@ -147,6 +147,15 @@ packages:
     license: BSD-3-Clause AND MIT
     deps: [hyprland, hyprlang, hyprutils]
     status: verified
+    # 0.3.0 moved to Hyprland 0.57 internals (hyprland/src/desktop/view/window/
+    # Window.hpp, desktop/state/WindowState.hpp, ...). nett00n/hyprland still
+    # ships hyprland-devel 0.56.2, so 0.3.0 neither compiles nor -- being a
+    # plugin loaded into the running compositor -- could run there. auto-update
+    # skips held packages; drop this key when
+    #   dnf repoquery --latest-limit 1 hyprland-devel
+    # reports >= 0.57, then bump (upstream rebuild_on means 0.2.2 must be
+    # replaced then anyway).
+    hold: "0.3.0 needs Hyprland >= 0.57 headers; nett00n/hyprland ships 0.56.2"
     version: 0.2.2
     note: Hyprland plugin drawing titlebars on Omarchy's floating windows; loaded from /usr/lib/omarchy-hyprland-titlebars/titlebars.so and registered as `hyprbars`. Compiled against nett00n/hyprland's hyprland-devel, so it must be rebuilt when Hyprland changes (upstream rebuild_on). Container-built OK.
   omarchy-emacs:

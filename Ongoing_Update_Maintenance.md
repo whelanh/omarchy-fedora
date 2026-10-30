@@ -56,6 +56,13 @@ bash fedora/rpm/copr/check-updates.sh --pins
 `omarchy-pkgs` master, so a stale pin is caught even when the app version has
 not moved.
 
+Statuses: `ok`, `OUTDATED` (bump it), `HELD` (upstream is ahead but the package
+is pinned by a `hold:` reason in `manifest.yaml` — see below) and `(unknown)`.
+Like `auto-update.sh`, it reads the maintainer's *latest release*, so a
+prerelease tag (e.g. `v0.3.0` before it goes stable) is not reported as
+OUTDATED. Set `GITHUB_TOKEN` (or `GH_TOKEN`) to lift GitHub's 60 req/hour
+unauthenticated limit; without it most rows print `(unknown)`.
+
 `--packages` diffs upstream's `omarchy-base.packages` + `omarchy-other.packages`
 against `fedora/mappings/packages.yaml` and prints:
 
@@ -117,16 +124,28 @@ COPR first-party.) Removals are handled by the retired list (row 5), so
 ## Bumping a first-party package to a newer release
 
 1. `bash fedora/rpm/copr/check-updates.sh` to see what's out of date.
-2. In `fedora/rpm/<pkg>/<pkg>.spec`: bump `Version:`, reset `Release:` to `1`,
+2. If the new release cannot be built on Fedora yet — it needs a newer
+   dependency than the repo we install from provides — do **not** bump.
+   Record the blocker instead:
+   ```yaml
+     hold: "0.3.0 needs Hyprland >= 0.57 headers; nett00n/hyprland ships 0.56.2"
+   ```
+   in that package's `manifest.yaml` entry. `auto-update.sh` then skips it and
+   `check-updates.sh` reports `HELD` rather than `OUTDATED`; drop the key once
+   the dependency lands (for the example above:
+   `dnf repoquery --latest-limit 1 hyprland-devel`). Live example:
+   `omarchy-hyprland-titlebars` (a plugin is compiled against Hyprland's private
+   headers, so it cannot be built — let alone loaded — ahead of the compositor).
+3. In `fedora/rpm/<pkg>/<pkg>.spec`: bump `Version:`, reset `Release:` to `1`,
    and add a `%changelog` entry (or bump `Release:` only if it's a packaging
    fix with no upstream change).
-3. Update `fedora/rpm/manifest.yaml` for that package: set `version:` (and
+4. Update `fedora/rpm/manifest.yaml` for that package: set `version:` (and
    `deps:`/`note:` if they changed) to match the spec. This is a manual record
    — nothing auto-syncs it — and `fedora/tests/static.sh` fails if the two
    drift out of sync.
-4. Container-verify: `bash fedora/rpm/build-rpm-in-ci.sh <pkg>`.
-5. Submit: `bash fedora/rpm/copr/submit-builds.sh <pkg>`.
-6. Watch: `copr-cli list-builds whelanh/omarchy --output-format text`.
+5. Container-verify: `bash fedora/rpm/build-rpm-in-ci.sh <pkg>`.
+6. Submit: `bash fedora/rpm/copr/submit-builds.sh <pkg>`.
+7. Watch: `copr-cli list-builds whelanh/omarchy --output-format text`.
 
 ---
 

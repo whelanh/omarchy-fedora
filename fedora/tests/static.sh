@@ -189,6 +189,32 @@ s = open('fedora/rpm/copr/auto-update.sh').read()
 assert '--prune-retired' in s, 'flag missing'
 assert 'delete-retired.sh' in s, 'prune must call delete-retired.sh'
 "
+# A package can be pinned at its packaged version with `hold:` while upstream's
+# new release needs a dependency we cannot get yet (titlebars 0.3.0 needs
+# Hyprland 0.57 headers; nett00n/hyprland still ships 0.56.2). Both the updater
+# and the drift report must honour it, otherwise every run re-bumps the package
+# and the COPR build fails again.
+t "manifest holds carry a reason" python3 -c "
+import yaml
+d = yaml.safe_load(open('fedora/rpm/manifest.yaml'))['packages']
+for n, p in d.items():
+    if 'hold' in p:
+        assert isinstance(p['hold'], str) and p['hold'].strip(), n
+"
+t "auto-update.sh skips held packages" python3 -c "
+s = open('fedora/rpm/copr/auto-update.sh').read()
+assert 'if n in held' in s, 'updater must skip hold: packages'
+"
+t "check-updates.sh marks held packages HELD" python3 -c "
+s = open('fedora/rpm/copr/check-updates.sh').read()
+assert 'HELD' in s and 'hold' in s, 'drift report must mark holds'
+"
+# Without a token the report hits GitHub's 60 req/hour unauthenticated limit
+# (~2 per upstream repo) and prints (unknown) for everything.
+t "check-updates.sh honours GITHUB_TOKEN" python3 -c "
+s = open('fedora/rpm/copr/check-updates.sh').read()
+assert 'GITHUB_TOKEN' in s and 'Authorization' in s, 'token support missing'
+"
 for pkg in $(python3 -c "
 import yaml; d=yaml.safe_load(open('fedora/rpm/manifest.yaml'))
 print(' '.join(sorted(d['packages'].keys())))

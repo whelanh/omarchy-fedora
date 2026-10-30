@@ -17,6 +17,10 @@ in Fedora official/COPR repos. They map to `source: copr` entries in
 
 - `manifest.yaml` — machine-readable record of every package: repo, language,
   build command, license, upstream reference, version, and verification status.
+  A package can also carry `hold: "<reason>"` when upstream's newer release
+  needs a dependency this repo cannot provide yet; `copr/auto-update.sh` skips
+  held packages and `copr/check-updates.sh` reports them as `HELD` instead of
+  `OUTDATED`.
 - `build-rpm.sh <pkg>` — builds one package with `rpmbuild` (optionally via
   `mock`).
 - `build-rpm-in-ci.sh [pkg...]` — builds all `verified` packages (or the
