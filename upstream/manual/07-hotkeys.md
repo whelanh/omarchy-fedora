@@ -63,6 +63,8 @@ You can see all the main keyboard bindings with `Super + K` (Tmux bindings with 
 | `Ctrl + Alt + Tab`| Cycle focus forward through monitors |
 | `Ctrl + Alt + Shift + Tab`| Cycle focus backwards through monitors |
 
+Resize shortcuts use physical keys `code:20` and `code:21` (XKB `<AE11>` and `<AE12>`), regardless of the characters printed on the keyboard. On US keyboards these keys are `-` and `=`; on Japanese (JIS) keyboards they are `-` and `^`; on Spanish keyboards they are `'` and `¡`. On JIS, `Super + ^` is `Super + Equal`, while `Super + Shift + -` (which types `=`) is `Super + Shift + Minus`.
+
 ## System controls
 
 | Hotkey                  | Function              |
@@ -135,6 +137,7 @@ Change/add bindings in `~/.config/hypr/bindings.lua`.
 
 | Hotkey                  | Function              |
 | ----------------------- | --------------------- |
+| `Super + A`           | Select all in apps that support `Ctrl + A`    |
 | `Super + C`           | Copy    |
 | `Super + X`           | Cut (not in terminal)    |
 | `Super + V`           | Paste    |
@@ -307,7 +310,7 @@ Ghostty terminal is installed using _Install > Terminal_ via the Omarchy menu.
 | ------------------- | ------------------------------ |
 | `Ctrl + L`            | Go to path                     |
 | `Space`               | Preview file (arrows navigate) |
-| `Backspace`      | Go back one folder             |
+| `Alt + Up`       | Go up to parent folder        |
 
 ## Neovim (w/ lazyvim)
 
