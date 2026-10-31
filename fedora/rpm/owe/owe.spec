@@ -3,7 +3,7 @@
 # Source-built from the same tag archive as owe-lockfeed; this SPEC mirrors the
 # Arch `owe` package (daemon + CLI + renderer + hooks), not the qml-plugin.
 Name:           owe
-Version:        0.2.12
+Version:        0.2.13
 Release:        1%{?dist}
 Summary:        High-performance wallpaper engine for Omarchy (mp4, gif, stills)
 
@@ -63,6 +63,9 @@ install -Dm644 config/config.toml %{buildroot}%{_docdir}/%{name}/config.toml.exa
 %{_docdir}/%{name}/config.toml.example
 
 %changelog
+* Sat Oct 31 2026 whelanh <brickhousedevelopers@gmail.com> - 0.2.13-1
+- Automatic update to upstream v0.2.13
+
 * Thu Oct 22 2026 whelanh <brickhousedevelopers@gmail.com> - 0.2.12-1
 - Automatic update to upstream v0.2.12
 
