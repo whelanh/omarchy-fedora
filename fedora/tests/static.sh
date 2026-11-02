@@ -347,6 +347,19 @@ assert '.config/autostart/org.kde.xwaylandvideobridge.desktop' in src, 'must wri
 assert 'Hidden=true' in src, 'override must set Hidden=true'
 "
 
+echo "== Installer ships the snapper GUI =="
+# The README's rollback path promises btrfs-assistant (Fedora 2.2): the GUI for
+# browsing, diffing and restoring the snapshots snapper takes. It must actually
+# be installed, from the btrfs-gated snapper step, and never break the install.
+t "install_snapper installs btrfs-assistant" python3 -c "
+src = open('fedora/scripts/install.sh').read()
+assert 'btrfs-assistant' in src, 'snapper step must install the GUI'
+assert src.count('btrfs-assistant') >= 3, 'must check, log and install it'
+assert 'btrfs-assistant install failed (snapshots still work via snapper)' in src, \
+    'a GUI failure must not abort the snapshot setup'
+"
+t "mapped: btrfs-assistant" python3 fedora/scripts/lib/resolve.py --package btrfs-assistant
+
 echo "== Installer's grub-btrfs guard works without root =="
 # `omarchy update` runs install.sh as the desktop user, escalating per command,
 # so the old guard (`[ ! -e /boot/grub2/grub.cfg ]`) hit EACCES on /boot/grub2

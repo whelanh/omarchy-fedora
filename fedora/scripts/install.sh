@@ -424,6 +424,17 @@ install_snapper() {
     fi
   fi
 
+  # GUI front-end for those snapshots (Fedora's btrfs-assistant): browse,
+  # diff and restore from the running system or a live ISO. Non-fatal -- the
+  # snapshots and grub-btrfs entries work without it.
+  if omarchy_pkg_is_installed btrfs-assistant; then
+    log "  btrfs-assistant already installed"
+  else
+    log "  installing btrfs-assistant"
+    omarchy_pkg_install btrfs-assistant \
+      || warn "  btrfs-assistant install failed (snapshots still work via snapper)"
+  fi
+
   # Cap retained snapshots (tunable). snapper-cleanup.timer enforces this.
   _snapper -c root set-config NUMBER_LIMIT=5 TIMELINE_LIMIT_HOURLY=5 TIMELINE_LIMIT_DAILY=0 TIMELINE_LIMIT_WEEKLY=0 TIMELINE_LIMIT_MONTHLY=0 TIMELINE_LIMIT_YEARLY=0 \
     || warn "  could not set snapper snapshot limits"

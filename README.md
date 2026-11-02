@@ -127,7 +127,9 @@ doing a dnf upgrade).  You may occasionally get hyprland config errors during an
 let the update complete and then reboot.
 
 ## Rollback
-In an attempt to emulate Omarchy's Limine rollback structure. The install script installs `snapper`, `btrfs-assistant`, and `grub-btrfs` (from COPR).  Snapshots are created pre and post upgrade and on a time-line (with retention limits). You can boot into a snapshot.  To actually re-set to a snapshot, follow directions for `snapper`.
+In an attempt to emulate Omarchy's Limine rollback structure, the install script sets up `snapper`, `btrfs-assistant` and `grub-btrfs` (from COPR) on btrfs systems.  Snapshots are created pre and post upgrade and on a time-line (with retention limits), and `grub-btrfs` lists them in the GRUB menu so you can boot one.  To actually re-set to a snapshot, follow directions for `snapper`, or use `btrfs-assistant`'s Snapper view to browse, diff and restore.
+
+Note: when `/boot` is a separate (non-btrfs) filesystem -- Fedora's default layout -- kernels are not part of the snapshots, so a snapshot entry boots the kernel currently in `/boot` rather than the one it was taken with.  A snapshot from before a kernel update restores `/` only.
 
 ## Documentation
 

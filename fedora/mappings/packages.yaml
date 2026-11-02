@@ -572,6 +572,7 @@ packages:
 
   # --- Fedora official infra (secondary) ---
   autoconf-archive:      { package: autoconf-archive, source: fedora }
+  btrfs-assistant:       { package: btrfs-assistant, source: fedora }
   btrfs-progs:           { package: btrfs-progs, source: fedora }
   dkms:                  { package: dkms, source: fedora }
   intel-lpmd:            { package: intel-lpmd, source: fedora }
