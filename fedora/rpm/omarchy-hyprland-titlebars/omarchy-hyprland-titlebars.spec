@@ -11,7 +11,7 @@
 %global _lto_cflags %{nil}
 
 Name:           omarchy-hyprland-titlebars
-Version:        0.2.2
+Version:        0.3.0
 Release:        1%{?dist}
 Summary:        Titlebars for Omarchy's floating workspace mode
 
@@ -21,7 +21,9 @@ Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz
 
 BuildRequires:  cmake
 BuildRequires:  gcc-c++
-BuildRequires:  pkgconfig(hyprland)
+# 0.3.0 moved to Hyprland 0.57 internals; an older hyprland-devel fails here
+# with a clear dependency error instead of a missing-header compile error.
+BuildRequires:  pkgconfig(hyprland) >= 0.57
 BuildRequires:  pkgconfig(libdrm)
 BuildRequires:  pkgconfig(libinput)
 BuildRequires:  pkgconfig(libudev)
@@ -60,6 +62,11 @@ install -Dm644 LICENSE.MIT %{buildroot}%{_datadir}/licenses/%{name}/LICENSE.MIT
 %{_prefix}/lib/omarchy-hyprland-titlebars/titlebars.so
 
 %changelog
+* Mon Nov 02 2026 whelanh <brickhousedevelopers@gmail.com> - 0.3.0-1
+- Automatic update to upstream v0.3.0 (Build against Hyprland 0.57)
+- Require pkgconfig(hyprland) >= 0.57: 0.3.0 includes the 0.57 internal headers
+  (desktop/view/window/*, desktop/state/WindowState.hpp)
+
 * Tue Oct 13 2026 whelanh <brickhousedevelopers@gmail.com> - 0.2.2-1
 - Automatic update to upstream v0.2.2
 

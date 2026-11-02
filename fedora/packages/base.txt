@@ -102,6 +102,9 @@ wl-clipboard
 wtype
 xdg-desktop-portal-gtk
 xdg-terminal-exec
+# xsetroot (Arch: xorg-xsetroot): restores the X11/XWayland root cursor from
+# upstream default/hypr/startup-cursor.lua (harmless with no Xwayland clients).
+xsetroot
 yt-dlp
 zbar
 zoxide

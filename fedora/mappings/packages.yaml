@@ -107,6 +107,12 @@ packages:
     repository: whelanh/omarchy
     rpm: fedora/rpm/omarchy-hyprland-titlebars/omarchy-hyprland-titlebars.spec
     note: Hyprland plugin for Omarchy's floating-window titlebars; cmake, built against hyprland-devel from nett00n/hyprland. Must be rebuilt when Hyprland changes.
+  omarchy-local-ai:
+    package: omarchy-local-ai
+    source: copr
+    repository: whelanh/omarchy
+    rpm: fedora/rpm/omarchy-local-ai/omarchy-local-ai.spec
+    note: Local model engine (Python) plus its curated recipe catalog; noarch, no compile step. Omarchy's omarchy-agent-local exposes it as `omarchy agent local`; the models themselves run in rootless podman, installed on demand.
   omarchy-screensaver:
     package: omarchy-screensaver
     source: copr
@@ -393,6 +399,7 @@ packages:
   wl-clipboard:          { package: wl-clipboard, source: fedora }
   wtype:                 { package: wtype, source: fedora }
   xdg-desktop-portal-gtk: { package: xdg-desktop-portal-gtk, source: fedora }
+  xorg-xsetroot:         { package: xsetroot, source: fedora }
   xournalpp:             { package: xournalpp, source: fedora }
   yt-dlp:                { package: yt-dlp, source: fedora }
   zbar:                  { package: zbar, source: fedora }
