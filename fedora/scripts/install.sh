@@ -434,6 +434,25 @@ install_snapper() {
     || warn "  could not enable snapper-cleanup.timer"
 }
 
+# True when GRUB is this machine's boot loader, i.e. when snapshot entries have
+# a menu to land in. /boot/grub2 is mode 0700 root, so testing grub.cfg directly
+# answers "absent" for every other user -- and `omarchy update` runs install.sh
+# as the desktop user (update.sh calls `bash install.sh --update` without sudo
+# and escalates per command), which made the guard report "no GRUB
+# configuration found" on machines that boot GRUB perfectly well. Probe what any
+# user can stat instead: the directory GRUB owns under /boot plus its own
+# /etc/default/grub, falling back to the real config when it is readable (root).
+_grub_is_bootloader() {
+  local cfg
+  for cfg in /boot/grub2/grub.cfg /boot/grub/grub.cfg; do
+    [ -e "$cfg" ] && return 0
+  done
+  if { [ -d /boot/grub2 ] || [ -d /boot/grub ]; } && [ -e /etc/default/grub ]; then
+    return 0
+  fi
+  return 1
+}
+
 # Omarchy on Arch ships Limine + snapshots so a broken upgrade can be rolled
 # back from the boot menu. Fedora has no Limine, so offer the GRUB equivalent:
 # grub-btrfs (jmarcoshp/grub-btrfs COPR) regenerates GRUB entries for btrfs
@@ -447,8 +466,8 @@ install_grub_btrfs() {
     log "grub-btrfs: skipped (root filesystem is $rootfs, not btrfs)"
     return 0
   fi
-  if [ ! -e /boot/grub2/grub.cfg ] && [ ! -e /boot/grub/grub.cfg ]; then
-    log "grub-btrfs: skipped (no GRUB configuration found)"
+  if ! _grub_is_bootloader; then
+    log "grub-btrfs: skipped (GRUB is not the boot loader)"
     return 0
   fi
 

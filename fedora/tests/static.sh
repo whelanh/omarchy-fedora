@@ -347,6 +347,21 @@ assert '.config/autostart/org.kde.xwaylandvideobridge.desktop' in src, 'must wri
 assert 'Hidden=true' in src, 'override must set Hidden=true'
 "
 
+echo "== Installer's grub-btrfs guard works without root =="
+# `omarchy update` runs install.sh as the desktop user, escalating per command,
+# so the old guard (`[ ! -e /boot/grub2/grub.cfg ]`) hit EACCES on /boot/grub2
+# (mode 0700) and reported "no GRUB configuration found" on machines that boot
+# GRUB fine. The guard must probe paths any user can stat.
+t "grub-btrfs guard does not test root-only GRUB configs alone" python3 -c "
+src = open('fedora/scripts/install.sh').read()
+assert '_grub_is_bootloader()' in src, 'missing _grub_is_bootloader helper'
+assert src.count('_grub_is_bootloader') >= 2, 'helper must be defined and called'
+assert '[ ! -e /boot/grub2/grub.cfg ] && [ ! -e /boot/grub/grub.cfg ]' not in src, \
+    'root-only probe misreads EACCES as \"no GRUB\" for an unprivileged update'
+assert '/etc/default/grub' in src, 'must fall back to a stat any user can do'
+assert 'no GRUB configuration found' not in src, 'message must describe the real reason'
+"
+
 echo "== Installer takes over the display manager (GDM / PLM bases) =="
 # On Fedora Workstation GDM owns display-manager.service, and on Fedora 44+
 # KDE Plasma Login Manager (plasmalogin.service) owns it, so `systemctl enable
