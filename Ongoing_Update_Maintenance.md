@@ -133,9 +133,13 @@ COPR first-party.) Removals are handled by the retired list (row 5), so
    in that package's `manifest.yaml` entry. `auto-update.sh` then skips it and
    `check-updates.sh` reports `HELD` rather than `OUTDATED`; drop the key once
    the dependency lands (for the example above:
-   `dnf repoquery --latest-limit 1 hyprland-devel`). Live example:
-   `omarchy-hyprland-titlebars` (a plugin is compiled against Hyprland's private
-   headers, so it cannot be built — let alone loaded — ahead of the compositor).
+   `dnf repoquery --latest-limit 1 hyprland-devel`).
+
+   Worked example: `omarchy-hyprland-titlebars` was held at 0.2.2 between
+   upstream 0.3.0 (which needs Hyprland 0.57 internals) and `nett00n/hyprland`
+   publishing `hyprland-devel 0.57.0`; the hold was dropped and 0.3.0 shipped as
+   soon as it did. A plugin is compiled against Hyprland's private headers, so
+   it can never be built — let alone loaded — ahead of the compositor it targets.
 3. In `fedora/rpm/<pkg>/<pkg>.spec`: bump `Version:`, reset `Release:` to `1`,
    and add a `%changelog` entry (or bump `Release:` only if it's a packaging
    fix with no upstream change).
