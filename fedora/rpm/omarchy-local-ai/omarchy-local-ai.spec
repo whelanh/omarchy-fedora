@@ -11,7 +11,7 @@
 %global debug_package %{nil}
 
 Name:           omarchy-local-ai
-Version:        0.3.2
+Version:        0.4.0
 Release:        1%{?dist}
 Summary:        Run open models locally for Omarchy's coding agents
 
@@ -71,5 +71,8 @@ ln -s ../share/%{name}/omarchy-local-ai %{buildroot}%{_bindir}/omarchy-local-ai
 %{_datadir}/%{name}
 
 %changelog
+* Tue Nov 3 2026 whelanh <brickhousedevelopers@gmail.com> - 0.4.0-1
+- Automatic update to upstream v0.4.0
+
 * Mon Nov 02 2026 whelanh <brickhousedevelopers@gmail.com> - 0.3.2-1
 - Initial Fedora package: local model engine + recipe catalog (v0.3.2)

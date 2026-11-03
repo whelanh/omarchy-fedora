@@ -5,7 +5,7 @@
 %global protocols_commit 3a5c2bda1c1a4e55cc1330c782547695a93f05b2
 
 Name:           hyprland-preview-share-picker
-Version:        0.2.1
+Version:        0.3.1
 Release:        1%{?dist}
 Summary:        An alternative share picker for Hyprland with window and monitor previews
 
@@ -51,5 +51,8 @@ install -Dm644 schema.json %{buildroot}%{_datadir}/hyprland-preview-share-picker
 %{_datadir}/hyprland-preview-share-picker/schema.json
 
 %changelog
+* Tue Nov 3 2026 whelanh <brickhousedevelopers@gmail.com> - 0.3.1-1
+- Automatic update to upstream v0.3.1
+
 * Mon Aug 31 2026 whelanh <brickhousedevelopers@gmail.com> - 0.2.1-1
 - Source build on stable Fedora Rust; hyprland-protocols vendored at pinned commit; vendor crates.io deps for offline COPR builds

@@ -97,7 +97,7 @@ packages:
     license: MIT
     deps: [gtk4, gtk4-layer-shell, xdg-desktop-portal-hyprland, hyprland, slurp]
     status: verified
-    version: 0.2.1
+    version: 0.3.1
     note: Spec cds the pinned hyprland-protocols in (Source from hyprwm), builds on stable Fedora Rust with crates.io deps vendored for offline COPR build; needs gtk4-layer-shell-devel from nett00n/hyprland COPR. Container-built OK.
   monologue:
     repo: https://github.com/omacom/monologue
@@ -277,7 +277,7 @@ packages:
     license: MIT
     deps: [python3, systemd]
     status: verified
-    version: 0.3.2
+    version: 0.4.0
     note: Local model engine and its curated recipe catalog, installed as one tree under /usr/share/omarchy-local-ai with /usr/bin/omarchy-local-ai symlinked into it (the engine reads the catalog beside itself). %check runs upstream's `validate .` offline. The containers that run models (podman + crun) are optional and installed on demand by `omarchy agent local use`.
   omarchy-screensaver:
     repo: https://github.com/omacom/omarchy-screensaver
