@@ -37,7 +37,7 @@ packages:
     license: MIT
     deps: [alsa-lib, ffmpeg-free, yt-dlp]
     status: verified
-    version: 2.3.0
+    version: 2.4.0
     note: Repack of cliamp-linux-amd64; desktop + Cliamp.png. Container-built OK.
   disktree-bin:
     repo: https://github.com/tobi/disktree
@@ -67,7 +67,7 @@ packages:
     license: MIT AND BSD-2-Clause
     deps: [dbus, openssh, vulkan-loader, gtk4, libadwaita, libva, libdrm, nasm]
     status: verified
-    version: 0.4.1
+    version: 0.4.2
     note: Hyprland remote desktop over SSH (GPU H.264 4:4:4); Rust workspace with gliff + gliff-server + gliff-probe. Crates vendored via fedora/rpm/vendor-rust.sh; cargo build --offline --locked. Container-built OK.
   herdr:
     repo: https://github.com/herdrdev/herdr
@@ -207,7 +207,7 @@ packages:
     license: MIT
     deps: [hyprland, layer-shell-qt, wl-clipboard, qt6-qtbase, xdg-utils]
     status: verified
-    version: 1.24.0
+    version: 1.25.0
     note: Repack of omasnap-1.21.0-archlinux-x86_64.tar.gz (mirrors AUR omasnap-bin); screenshot/annotation editor that supersedes tensaku. Container-built OK.
   openai-codex-desktop:
     repo: https://chatgpt.com/codex/
