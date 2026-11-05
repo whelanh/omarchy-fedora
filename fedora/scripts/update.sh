@@ -25,6 +25,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 OMARCHY_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 INSTALL_SH="$SCRIPT_DIR/install.sh"
 . "$SCRIPT_DIR/lib/pkg.sh"
+. "$SCRIPT_DIR/lib/snapshot.sh"
 
 log() { printf '\033[1;34m[omarchy-update] %s\033[0m\n' "$*"; }
 warn() { printf '\033[1;33m[omarchy-update] %s\033[0m\n' "$*" >&2; }
@@ -134,8 +135,20 @@ omarchy_fedora_sync_userspace_tarball() {
 # `omarchy-snapshot create` without depending on the upstream binary. Skipped
 # with a notice when snapper is absent or has no root config - a missing snapshot
 # must never block the update.
+#
+# snapper metadata is root-only (/.snapshots is 0750), so detection runs through
+# sudo when the updater is invoked as the desktop user, just like snapper itself.
+_omarchy_snapshot_orphans_as_root() {
+  if (( EUID == 0 )); then
+    omarchy_snapshot_orphans
+  else
+    sudo bash -c "$(declare -f omarchy_snapshot_orphans)
+omarchy_snapshot_orphans" 2>/dev/null || true
+  fi
+}
+
 omarchy_fedora_snapshot() {
-  local rootfs desc
+  local rootfs desc orphans="" nums="" cleanup="" n err rc=0
   rootfs="$(findmnt -no FSTYPE / 2>/dev/null || true)"
   if [ "$rootfs" != "btrfs" ]; then
     return 0
@@ -149,15 +162,46 @@ omarchy_fedora_snapshot() {
     return 0
   fi
 
+  # A subvolume deleted without its info.xml leaves snapper warning about the
+  # same snapshot on every run. Report it up front, with the exact cleanup
+  # command, instead of letting the raw "snapshot check failed" line stand
+  # alone. Never delete automatically: confirm the subvolume is really gone.
+  orphans="$(_omarchy_snapshot_orphans_as_root)"
+  if [ -n "$orphans" ]; then
+    while IFS= read -r n; do
+      [ -n "$n" ] || continue
+      nums+="${nums:+ }$n"
+      cleanup+=" /.snapshots/$n"
+    done <<<"$orphans"
+    warn "snapper has orphaned snapshot metadata: $nums"
+    warn "  Their btrfs subvolumes are gone, so snapper skips them and repeats"
+    warn "  'snapshot check failed' on every run. After confirming with"
+    warn "  'sudo btrfs subvolume show /.snapshots/<num>/snapshot', remove them with:"
+    warn "    sudo rm -rf$cleanup"
+  fi
+
   log "Creating pre-update snapshot..."
   desc="omarchy update"
+  err="$(mktemp)"
   if (( EUID == 0 )); then
-    snapper --no-dbus -c root create -c number -d "$desc" >/dev/null \
-      && snapper --no-dbus -c root cleanup number >/dev/null
+    snapper --no-dbus -c root create -c number -d "$desc" >/dev/null 2>"$err" \
+      && snapper --no-dbus -c root cleanup number >/dev/null 2>>"$err" || rc=$?
   else
-    sudo snapper --no-dbus -c root create -c number -d "$desc" >/dev/null \
-      && sudo snapper --no-dbus -c root cleanup number >/dev/null
-  fi || warn "Pre-update snapshot failed (continuing without one)"
+    sudo snapper --no-dbus -c root create -c number -d "$desc" >/dev/null 2>"$err" \
+      && sudo snapper --no-dbus -c root cleanup number >/dev/null 2>>"$err" || rc=$?
+  fi
+  if [ -s "$err" ]; then
+    if [ -n "$orphans" ]; then
+      # The warning is already explained above; drop just that repeated line.
+      grep -vE 'snapshot check failed\. not adding snapshot [0-9]+$' "$err" >&2 || true
+    else
+      cat "$err" >&2
+    fi
+  fi
+  rm -f "$err"
+  if (( rc != 0 )); then
+    warn "Pre-update snapshot failed (continuing without one)"
+  fi
 }
 
 # 1 + 2 — Fedora packages (incl. first-party COPR RPMs).

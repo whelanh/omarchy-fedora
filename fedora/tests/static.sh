@@ -391,6 +391,33 @@ assert 'btrfs-assistant install failed (snapshots still work via snapper)' in sr
 "
 t "mapped: btrfs-assistant" python3 fedora/scripts/lib/resolve.py --package btrfs-assistant
 
+echo "== Updater detects orphaned snapper metadata =="
+# A subvolume removed without its info.xml leaves snapper logging
+# "snapshot check failed. not adding snapshot N" forever. The updater must name
+# those leftovers and print the cleanup command (but never delete them itself).
+t "snapshot orphan detector" bash -c '
+  source fedora/scripts/lib/snapshot.sh
+  tmp="$(mktemp -d)"
+  trap "rm -rf \"$tmp\"" EXIT
+  mkdir -p "$tmp/115" "$tmp/116" "$tmp/117" "$tmp/118"
+  : >"$tmp/115/info.xml"                              # snapshot entry missing
+  : >"$tmp/116/info.xml"; : >"$tmp/116/snapshot"      # plain file, not a subvolume
+  : >"$tmp/117/info.xml"                              # snapshot entry missing
+  : >"$tmp/118/snapshot"                              # no info.xml: not snapper metadata
+  out="$(omarchy_snapshot_orphans "$tmp")"
+  [ "$out" = "115
+116
+117" ]
+'
+t "update.sh explains and reports orphan snapshot metadata" python3 -c "
+src = open('fedora/scripts/update.sh').read()
+assert 'lib/snapshot.sh' in src, 'must source the detector'
+assert 'omarchy_snapshot_orphans' in src, 'must call the detector'
+assert 'snapper has orphaned snapshot metadata' in src, 'must explain the finding'
+assert 'sudo rm -rf' in src, 'must print the cleanup command'
+assert 'snapshot check failed' in src, 'must filter the now-explained raw warning'
+"
+
 echo "== Installer's grub-btrfs guard works without root =="
 # `omarchy update` runs install.sh as the desktop user, escalating per command,
 # so the old guard (`[ ! -e /boot/grub2/grub.cfg ]`) hit EACCES on /boot/grub2

@@ -107,6 +107,24 @@ commands to be absent until the BUILD_FROM_SOURCE RPM effort lands.
 Run the sync classification in `UPSTREAM.md`. If a Fedora-patched file
 conflicts, stop automatic merge and review manually via the created issue.
 
+## `snapshot check failed. not adding snapshot N` during `omarchy update`
+
+- This comes from snapper, not Omarchy. It keeps a snapshot in its list only
+  while `/.snapshots/N/snapshot` is a btrfs subvolume root; if a deletion,
+  rollback or interrupted cleanup left `info.xml` behind without the subvolume,
+  snapper skips that number and repeats the warning on every run.
+- It does not block the update: the pre-update snapshot is still created (for
+  the next free number) and the upgrade continues. But snapper will never clean
+  up the orphan automatically, so remove the metadata-only directory.
+- `omarchy update` detects these and prints the exact command. Confirm first,
+  then remove it:
+  ```bash
+  sudo btrfs subvolume show /.snapshots/115/snapshot
+  sudo rm -rf /.snapshots/115
+  ```
+  Only remove a number when `btrfs subvolume show` reports that the path is not
+  a subvolume (or does not exist). Never remove `/.snapshots` itself.
+
 ## How to report
 
 Provide: Fedora version, `fedora/scripts/lib/resolve.py --package <x>` output,
