@@ -14,12 +14,18 @@
 #   fedora/rpm/copr/auto-update.sh --srpms-only     # bump + build SRPMs, no submit
 #   fedora/rpm/copr/auto-update.sh --verify         # container-verify before submit
 #   fedora/rpm/copr/auto-update.sh --prune-retired  # also delete retired COPR packages
+#   fedora/rpm/copr/auto-update.sh --no-rebuilds   # don't auto-rebuild rebuild_on dependents
 #   fedora/rpm/copr/auto-update.sh --no-watch       # submit, don't watch/self-heal
 #   fedora/rpm/copr/auto-update.sh --chroot fedora-45-x86_64
 #
 # Notes:
 #   - Only packages with `status: verified` in manifest.yaml are considered;
 #     the others are not part of the COPR.
+#   - A package with `rebuild_on:` is rebuilt (Release: bumped, Version:
+#     unchanged) when its trigger's latest successful COPR build is newer than
+#     the package's own. This covers native plugins such as
+#     omarchy-hyprland-titlebars, whose ABI hash follows hyprland-devel even
+#     when the plugin's upstream version has not moved.
 #   - With --prune-retired, delete-retired.sh removes the packages named in
 #     retired-packages.conf from the COPR (a retired package is gone from
 #     fedora/rpm/ + manifest.yaml, so nothing else here touches it, but the COPR
@@ -67,6 +73,7 @@ Usage:
   auto-update.sh --srpms-only     bump + build SRPMs, do not submit
   auto-update.sh --verify         container-verify before submitting
   auto-update.sh --prune-retired  also delete retired packages from the COPR
+  auto-update.sh --no-rebuilds    don't auto-rebuild rebuild_on dependents
   auto-update.sh --no-watch       submit but don't watch/retry COPR builds
   auto-update.sh --chroot <name>  submit to only this chroot (repeatable)
 EOF
@@ -77,6 +84,7 @@ ASSUME_YES=0
 SUBMIT_BUILDS=1
 VERIFY=0
 PRUNE_RETIRED=0
+REBUILD_DEPENDENTS=1
 NO_WATCH=0
 CHROOTS=()
 while [ $# -gt 0 ]; do
@@ -86,6 +94,7 @@ while [ $# -gt 0 ]; do
     --srpms-only|--no-submit) SUBMIT_BUILDS=0 ;;
     --verify)     VERIFY=1 ;;
     --prune-retired) PRUNE_RETIRED=1 ;;
+    --no-rebuilds) REBUILD_DEPENDENTS=0 ;;
     --no-watch)   NO_WATCH=1 ;;
     --chroot)     CHROOTS+=("${2:?--chroot needs a value}"); shift ;;
     -h|--help)    usage; exit 0 ;;
@@ -111,8 +120,9 @@ if [ -z "$MAINTAINER" ]; then
 fi
 
 PLAN="$(mktemp)"
+REBUILD_PLAN="$(mktemp)"
 CHANGED_OUT="$(mktemp)"
-trap 'rm -f "$PLAN" "$CHANGED_OUT"' EXIT
+trap 'rm -f "$PLAN" "$REBUILD_PLAN" "$CHANGED_OUT"' EXIT
 
 if [ -n "${GITHUB_TOKEN:-}${GH_TOKEN:-}" ]; then
   echo "== checking upstream for verified packages in $COPR (authenticated) =="
@@ -282,6 +292,43 @@ if ! bash "$COP_DIR/check-updates.sh" --pins; then
   echo "      entry, and resubmit that package."
 fi
 
+# Native plugins (titlebars) are tied to their trigger's headers, not just their
+# own version. Rebuild them when the trigger's latest successful COPR build is
+# newer; a package already in the version plan is rebuilt by that bump anyway.
+if [ "$REBUILD_DEPENDENTS" = 1 ]; then
+  echo
+  echo "== checking rebuild_on dependents =="
+  RAW_REBUILDS="$(mktemp)"
+  rc=0
+  bash "$COP_DIR/check-updates.sh" --rebuilds --porcelain >"$RAW_REBUILDS" 2>/dev/null || rc=$?
+  if [ "$rc" -ne 0 ] && [ ! -s "$RAW_REBUILDS" ]; then
+    echo "NOTE: could not compare rebuild_on dependents (COPR API/network); continuing."
+    : >"$RAW_REBUILDS"
+  fi
+  python3 - "$PLAN" "$RAW_REBUILDS" "$REBUILD_PLAN" <<'PY'
+import sys
+versioned = {line.split("\t")[0] for line in open(sys.argv[1]) if line.strip()}
+out = []
+for line in open(sys.argv[2]):
+    line = line.rstrip("\n")
+    if not line:
+        continue
+    name = line.split("\t")[0]
+    if name and name not in versioned:
+        out.append(line)
+open(sys.argv[3], "w").write("\n".join(out) + ("\n" if out else ""))
+PY
+  rm -f "$RAW_REBUILDS"
+  if [ -s "$REBUILD_PLAN" ]; then
+    printf '\n%s\n' "rebuild needed (Version: unchanged; Release: bumped):"
+    while IFS=$'\t' read -r name trigger; do
+      printf '  %-34s REBUILD against %s\n' "$name" "$trigger"
+    done <"$REBUILD_PLAN"
+  else
+    echo "all rebuild_on dependents are newer than their trigger builds"
+  fi
+fi
+
 # Retired packages are gone from fedora/rpm/ + manifest.yaml, so no other step
 # here touches them — but the COPR keeps the source package and its build
 # history until deleted. --prune-retired removes them (retired-packages.conf);
@@ -301,7 +348,7 @@ if [ "$PRUNE_RETIRED" = 1 ]; then
   fi
 fi
 
-if [ ! -s "$PLAN" ]; then
+if [ ! -s "$PLAN" ] && [ ! -s "$REBUILD_PLAN" ]; then
   echo
   echo "Nothing to do."
   exit 0
@@ -314,7 +361,7 @@ if [ "$DRY_RUN" = 1 ]; then
 fi
 
 if [ "$ASSUME_YES" != 1 ]; then
-  printf '\nApply these version bumps and submit to %s? [y/N] ' "$COPR"
+  printf '\nApply these updates and submit to %s? [y/N] ' "$COPR"
   read -r reply || reply=""
   case "$reply" in
     [yY]|[yY][eE][sS]) ;;
@@ -322,10 +369,10 @@ if [ "$ASSUME_YES" != 1 ]; then
   esac
 fi
 
-if ! python3 - "$RPM_DIR" "$MANIFEST" "$PLAN" "$MAINTAINER" >"$CHANGED_OUT" <<'PY'
+if ! python3 - "$RPM_DIR" "$MANIFEST" "$PLAN" "$REBUILD_PLAN" "$MAINTAINER" >"$CHANGED_OUT" <<'PY'
 import datetime, os, re, sys
 
-rpm_dir, manifest_path, plan_path, fallback_maintainer = sys.argv[1:5]
+rpm_dir, manifest_path, plan_path, rebuild_path, fallback_maintainer = sys.argv[1:6]
 
 plan = []
 for line in open(plan_path):
@@ -335,6 +382,17 @@ for line in open(plan_path):
     fields = line.split("\t")
     name, newver, oldver, tag = (fields + ["", "", "", ""])[:4]
     plan.append((name, newver, oldver, tag))
+
+rebuilds = []
+for line in open(rebuild_path):
+    line = line.rstrip("\n")
+    if not line:
+        continue
+    fields = line.split("\t")
+    name = fields[0]
+    trigger = fields[1] if len(fields) > 1 else ""
+    if name:
+        rebuilds.append((name, trigger or "an updated build dependency"))
 
 def read(path):
     with open(path) as f:
@@ -399,6 +457,41 @@ for name, newver, oldver, tag in plan:
     writes[spec_path] = new_src
     changed.append(name)
     print(f"auto-update: {name} {cur} -> {newver}", file=sys.stderr)
+
+versioned = {name for name, *_ in plan}
+for name, trigger in rebuilds:
+    if name in versioned:
+        continue
+
+    spec_path = os.path.join(rpm_dir, name, name + ".spec")
+    if not os.path.exists(spec_path):
+        print(f"auto-update: no spec for {name}, skipping rebuild", file=sys.stderr)
+        continue
+
+    src = writes.get(spec_path, read(spec_path))
+    vm = re.search(r"(?m)^Version:\s*(\S+)", src)
+    rm = re.search(r"(?m)^Release:\s+(\d+)", src)
+    if not vm or not rm:
+        print(f"auto-update: no Version:/Release: in {spec_path}, skipping rebuild", file=sys.stderr)
+        continue
+
+    version, newrel = vm.group(1), int(rm.group(1)) + 1
+    maintainer = find_maintainer(src, fallback_maintainer)
+    new_src = re.sub(r"(?m)^(Release:\s+)\d+", r"\g<1>" + str(newrel), src, count=1)
+
+    idx = new_src.find("%changelog")
+    if idx == -1:
+        print(f"auto-update: no %changelog in {spec_path}, skipping rebuild", file=sys.stderr)
+        continue
+
+    entry = (f"* {date_str} {maintainer} - {version}-{newrel}\n"
+             f"- Automatic rebuild against {trigger}: native plugin ABI follows its COPR build dependency\n\n")
+    nl = new_src.find("\n", idx)
+    new_src = new_src[:nl + 1] + entry + new_src[nl + 1:]
+
+    writes[spec_path] = new_src
+    changed.append(name)
+    print(f"auto-update: {name} rebuilt ({version}-{newrel}) against {trigger}", file=sys.stderr)
 
 if not changed and manifest_src == read(manifest_path):
     sys.exit(0)

@@ -38,7 +38,7 @@ That is a concrete, automated "you need to map a new package" signal.
 (Package *removals* are quieter — a stale mapping is harmless until you clean
 it up.)
 
-### 3. `check-updates.sh` (three modes)
+### 3. `check-updates.sh` (four modes)
 
 ```sh
 # version drift for the 26 first-party COPR packages
@@ -49,12 +49,24 @@ bash fedora/rpm/copr/check-updates.sh --packages
 
 # omarchy-pkgs commit-pin drift (auxiliary files pinned in a spec)
 bash fedora/rpm/copr/check-updates.sh --pins
+
+# native-plugin rebuild drift (rebuild_on: entries in manifest.yaml)
+bash fedora/rpm/copr/check-updates.sh --rebuilds
 ```
 
 `--pins` compares each file a spec pins to an `omacom/omarchy-pkgs` commit
 (launcher, service, desktop entries, release key, setup scripts) against current
 `omarchy-pkgs` master, so a stale pin is caught even when the app version has
 not moved.
+
+`--rebuilds` looks at manifest entries with `rebuild_on:` (currently
+`omarchy-hyprland-titlebars` → `nett00n/hyprland`). A native Hyprland plugin is
+compiled against the compositor's private headers, and Hyprland's plugin ABI
+hash covers its dependency versions too — so a dependency-only rebuild
+(`hyprland 0.57.0-4` → `0.57.0-5` moving to aquamarine 0.16 / hyprgraphics 0.6)
+invalidates the plugin even though its own version did not move. The mode
+compares the latest successful COPR build times and reports `REBUILD`; `auto-
+update.sh` bumps `Release:` and resubmits such packages automatically.
 
 Statuses: `ok`, `OUTDATED` (bump it), `HELD` (upstream is ahead but the package
 is pinned by a `hold:` reason in `manifest.yaml` — see below) and `(unknown)`.

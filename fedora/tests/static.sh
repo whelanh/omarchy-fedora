@@ -215,6 +215,37 @@ t "check-updates.sh honours GITHUB_TOKEN" python3 -c "
 s = open('fedora/rpm/copr/check-updates.sh').read()
 assert 'GITHUB_TOKEN' in s and 'Authorization' in s, 'token support missing'
 "
+# Native plugins are tied to their trigger's headers, not their own version:
+# titlebars 0.3.0-1 loaded against hyprland 0.57.0-4's headers, then failed with
+# a "Version mismatch" once 0.57.0-5 moved aquamarine 0.16 / hyprgraphics 0.6.
+# Keep the rebuild_on metadata and the check that acts on it.
+t "manifest rebuild_on entries are well formed" python3 -c "
+import yaml
+d = yaml.safe_load(open('fedora/rpm/manifest.yaml'))['packages']
+for n, p in d.items():
+    if 'rebuild_on' not in p:
+        continue
+    trig = p['rebuild_on']
+    assert isinstance(trig, list) and trig, n
+    for t in trig:
+        assert isinstance(t, dict), n
+        assert t.get('copr', '').count('/') == 1, n
+        assert t.get('package'), n
+"
+t "titlebars declares its hyprland rebuild trigger" python3 -c "
+import yaml
+p = yaml.safe_load(open('fedora/rpm/manifest.yaml'))['packages']['omarchy-hyprland-titlebars']
+assert p.get('rebuild_on') == [{'copr': 'nett00n/hyprland', 'package': 'hyprland'}]
+"
+t "check-updates.sh supports --rebuilds" python3 -c "
+s = open('fedora/rpm/copr/check-updates.sh').read()
+assert '--rebuilds' in s and 'rebuild_on' in s and '--porcelain' in s
+"
+t "auto-update.sh rebuilds rebuild_on dependents" python3 -c "
+s = open('fedora/rpm/copr/auto-update.sh').read()
+assert '--no-rebuilds' in s and '--rebuilds' in s, 'rebuild wiring missing'
+assert 'Automatic rebuild against' in s, 'rebuild changelog entry missing'
+"
 for pkg in $(python3 -c "
 import yaml; d=yaml.safe_load(open('fedora/rpm/manifest.yaml'))
 print(' '.join(sorted(d['packages'].keys())))

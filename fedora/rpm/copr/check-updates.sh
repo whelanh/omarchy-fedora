@@ -20,10 +20,21 @@
 # release keys, setup scripts) can change independently, so the pin needs
 # updating when they do.
 #
+# --rebuilds: report verified packages whose `rebuild_on` COPR dependency has a
+# newer successful build than the package itself. A native Hyprland plugin is
+# compiled against the compositor's private headers, and Hyprland's plugin ABI
+# hash covers its dependency versions too, so a dependency-only rebuild (for
+# example hyprland 0.57.0-4 -> 0.57.0-5 moving to aquamarine 0.16) invalidates
+# the plugin even when the plugin's own version has not changed. The check is
+# deliberately conservative: it compares COPR build completion times, so a
+# rebuild is cheap insurance rather than a proof of ABI drift. `--porcelain`
+# prints one `package<TAB>trigger` line per stale package.
+#
 # Usage:
 #   bash fedora/rpm/copr/check-updates.sh
 #   bash fedora/rpm/copr/check-updates.sh --packages
 #   bash fedora/rpm/copr/check-updates.sh --pins
+#   bash fedora/rpm/copr/check-updates.sh --rebuilds [--porcelain]
 #
 # Exit status is 0 when everything is current, 1 when something needs attention.
 set -euo pipefail
@@ -82,6 +93,96 @@ if not unmapped and not stale:
 
 print(f"{len(unmapped)} unmapped, {len(stale)} stale")
 sys.exit(1)
+PY
+  exit
+fi
+
+if [ "${1:-}" = "--rebuilds" ]; then
+  PORCELAIN=0
+  [ "${2:-}" = "--porcelain" ] && PORCELAIN=1
+  python3 - "$MANIFEST" "$PORCELAIN" <<'PY'
+import datetime, json, sys, urllib.parse, urllib.request, yaml
+
+manifest, porcelain = sys.argv[1], sys.argv[2] == "1"
+COPR_OWNER, COPR_PROJECT = "whelanh", "omarchy"
+UA = {"User-Agent": "omarchy-fedora-check"}
+
+def api(path):
+    req = urllib.request.Request(f"https://copr.fedorainfracloud.org/api_3/{path}", headers=UA)
+    with urllib.request.urlopen(req, timeout=30) as r:
+        return json.load(r)
+
+def latest_success(owner, project, package):
+    qs = urllib.parse.urlencode({
+        "ownername": owner, "projectname": project, "packagename": package,
+        "limit": 20,
+    })
+    items = api(f"build/list/?{qs}").get("items") or []
+    good = [b for b in items if b.get("state") == "succeeded"]
+    return max(good, key=lambda b: b.get("ended_on") or b.get("submitted_on") or 0) if good else None
+
+def when(build):
+    ts = (build or {}).get("ended_on") or (build or {}).get("submitted_on")
+    return datetime.datetime.fromtimestamp(ts, datetime.timezone.utc).strftime("%Y-%m-%d") if ts else "?"
+
+def version(build):
+    return ((build or {}).get("source_package") or {}).get("version") or "?"
+
+pkgs = yaml.safe_load(open(manifest))["packages"]
+dependent = {n: p for n, p in pkgs.items()
+             if p.get("status") == "verified" and p.get("rebuild_on")}
+
+if not dependent:
+    print("No packages declare rebuild_on; nothing to check.")
+    sys.exit(0)
+
+rows, stale = [], []
+for name, p in sorted(dependent.items()):
+    own = latest_success(COPR_OWNER, COPR_PROJECT, name)
+    triggers = p["rebuild_on"] if isinstance(p["rebuild_on"], list) else [p["rebuild_on"]]
+    newest, newest_name = None, ""
+    for trig in triggers:
+        if isinstance(trig, str):
+            owner, project, package = "nett00n", "hyprland", trig
+        else:
+            owner, project = trig["copr"].split("/", 1)
+            package = trig["package"]
+        b = latest_success(owner, project, package)
+        if b and (newest is None or (b.get("ended_on") or 0) > (newest.get("ended_on") or 0)):
+            newest, newest_name = b, f"{package} {version(b)}"
+    if not newest:
+        rows.append((name, "unknown", f"{version(own)} ({when(own)})", "UNKNOWN"))
+        continue
+
+    # A build that finished after the trigger's build did may still have
+    # resolved the older headers, but the window is tiny; flag conservatively.
+    if own is None:
+        status = "MISSING"
+        stale.append(name)
+    elif (newest.get("ended_on") or 0) > (own.get("ended_on") or 0):
+        status = "REBUILD"
+        stale.append(name)
+    else:
+        status = "ok"
+    rows.append((name, f"{newest_name} ({when(newest)})", f"{version(own)} ({when(own)})", status))
+
+if porcelain:
+    trig_by_name = {name: trig for name, trig, own, status in rows}
+    print("\n".join(f"{name}\t{trig_by_name[name]}" for name in stale))
+else:
+    print(f"{'package':32} {'trigger build':32} {'package build':24}  status")
+    print("-" * 100)
+    for name, trig, own, status in rows:
+        print(f"{name:32} {trig:32} {own:24}  {status}")
+    print()
+    if stale:
+        print(f"{len(stale)} package(s) need a rebuild: bump Release: (Version: stays put),")
+        print("add a %changelog entry, then submit:")
+        print("  bash fedora/rpm/copr/submit-builds.sh " + " ".join(stale))
+    else:
+        print("all rebuild_on dependents are newer than their trigger builds")
+
+sys.exit(1 if stale else 0)
 PY
   exit
 fi

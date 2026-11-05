@@ -12,7 +12,7 @@
 
 Name:           omarchy-hyprland-titlebars
 Version:        0.3.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Titlebars for Omarchy's floating workspace mode
 
 License:        BSD-3-Clause AND MIT
@@ -62,6 +62,12 @@ install -Dm644 LICENSE.MIT %{buildroot}%{_datadir}/licenses/%{name}/LICENSE.MIT
 %{_prefix}/lib/omarchy-hyprland-titlebars/titlebars.so
 
 %changelog
+* Thu Nov 05 2026 whelanh <brickhousedevelopers@gmail.com> - 0.3.0-2
+- Rebuild against Hyprland 0.57.1's hyprland-devel (aquamarine 0.16,
+  hyprgraphics 0.6) so the plugin ABI hash matches the running compositor.
+  The 0.3.0-1 build predated those dependency moves and failed to load with
+  "Version mismatch (headers ver is not equal to running hyprland ver)".
+
 * Mon Nov 02 2026 whelanh <brickhousedevelopers@gmail.com> - 0.3.0-1
 - Automatic update to upstream v0.3.0 (Build against Hyprland 0.57)
 - Require pkgconfig(hyprland) >= 0.57: 0.3.0 includes the 0.57 internal headers

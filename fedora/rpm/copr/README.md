@@ -144,6 +144,9 @@ sudo dnf install aether cliamp disktree-bin gliff herdr hype \
   Hyprland build (upstream marks `rebuild_on: hyprland`). It is built against
   `hyprland-devel` from the `nett00n/hyprland` per-chroot repo, so it must be
   rebuilt (bump `Release:` and resubmit) whenever that repo's Hyprland moves.
+  `check-updates.sh --rebuilds` compares the latest successful COPR builds and
+  flags stale dependents; `auto-update.sh` bumps `Release:` and resubmits them
+  automatically (skip with `--no-rebuilds`).
 
 ## Retiring / removing a package
 

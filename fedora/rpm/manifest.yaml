@@ -148,7 +148,10 @@ packages:
     deps: [hyprland, hyprlang, hyprutils]
     status: verified
     version: 0.3.0
-    note: Hyprland plugin drawing titlebars on Omarchy's floating windows; loaded from /usr/lib/omarchy-hyprland-titlebars/titlebars.so and registered as `hyprbars`. Compiled against nett00n/hyprland's hyprland-devel, so it must be rebuilt when Hyprland changes (upstream rebuild_on). Container-built OK.
+    rebuild_on:
+      - copr: nett00n/hyprland
+        package: hyprland
+    note: Hyprland plugin drawing titlebars on Omarchy's floating windows; loaded from /usr/lib/omarchy-hyprland-titlebars/titlebars.so and registered as `hyprbars`. Compiled against nett00n/hyprland's hyprland-devel, so it must be rebuilt when Hyprland changes (upstream rebuild_on); `check-updates.sh --rebuilds` compares COPR build times. Container-built OK.
   omarchy-emacs:
     repo: https://github.com/scottjones/omarchy-emacs
     language: emacs-lisp
