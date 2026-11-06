@@ -11,19 +11,19 @@
 
 Name:           superwhisper-bin
 Version:        1.2.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Local and cloud voice dictation with Superwhisper
 
 License:        LicenseRef-proprietary AND MIT
 URL:            https://superwhisper.com
 Source0:        https://tux.superwhisper.com/x86_64/v%{version}/superwhisper-omarchy-x86_64-%{version}.tar.zst
 Source1:        https://tux.superwhisper.com/x86_64/v%{version}/superwhisper-omarchy-x86_64-%{version}.tar.zst.minisig
-Source2:        https://raw.githubusercontent.com/omacom/omarchy-pkgs/3e4cb2308ec4280500f3f083245dc8e4948f24f5/pkgbuilds/superwhisper-bin/linux-release.pub
-Source3:        https://raw.githubusercontent.com/omacom/omarchy-pkgs/3e4cb2308ec4280500f3f083245dc8e4948f24f5/pkgbuilds/superwhisper-bin/superwhisper
-Source4:        https://raw.githubusercontent.com/omacom/omarchy-pkgs/3e4cb2308ec4280500f3f083245dc8e4948f24f5/pkgbuilds/superwhisper-bin/superwhisper.service
-Source5:        https://raw.githubusercontent.com/omacom/omarchy-pkgs/3e4cb2308ec4280500f3f083245dc8e4948f24f5/pkgbuilds/superwhisper-bin/superwhisper.desktop
-Source6:        https://raw.githubusercontent.com/omacom/omarchy-pkgs/3e4cb2308ec4280500f3f083245dc8e4948f24f5/pkgbuilds/superwhisper-bin/superwhisper-url.desktop
-Source7:        https://raw.githubusercontent.com/omacom/omarchy-pkgs/3e4cb2308ec4280500f3f083245dc8e4948f24f5/pkgbuilds/superwhisper-bin/setup-user
+Source2:        https://raw.githubusercontent.com/omacom/omarchy-pkgs/11a0c28bb4fd6ad3987b4380ef088cc04f3526c9/pkgbuilds/superwhisper-bin/linux-release.pub
+Source3:        https://raw.githubusercontent.com/omacom/omarchy-pkgs/11a0c28bb4fd6ad3987b4380ef088cc04f3526c9/pkgbuilds/superwhisper-bin/superwhisper
+Source4:        https://raw.githubusercontent.com/omacom/omarchy-pkgs/11a0c28bb4fd6ad3987b4380ef088cc04f3526c9/pkgbuilds/superwhisper-bin/superwhisper.service
+Source5:        https://raw.githubusercontent.com/omacom/omarchy-pkgs/11a0c28bb4fd6ad3987b4380ef088cc04f3526c9/pkgbuilds/superwhisper-bin/superwhisper.desktop
+Source6:        https://raw.githubusercontent.com/omacom/omarchy-pkgs/11a0c28bb4fd6ad3987b4380ef088cc04f3526c9/pkgbuilds/superwhisper-bin/superwhisper-url.desktop
+Source7:        https://raw.githubusercontent.com/omacom/omarchy-pkgs/11a0c28bb4fd6ad3987b4380ef088cc04f3526c9/pkgbuilds/superwhisper-bin/setup-user
 
 ExclusiveArch:  x86_64
 AutoReqProv:    no
@@ -134,6 +134,11 @@ sed 's|@LIBRARY@|/opt/superwhisper/lib/fcitx5/libsuperwhisper-fcitx5|' \
 /opt/superwhisper
 
 %changelog
+* Fri Nov 6 2026 whelanh <brickhousedevelopers@gmail.com> - 1.2.0-2
+- Refresh the pinned omarchy-pkgs helpers to 11a0c28: setup-user now places a
+  newly linked Superwhisper panel in the bar's tray section instead of the
+  right section. No vendor payload change.
+
 * Wed Nov 4 2026 whelanh <brickhousedevelopers@gmail.com> - 1.2.0-1
 - Automatic update to upstream v1.2.0
 
