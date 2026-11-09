@@ -176,6 +176,19 @@ for path in glob.glob('fedora/packages/*.txt'):
             bad.append((path, n, pkg))
 assert not bad, 'retired packages still in manifests: %r' % bad
 "
+# check-updates.sh --packages suppresses rows accepted in this baseline; keep it
+# parseable so a typo cannot silently disable the drift report.
+t "package-audit-baseline.conf parses" python3 -c "
+seen = set()
+for i, line in enumerate(open('fedora/mappings/package-audit-baseline.conf'), 1):
+    line = line.split('#')[0].strip()
+    if not line:
+        continue
+    assert ' ' not in line, ('space in name', i, line)
+    assert line not in seen, ('duplicate', line)
+    seen.add(line)
+print(len(seen), 'baseline entries')
+"
 
 echo "== First-party RPM scaffold: manifest + spec + build helper =="
 t "fedora/rpm/manifest.yaml parses" python3 -c "

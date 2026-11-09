@@ -165,14 +165,14 @@ bash fedora/rpm/copr/delete-retired.sh             # delete them
 ```
 
 It deletes every SRPM Name listed in `fedora/rpm/copr/retired-packages.conf`
-(currently `elsewhen` and `openai-codex-bin`, both retired: Elsewhen moved
-in-tree as `omarchy.elsewhen`, and the Codex CLI is installed through mise).
-The script is idempotent, so re-running it is harmless. `auto-update.sh
---prune-retired` runs it automatically (best-effort) as part of the update, so a
-cron job / systemd timer keeps the COPR clean:
+(currently `elsewhen`, `openai-codex-bin` and `tensaku`: Elsewhen moved in-tree
+as `omarchy.elsewhen`, the Codex CLI is installed through mise, and Tensaku was
+replaced by `omasnap`). The script is idempotent, so re-running it is harmless.
+`auto-update.sh` runs it automatically (best-effort) as part of every update, so
+a cron job / systemd timer keeps the COPR clean:
 
 ```sh
-bash fedora/rpm/copr/auto-update.sh --yes --prune-retired
+bash fedora/rpm/copr/auto-update.sh --yes
 ```
 
 ## Checking for upstream updates
@@ -206,6 +206,13 @@ Other checks:
 bash fedora/rpm/copr/check-updates.sh --packages   # upstream <-> mapping drift
 ```
 
+`--packages` compares `upstream/install/omarchy-{base,other}.packages` with
+`fedora/mappings/packages.yaml`: **unmapped** upstream packages need a mapping,
+and **stale** mappings are packages upstream dropped (retire them). Rows that
+have been triaged and accepted (hardware/kernel extras, deliberate Fedora-side
+mappings) live in `fedora/mappings/package-audit-baseline.conf`, so only new
+drift is printed; `auto-update.sh` runs this mode on every update.
+
 ### Fully automated: check → bump → submit
 
 ```sh
@@ -218,8 +225,8 @@ bash fedora/rpm/copr/auto-update.sh --yes
 # bump + build SRPMs locally, don't submit
 bash fedora/rpm/copr/auto-update.sh --yes --srpms-only
 
-# also delete retired packages from the COPR (see "Retiring / removing")
-bash fedora/rpm/copr/auto-update.sh --yes --prune-retired
+# skip the default retired-package prune of the COPR (see "Retiring / removing")
+bash fedora/rpm/copr/auto-update.sh --yes --no-prune-retired
 
 # submit without watching/retrying the COPR builds
 bash fedora/rpm/copr/auto-update.sh --yes --no-watch
@@ -229,15 +236,16 @@ bash fedora/rpm/copr/auto-update.sh --yes --no-watch
 `status: verified` packages, bumps packages that share an upstream repo
 (`owe` + `owe-lockfeed`) together to the same version, reads the current
 version from the spec (so a stale manifest can't hide a bump), and writes all
-edits only after every edit has succeeded. `--verify` additionally runs
-`build-rpm-in-ci.sh` before submitting, and `--chroot <name>` (repeatable)
-submits to specific chroots. The submit step watches the builds and retries
-transient chroot failures as described in [Build + submit](#2-build--submit);
-`--no-watch` restores fire-and-forget. `--prune-retired` runs
-`delete-retired.sh` (best-effort) so retired packages are pulled from the COPR
-too; it is skipped with `--srpms-only` and previewed with `--dry-run`. Set
-`GITHUB_TOKEN`/`GH_TOKEN` (or use `gh auth token`) to avoid the
-60-requests/hour unauthenticated API limit.
+edits only after every edit has succeeded. It also runs `check-updates.sh
+--packages` (new unmapped/stale drift) and `--pins`, warning without blocking.
+`--verify` additionally runs `build-rpm-in-ci.sh` before submitting, and
+`--chroot <name>` (repeatable) submits to specific chroots. The submit step
+watches the builds and retries transient chroot failures as described in
+[Build + submit](#2-build--submit); `--no-watch` restores fire-and-forget.
+Retired packages are pruned from the COPR by default (`delete-retired.sh`,
+best-effort; `--no-prune-retired` skips it, `--srpms-only` implies skip and
+`--dry-run` previews it). Set `GITHUB_TOKEN`/`GH_TOKEN` (or use `gh auth
+token`) to avoid the 60-requests/hour unauthenticated API limit.
 
 ## Why COPR and not official Fedora
 

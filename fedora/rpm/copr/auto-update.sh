@@ -13,7 +13,8 @@
 #   fedora/rpm/copr/auto-update.sh --yes            # no confirmation prompt
 #   fedora/rpm/copr/auto-update.sh --srpms-only     # bump + build SRPMs, no submit
 #   fedora/rpm/copr/auto-update.sh --verify         # container-verify before submit
-#   fedora/rpm/copr/auto-update.sh --prune-retired  # also delete retired COPR packages
+#   fedora/rpm/copr/auto-update.sh --no-prune-retired  # skip deleting retired COPR packages
+#   fedora/rpm/copr/auto-update.sh --no-packages-check # skip the upstream add/remove drift report
 #   fedora/rpm/copr/auto-update.sh --no-rebuilds   # don't auto-rebuild rebuild_on dependents
 #   fedora/rpm/copr/auto-update.sh --no-watch       # submit, don't watch/self-heal
 #   fedora/rpm/copr/auto-update.sh --chroot fedora-45-x86_64
@@ -21,16 +22,22 @@
 # Notes:
 #   - Only packages with `status: verified` in manifest.yaml are considered;
 #     the others are not part of the COPR.
+#   - Runs `check-updates.sh --packages` and warns about new upstream package
+#     add/remove drift (unmapped or stale mappings). Rows accepted in
+#     fedora/mappings/package-audit-baseline.conf are suppressed, so only new
+#     drift is reported. Mapping/retirement is a manual task, so it warns but
+#     does not block the bumps.
 #   - A package with `rebuild_on:` is rebuilt (Release: bumped, Version:
 #     unchanged) when its trigger's latest successful COPR build is newer than
 #     the package's own. This covers native plugins such as
 #     omarchy-hyprland-titlebars, whose ABI hash follows hyprland-devel even
 #     when the plugin's upstream version has not moved.
-#   - With --prune-retired, delete-retired.sh removes the packages named in
-#     retired-packages.conf from the COPR (a retired package is gone from
-#     fedora/rpm/ + manifest.yaml, so nothing else here touches it, but the COPR
-#     keeps it until deleted). Best-effort: a prune failure warns, never blocks.
-#     Skipped with --srpms-only, and previewed with --dry-run.
+#   - delete-retired.sh removes the packages named in retired-packages.conf
+#     from the COPR (a retired package is gone from fedora/rpm/ + manifest.yaml,
+#     so nothing else here touches it, but the COPR keeps it until deleted).
+#     This is ON by default; --no-prune-retired skips it. Best-effort: a prune
+#     failure warns, never blocks. Skipped with --srpms-only, and previewed with
+#     --dry-run.
 #   - The submit step watches the COPR builds and self-heals chroots that failed
 #     for a recognised transient reason (e.g. the nett00n/hyprland build repo
 #     briefly 404ing while COPR's Pulp mirror resyncs), a bounded number of
@@ -45,7 +52,7 @@
 #     succeeded, so a failure never leaves a half-bumped tree.
 #   - The maintainer identity in new %changelog entries is taken from the
 #     spec's existing entry (falling back to git config / OMARCHY_RPM_MAINTAINER).
-#   - Always runs `check-updates.sh --pins` first and warns about specs whose
+#   - Also runs `check-updates.sh --pins` and warns about specs whose
 #     omarchy-pkgs commit pin (launcher/service/desktop/key/setup files) is now
 #     stale. That is a manual review, so it warns but does not block the bumps.
 #
@@ -72,7 +79,8 @@ Usage:
   auto-update.sh --yes            no confirmation prompt
   auto-update.sh --srpms-only     bump + build SRPMs, do not submit
   auto-update.sh --verify         container-verify before submitting
-  auto-update.sh --prune-retired  also delete retired packages from the COPR
+  auto-update.sh --no-prune-retired   skip deleting retired packages from the COPR
+  auto-update.sh --no-packages-check  skip the upstream add/remove drift report
   auto-update.sh --no-rebuilds    don't auto-rebuild rebuild_on dependents
   auto-update.sh --no-watch       submit but don't watch/retry COPR builds
   auto-update.sh --chroot <name>  submit to only this chroot (repeatable)
@@ -83,7 +91,8 @@ DRY_RUN=0
 ASSUME_YES=0
 SUBMIT_BUILDS=1
 VERIFY=0
-PRUNE_RETIRED=0
+PRUNE_RETIRED=1
+PACKAGES_CHECK=1
 REBUILD_DEPENDENTS=1
 NO_WATCH=0
 CHROOTS=()
@@ -94,6 +103,8 @@ while [ $# -gt 0 ]; do
     --srpms-only|--no-submit) SUBMIT_BUILDS=0 ;;
     --verify)     VERIFY=1 ;;
     --prune-retired) PRUNE_RETIRED=1 ;;
+    --no-prune-retired) PRUNE_RETIRED=0 ;;
+    --no-packages-check) PACKAGES_CHECK=0 ;;
     --no-rebuilds) REBUILD_DEPENDENTS=0 ;;
     --no-watch)   NO_WATCH=1 ;;
     --chroot)     CHROOTS+=("${2:?--chroot needs a value}"); shift ;;
@@ -281,6 +292,21 @@ if unknown:
 sys.exit(0)
 PY
 
+# Surface new upstream package add/remove drift. Unmapped packages need a
+# packages.yaml entry; stale mappings need retiring (or a baseline row). This is
+# a manual mapping task, so warn but do not block the version bumps.
+if [ "$PACKAGES_CHECK" = 1 ]; then
+  echo
+  echo "== checking upstream package add/remove drift =="
+  if ! bash "$COP_DIR/check-updates.sh" --packages; then
+    echo
+    echo "NOTE: new upstream package drift — map added packages and retire removed"
+    echo "      ones (fedora/mappings/packages.yaml + retired-packages.conf). If an"
+    echo "      accepted gap should stay, add it to"
+    echo "      fedora/mappings/package-audit-baseline.conf with a reason."
+  fi
+fi
+
 # Surface stale omarchy-pkgs commit pins (auxiliary files pinned in a spec).
 # These need a manual review, not a version bump, so warn but do not block.
 echo
@@ -331,8 +357,9 @@ fi
 
 # Retired packages are gone from fedora/rpm/ + manifest.yaml, so no other step
 # here touches them — but the COPR keeps the source package and its build
-# history until deleted. --prune-retired removes them (retired-packages.conf);
-# best-effort so a login/network hiccup never blocks the version bumps.
+# history until deleted. delete-retired.sh removes them (retired-packages.conf);
+# this runs by default (--no-prune-retired skips it) and is best-effort so a
+# login/network hiccup never blocks the version bumps.
 if [ "$PRUNE_RETIRED" = 1 ]; then
   echo
   if [ "$SUBMIT_BUILDS" = 0 ]; then

@@ -34,9 +34,9 @@ upstream *adds* a base package you haven't mapped, CI goes red with:
 FAIL  mapped: <newpkg>
 ```
 
-That is a concrete, automated "you need to map a new package" signal.
-(Package *removals* are quieter — a stale mapping is harmless until you clean
-it up.)
+That is a concrete, automated "you need to map a new package" signal for the
+base list. Additions to `omarchy-other.packages` and package *removals* are
+caught by `check-updates.sh --packages` (next), which `auto-update.sh` runs.
 
 ### 3. `check-updates.sh` (four modes)
 
@@ -44,7 +44,7 @@ it up.)
 # version drift for the 25 first-party COPR packages
 bash fedora/rpm/copr/check-updates.sh
 
-# package add/remove drift vs our mapping
+# package add/remove drift vs our mapping (also run by auto-update.sh)
 bash fedora/rpm/copr/check-updates.sh --packages
 
 # omarchy-pkgs commit-pin drift (auxiliary files pinned in a spec)
@@ -53,6 +53,11 @@ bash fedora/rpm/copr/check-updates.sh --pins
 # native-plugin rebuild drift (rebuild_on: entries in manifest.yaml)
 bash fedora/rpm/copr/check-updates.sh --rebuilds
 ```
+
+`auto-update.sh` runs the version check, `--packages`, `--pins` and
+`--rebuilds` on every invocation, and prunes retired COPR packages by default
+(`--no-prune-retired` skips that). So the daily COPR run is the regular
+stale-package pass; these commands are for investigating manually.
 
 `--pins` compares each file a spec pins to an `omacom/omarchy-pkgs` commit
 (launcher, service, desktop entries, release key, setup scripts) against current
@@ -80,6 +85,13 @@ against `fedora/mappings/packages.yaml` and prints:
 
 - **unmapped** — upstream ships a package we have no mapping for yet
 - **stale** — we map a package upstream no longer lists
+
+Rows already triaged and accepted (hardware/kernel extras, deliberate
+Fedora-side mappings, packages kept on purpose) live in
+`fedora/mappings/package-audit-baseline.conf` and are suppressed, so only new
+drift is printed. Retired packages and `official`/`drop`/`unavailable`
+classifications are filtered out automatically. When you fix a row, delete its
+baseline line; the check flags lines that no longer describe anything.
 
 ### 4. Upstream migration summaries
 

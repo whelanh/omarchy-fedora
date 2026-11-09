@@ -11,6 +11,11 @@
 # and report:
 #   - unmapped  upstream packages we haven't mapped yet (need action)
 #   - stale     mappings for packages upstream no longer lists
+# Rows triaged as accepted are listed in
+# fedora/mappings/package-audit-baseline.conf and suppressed, so the report
+# shows only new drift; resolved baseline entries are flagged for cleanup.
+# Retired packages and `official`/`drop`/`unavailable` mappings are filtered
+# out (they are deliberate, not drift).
 #
 # --pins: report specs that pin auxiliary files to a specific
 # omacom/omarchy-pkgs commit (Source URLs like
@@ -67,13 +72,27 @@ upstream = load_pkg_list(f"{root}/upstream/install/omarchy-base.packages") \
 
 pkgs = yaml.safe_load(open(f"{root}/fedora/mappings/packages.yaml"))["packages"]
 mapped = set(pkgs)
+retired = load_pkg_list(f"{root}/fedora/mappings/retired-packages.conf")
+baseline = load_pkg_list(f"{root}/fedora/mappings/package-audit-baseline.conf")
 
 # A package upstream ships that we have no mapping for yet.
-unmapped = sorted(upstream - mapped)
+unmapped_all = sorted(upstream - mapped)
 # A mapping whose package upstream no longer lists. `source: official` marks a
-# Fedora-specific addition (a Fedora package name with no Arch upstream
-# counterpart), so those are not "stale" — they are intentionally ours.
-stale = sorted(k for k in mapped - upstream if pkgs[k].get("source") != "official")
+# Fedora-specific addition, `drop`/`unavailable` are deliberate classifications,
+# so none of those are drift. Retired packages keep their mapping for reference
+# but are excluded too (retired-packages.conf already drives their removal).
+stale_all = sorted(
+    k for k in mapped - upstream
+    if pkgs[k].get("source") not in ("official", "drop", "unavailable")
+    and k not in retired
+    and str(pkgs[k].get("package") or "") not in retired
+)
+
+# Rows triaged once and accepted in package-audit-baseline.conf are suppressed,
+# so the report only surfaces new drift. Delete a baseline line when fixed.
+unmapped = [p for p in unmapped_all if p not in baseline]
+stale = [k for k in stale_all if k not in baseline]
+suppressed = (len(unmapped_all) - len(unmapped)) + (len(stale_all) - len(stale))
 
 if unmapped:
     print("Unmapped upstream packages (add a packages.yaml entry + a source):")
@@ -87,8 +106,20 @@ if stale:
         print(f"  {k}  ->  {pkgs[k].get('source')} {pkgs[k].get('package', '')}")
     print()
 
+if suppressed:
+    print(f"({suppressed} known row(s) suppressed by fedora/mappings/package-audit-baseline.conf)")
+
+# Hygiene: a baseline entry that no longer describes a row is resolved.
+live = set(unmapped_all) | set(stale_all)
+resolved = sorted(baseline - live)
+if resolved:
+    print()
+    print("Baseline entries no longer needed (delete from package-audit-baseline.conf):")
+    for p in resolved:
+        print(f"  {p}")
+
 if not unmapped and not stale:
-    print("No package drift: every upstream package is mapped, nothing stale.")
+    print("No new package drift: every upstream package is mapped or baselined, nothing newly stale.")
     sys.exit(0)
 
 print(f"{len(unmapped)} unmapped, {len(stale)} stale")
