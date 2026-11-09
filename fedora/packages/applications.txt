@@ -12,5 +12,6 @@ libreoffice-core
 nautilus
 nautilus-python
 obs-studio
+papers
 sushi
 xournalpp
