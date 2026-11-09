@@ -186,10 +186,11 @@ install_repos() {
   # herdr, hype, hyprland-preview-share-picker, monologue, omacalc, omacut,
   # omapresent, omarchy-emacs, omarchy-hyprland-titlebars, omawrite, omasnap,
   # openai-codex-desktop, owe, owe-lockfeed, signed,
-  # superwhisper-bin, tensaku, try, ttfx, voxtype-bin) live in the
-  # whelanh/omarchy COPR (see fedora/rpm/copr/README.md). The retired elsewhen
-  # and openai-codex-bin RPMs are excluded via retired-packages.conf (upstream
-  # moved Elsewhen in-tree and the Codex CLI to mise).
+  # superwhisper-bin, try, ttfx, voxtype-bin) live in the
+  # whelanh/omarchy COPR (see fedora/rpm/copr/README.md). The retired elsewhen,
+  # openai-codex-bin and tensaku RPMs are excluded via retired-packages.conf
+  # (upstream moved Elsewhen in-tree, the Codex CLI to mise, and screenshots to
+  # omasnap).
   if [ "$INSTALL_FIRSTPARTY" = 1 ]; then
     omarchy_fedora_enable_optional_coprs whelanh/omarchy \
       || die "failed to enable whelanh/omarchy COPR"
@@ -544,16 +545,16 @@ install_omarchy_tree() {
     sudo chown -R root:root "$dest"
   fi
   log "Omarchy tree installed to $dest"
-  log "NOTE: the 24 first-party packages (aether, cliamp, disktree-bin," \
+  log "NOTE: the 23 first-party packages (aether, cliamp, disktree-bin," \
        "gliff, herdr, hype, hyprland-preview-share-picker," \
        "monologue, omacalc, omacut, omapresent, omarchy-emacs," \
        "omarchy-hyprland-titlebars, omawrite, omasnap," \
        "openai-codex-desktop, owe, owe-lockfeed, signed, superwhisper-bin," \
-       "tensaku, try, ttfx, voxtype-bin) are packaged" \
+       "try, ttfx, voxtype-bin) are packaged" \
        "under fedora/rpm and ship from the whelanh/omarchy COPR (see" \
-       "fedora/rpm/copr/README.md). The retired elsewhen and openai-codex-bin" \
-       "RPMs are no longer installed (upstream moved Elsewhen in-tree and the" \
-       "Codex CLI to mise)."
+       "fedora/rpm/copr/README.md). The retired elsewhen, openai-codex-bin and" \
+       "tensaku RPMs are no longer installed (upstream moved Elsewhen in-tree," \
+       "the Codex CLI to mise, and screenshots to omasnap)."
 }
 
 # Install the upstream user systemd units (bt-agent, sleep-lock, crash-watch,

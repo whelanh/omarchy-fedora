@@ -73,12 +73,13 @@ The installer is **idempotent** — running it again is safe.
 > gliff, herdr, hype, hyprland-preview-share-picker, monologue,
 > omacalc, omacut, omapresent, omarchy-emacs, omarchy-hyprland-titlebars,
 > omawrite, omasnap, openai-codex-desktop, owe, owe-lockfeed,
-> signed, superwhisper-bin, tensaku, try, ttfx, voxtype-bin)
+> signed, superwhisper-bin, try, ttfx, voxtype-bin)
 > are built as Fedora
 > RPMs and installed from the `whelanh/omarchy` COPR by the installer (see
 > `fedora/rpm/copr/README.md`). Pass `--no-firstparty` to skip. (The `elsewhen`
 > world-clock plugin is retired: upstream moved it in-tree as `omarchy.elsewhen`.
-> The Codex CLI is retired from RPM: upstream installs it via mise.)
+> The Codex CLI is retired from RPM: upstream installs it via mise. `tensaku` is
+> retired: upstream replaced it with `omasnap`.)
 
 ## Login screen
 

@@ -5,8 +5,10 @@
 # package itself lands via the first-party COPR backfill; the layer rule and the
 # default imv config already ship in the synced upstream tree.
 #
-# Upstream also drops satty and tensaku; the Fedora port keeps packaging tensaku
-# for now, so it is intentionally not removed here.
+# Upstream also drops satty and tensaku; the Fedora port no longer packages
+# tensaku either. It is listed in fedora/mappings/retired-packages.conf, so the
+# retired-package prune (step 4 of `omarchy update`) removes it; this migration
+# only has to fix the user-facing config.
 set -euo pipefail
 
 user="${SUDO_USER:-}"

@@ -242,16 +242,6 @@ packages:
     status: verified
     version: 0.2.13
     note: Qt6 QML module Owe.LockFeed from the same omacom/owe tag archive as `owe`; this is the package Omarchy splits out of the AUR owe build. Container-built OK.
-  tensaku:
-    repo: https://github.com/jondkinney/tensaku
-    language: rust
-    build: repack-release (release tarball carries full install tree, no toolchain)
-    binary: tensaku, tensaku-edit
-    license: MPL-2.0
-    deps: [gtk4, gtk4-layer-shell, libadwaita, fontconfig]
-    status: verified
-    version: 0.29.0
-    note: Repack of tensaku-v0.29.0-x86_64.tar.gz (bin/ + share/); desktop + icon + man + completions. Container-built OK.
   tobi-try:
     repo: https://github.com/tobi/try
     language: ruby

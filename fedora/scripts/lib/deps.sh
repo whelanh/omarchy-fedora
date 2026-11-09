@@ -265,8 +265,9 @@ omarchy_fedora_install_applications() {
 # hyprland-preview-share-picker, monologue, omacalc, omacut, omapresent,
 # omarchy-emacs, omarchy-hyprland-titlebars, omarchy-local-ai,
 # omarchy-screensaver, omawrite, omasnap, openai-codex-desktop, owe,
-# owe-lockfeed, signed, superwhisper-bin, tensaku, tobi-try, ttfx,
-# voxtype-bin; elsewhen retired upstream, pruned via retired-packages.conf).
+# owe-lockfeed, signed, superwhisper-bin, tobi-try, ttfx, voxtype-bin;
+# elsewhen, openai-codex-bin and tensaku retired upstream, pruned via
+# retired-packages.conf).
 # Requires the COPR enabled (install.sh does this in install_repos). They are
 # `source: copr` in packages.yaml; resolve.py --copr whelanh/omarchy emits the
 # exact set.

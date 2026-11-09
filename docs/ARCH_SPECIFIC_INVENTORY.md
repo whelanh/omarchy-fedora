@@ -153,9 +153,10 @@ Categories:
   gliff, herdr, hype, hyprland-preview-share-picker, monologue,
   omacalc, omacut, omapresent, omarchy-emacs, omarchy-hyprland-titlebars,
   omawrite, omasnap, openai-codex-desktop, owe, owe-lockfeed,
-  signed, superwhisper-bin, tensaku, tobi-try, ttfx, voxtype-bin.
+  signed, superwhisper-bin, tobi-try, ttfx, voxtype-bin.
   (`elsewhen` is retired — upstream moved it in-tree as `omarchy.elsewhen`;
-  `openai-codex-bin` is retired — upstream installs the Codex CLI via mise.)
+  `openai-codex-bin` is retired — upstream installs the Codex CLI via mise;
+  `tensaku` is retired — upstream replaced it with `omasnap`.)
   `asdcontrol`,
   `usage` and `omarchy-nvim` are intentionally out of RPM scope (rationale in
   `fedora/rpm/README.md`).

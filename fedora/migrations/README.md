@@ -19,18 +19,19 @@ their own. The two cases are:
    to be moved/rewritten to a new format (fresh installs are unaffected, but
    long-running installs need the transform).
 
-## Example: upstream replaces `tensaku` with `newPackage`
+## Example: upstream replaces `oldPackage` with `newPackage`
 
 1. Add a `newPackage` SPEC under `fedora/rpm/`, mark it `verified`, build +
    submit to the COPR.
-2. Drop `tensaku` from `fedora/rpm/manifest.yaml`.
-3. Add a migration here, e.g. `1789000000-replace-tensaku.sh`:
+2. Drop `oldPackage` from `fedora/rpm/manifest.yaml` (and add it to both
+   `retired-packages.conf` files if it was first-party).
+3. Add a migration here, e.g. `1789000000-replace-oldPackage.sh`:
 
 ```sh
 #!/bin/bash
-# Replace tensaku (retired upstream) with newPackage.
+# Replace oldPackage (retired upstream) with newPackage.
 set -euo pipefail
-dnf -y remove tensaku
+dnf -y remove oldPackage
 # newPackage is installed on the next dnf upgrade (or immediately):
 dnf -y install newPackage
 ```

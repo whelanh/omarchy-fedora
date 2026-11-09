@@ -149,12 +149,6 @@ packages:
     repository: whelanh/omarchy
     rpm: fedora/rpm/superwhisper-bin/superwhisper-bin.spec
     note: Proprietary local/cloud voice dictation (Superwhisper); repacks the vendor's Minisign-signed Linux archive under /opt. Upstream lists it in omarchy-base.packages, so it is in the default first-party set.
-  tensaku:
-    package: tensaku
-    source: copr
-    repository: whelanh/omarchy
-    rpm: fedora/rpm/tensaku/tensaku.spec
-    note: Screenshot annotator (Satty fork); repacked from release tarball tree.
   tobi-try:
     package: try
     source: copr

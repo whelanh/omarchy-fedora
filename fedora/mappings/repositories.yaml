@@ -151,7 +151,6 @@ repositories:
       - omasnap
       - owe
       - owe-lockfeed
-      - tensaku
       - try
       - ttfx
     why_not_official: >

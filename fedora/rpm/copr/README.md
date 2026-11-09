@@ -9,14 +9,15 @@ stock Fedora install gets them with a plain `dnf install` — no local builds.
 aether, cliamp, disktree-bin, gliff, herdr, hype,
 hyprland-preview-share-picker, monologue, omacalc, omacut, omapresent,
 omarchy-emacs, omarchy-hyprland-titlebars, omawrite, omasnap,
-openai-codex-desktop, owe, owe-lockfeed, signed, superwhisper-bin, tensaku,
+openai-codex-desktop, owe, owe-lockfeed, signed, superwhisper-bin,
 try (tobi-try), ttfx, voxtype-bin. All are `status: verified` in
 `fedora/rpm/manifest.yaml` and built green end-to-end on `fedora:rawhide`
 via `fedora/rpm/build-rpm-in-ci.sh`. (`elsewhen` and `openai-codex-bin` are
 `status: retired`: upstream moved Elsewhen in-tree as `omarchy.elsewhen`, and
 installs the Codex CLI through mise rather than pacman, so neither is built or
 published; their specs are kept only for the migrations that clean existing
-machines.)
+machines. `tensaku` is retired too: upstream replaced it with `omasnap`, so its
+spec and manifest entry are gone and `delete-retired.sh` drops the COPR copy.)
 
 > `omapresent` is the successor to `hype`; upstream still lists `hype` in
 > `omarchy-base.packages`, so both are published for now.
@@ -124,7 +125,7 @@ sudo dnf copr enable whelanh/omarchy
 sudo dnf install aether cliamp disktree-bin gliff herdr hype \
                  hyprland-preview-share-picker monologue omacalc omacut \
                  omapresent omarchy-hyprland-titlebars omawrite omasnap owe \
-                 owe-lockfeed signed superwhisper-bin tensaku try ttfx
+                 owe-lockfeed signed superwhisper-bin try ttfx
 ```
 
 `fedora/scripts/lib/deps.sh` exposes
@@ -245,8 +246,8 @@ key, and is fully scriptable from this repo.
 
 ## Security / trust notes
 
-- Every repack (aether, cliamp, disktree-bin, herdr, omasnap, superwhisper-bin,
-  tensaku) installs the byte-for-byte upstream release binary; the spec pins the
+- Every repack (aether, cliamp, disktree-bin, herdr, omasnap, superwhisper-bin)
+  installs the byte-for-byte upstream release binary; the spec pins the
   exact version + Source URLs. `superwhisper-bin` additionally verifies the
   vendor's Minisign signature before extraction.
 - `hyprland-preview-share-picker` is compiled from source on the versioned
