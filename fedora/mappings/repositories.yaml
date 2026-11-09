@@ -119,7 +119,9 @@ repositories:
       - lazydocker
     why_not_official: >
       lazydocker (terminal GUI for docker) is not packaged in official Fedora.
-      atim/lazydocker follows the same build pattern as atim/lazygit.
+      atim/lazydocker follows the same build pattern as atim/lazygit. Upstream
+      dropped lazydocker from the default install but preserves it on existing
+      machines, so the repo stays enabled for those installs (new ones skip it).
     trust: Community COPR; gpgcheck on.
     optional: false
 

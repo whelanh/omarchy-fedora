@@ -1,17 +1,14 @@
 # Fedora GUI application packages for Omarchy Quattro
 # Graphically-installed user applications (Fedora names).
 #
-# kdenlive, obs-studio and xournalpp are retired from upstream Omarchy (see
-# fedora/mappings/retired-packages.conf) and skipped at install time; kept here
-# only because upstream still lists them until the next vendored sync.
+# evince, kdenlive, obs-studio and xournalpp are retired upstream; they live in
+# fedora/mappings/retired-packages.conf instead, so they are never installed and
+# existing installs prune them. papers replaces evince as the document viewer
+# (upstream migrations/1794165002.sh).
 
-evince
 gnome-disk-utility
-kdenlive
 libreoffice-core
 nautilus
 nautilus-python
-obs-studio
 papers
 sushi
-xournalpp

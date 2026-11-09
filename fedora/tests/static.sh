@@ -58,6 +58,8 @@ echo "== Mapping consistency: fedora/substitute base packages are installed =="
 # applications). Otherwise it would silently never be installed - either the
 # mapping points at a nonexistent package (e.g. `dua` instead of `dua-cli`) or
 # the manifest is missing the entry. Offline proxy for "in the enabled repos".
+# Retired packages are the exception: they must NOT be installed (see the
+# retired-packages tests), so skip them here.
 t "fedora/substitute base targets are in the install manifests" python3 -c "
 import glob, yaml
 installed = set()
@@ -66,6 +68,11 @@ for path in glob.glob('fedora/packages/*.txt'):
         line = line.split('#')[0].strip()
         if line:
             installed.add(line)
+retired = set()
+for line in open('fedora/mappings/retired-packages.conf'):
+    line = line.split('#')[0].strip()
+    if line:
+        retired.add(line)
 packages = yaml.safe_load(open('fedora/mappings/packages.yaml'))['packages']
 missing = []
 for line in open('upstream/install/omarchy-base.packages'):
@@ -74,6 +81,8 @@ for line in open('upstream/install/omarchy-base.packages'):
         continue
     entry = packages.get(name)
     if entry and entry.get('source') in ('fedora', 'substitute') and entry.get('package'):
+        if entry['package'] in retired:
+            continue
         if entry['package'] not in installed:
             missing.append((name, entry['package']))
 assert not missing, 'mapped but not installed: %r' % missing
@@ -151,6 +160,21 @@ assert 'openai-codex-bin' in names, 'must be in retired-packages.conf'
 man = yaml.safe_load(open('fedora/rpm/manifest.yaml'))['packages']
 assert 'openai-codex-bin' not in man, 'must not be in the RPM manifest'
 assert 'openai-codex-desktop' in man, 'the ChatGPT desktop GUI must stay'
+"
+# A retired package listed in an install manifest is dead weight: the install
+# paths skip it, so the entry only invites the next reader to think it ships.
+# Keep the manifests honest instead of carrying tombstones.
+t "retired packages are not listed in install manifests" python3 -c "
+import glob
+retired = {l.split('#')[0].strip() for l in open('fedora/mappings/retired-packages.conf')}
+retired.discard('')
+bad = []
+for path in glob.glob('fedora/packages/*.txt'):
+    for n, line in enumerate(open(path), 1):
+        pkg = line.split('#')[0].strip()
+        if pkg in retired:
+            bad.append((path, n, pkg))
+assert not bad, 'retired packages still in manifests: %r' % bad
 "
 
 echo "== First-party RPM scaffold: manifest + spec + build helper =="
@@ -320,6 +344,42 @@ assert 'dedup' in mig, 'must deduplicate double entries'
 assert 'rpm -q elsewhen' in mig, 'must drop the retired RPM'
 assert 'omacom-elsewhen' in mig, 'must clean the old cache dir'
 assert '.config/omarchy/plugins/omacom.elsewhen' in mig, 'must clean the dev-checkout symlink'
+"
+
+echo "== Papers replaces Evince (upstream migrations/1794165002.sh) =="
+# Upstream swaps its document viewer: papers joins the base set, evince is
+# dropped and personal mimeapps entries are repointed. The Fedora port never
+# runs the pacman migration, so the package set follows applications.txt +
+# retired-packages.conf and the per-user rewrite lives in fedora/migrations/.
+t "papers mapped to the Fedora package and installed" python3 -c "
+import glob, yaml
+entry = yaml.safe_load(open('fedora/mappings/packages.yaml'))['packages']['papers']
+assert entry.get('source') == 'fedora' and entry.get('package') == 'papers', entry
+lists = [l.split('#')[0].strip() for p in glob.glob('fedora/packages/*.txt') for l in open(p)]
+assert 'papers' in lists, 'papers must be in an install manifest'
+"
+t "evince retired, not installed" python3 -c "
+import glob
+retired = [l.split('#')[0].strip() for l in open('fedora/mappings/retired-packages.conf')]
+assert 'evince' in retired, 'evince must be retired'
+lists = [l.split('#')[0].strip() for p in glob.glob('fedora/packages/*.txt') for l in open(p)]
+assert 'evince' not in lists, 'evince must not be in an install manifest'
+"
+t "papers-replaces-evince migration repoints per-user mimeapps" python3 -c "
+import glob
+migs = glob.glob('fedora/migrations/*-papers-replaces-evince.sh')
+assert len(migs) == 1, migs
+mig = open(migs[0]).read()
+assert 'org.gnome.Papers.desktop' in mig and 'Evince' in mig, 'must repoint the Evince desktop id at Papers'
+assert 'mimeapps.list' in mig, 'must rewrite per-user mimeapps.list'
+assert 'runuser' in mig, 'must edit user files as the user'
+assert 'rpm -e --test' in mig, 'evince removal must be dependency-aware'
+assert 'OMARCHY_FEDORA_NO_PRUNE' in mig, 'must honour the prune opt-out'
+"
+t "dua-cli and usbguard retired upstream" python3 -c "
+retired = [l.split('#')[0].strip() for l in open('fedora/mappings/retired-packages.conf')]
+for p in ('dua-cli', 'usbguard'):
+    assert p in retired, p + ' must be retired'
 "
 
 echo "== Installer SELinux + update-window hygiene =="

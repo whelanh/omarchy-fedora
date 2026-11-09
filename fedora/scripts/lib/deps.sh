@@ -70,6 +70,9 @@ omarchy_fedora_repo_tools() {
 # Enable the mandatory COPR repositories listed in repositories.yaml.
 # nett00n/hyprland supplies the Hyprland ecosystem; atim/* supplies CLI tools
 # (lazygit, lazydocker, starship) that are not packaged in official Fedora.
+# lazydocker is no longer installed by default (upstream dropped it from the
+# base set but keeps it on existing machines), so its repo stays enabled for
+# installs that still have it and want updates.
 omarchy_fedora_enable_coprs() {
   omarchy_fedora_repo_tools || return 1
   # Mandatory COPR repos

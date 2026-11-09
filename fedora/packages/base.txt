@@ -25,7 +25,6 @@ docker-buildx
 docker-compose
 dosfstools
 dotnet-runtime-10.0
-dua-cli
 exfatprogs
 eza
 fakeroot
@@ -50,7 +49,6 @@ imv
 inotify-tools
 inxi
 jq
-lazydocker
 lazygit
 less
 libpq
@@ -92,7 +90,6 @@ tree-sitter-cli
 udiskie
 ufw
 unzip
-usbguard
 vips
 vips-tools
 whois
@@ -123,11 +120,6 @@ jetbrains-mono-fonts
 yaru-icon-theme
 
 # development
-# clang/llvm are retired from upstream Omarchy (see
-# fedora/mappings/retired-packages.conf) and skipped at install time; kept here
-# only because upstream still lists them until the next vendored sync.
-clang
-llvm
 lua
 compat-lua
 luarocks
