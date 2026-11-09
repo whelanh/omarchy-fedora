@@ -47,8 +47,11 @@ if [ "$DRY_RUN" != 1 ]; then
     echo "cannot list packages in $COPR (run 'copr-cli login' first)" >&2; exit 1; }
 fi
 
+# list-packages JSON is an array of package objects, so membership must look at
+# each object's "name" (a bare `name in list` compares against the dicts and is
+# never true, which silently skipped every delete).
 has() {
-  python3 -c 'import json,sys; print("yes" if sys.argv[1] in json.load(sys.stdin) else "no")' \
+  python3 -c 'import json,sys; print("yes" if any(p.get("name")==sys.argv[1] for p in json.load(sys.stdin)) else "no")' \
     "$1" <<<"$present"
 }
 

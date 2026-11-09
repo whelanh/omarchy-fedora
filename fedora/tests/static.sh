@@ -200,12 +200,21 @@ t "copr/create-project.sh bash -n" bash -n fedora/rpm/copr/create-project.sh
 t "copr/submit-builds.sh bash -n" bash -n fedora/rpm/copr/submit-builds.sh
 t "copr/check-updates.sh bash -n" bash -n fedora/rpm/copr/check-updates.sh
 t "copr/delete-retired.sh bash -n" bash -n fedora/rpm/copr/delete-retired.sh
+# list-packages JSON is an array of objects; the presence check must compare the
+# "name" field. A bare `name in list` compares against the dicts and is never
+# true, so every delete is silently skipped as "already absent".
+t "copr/delete-retired.sh checks the package name field" python3 -c "
+s = open('fedora/rpm/copr/delete-retired.sh').read()
+assert 'any(p.get(\"name\")==sys.argv[1]' in s, 'presence check must compare the name field'
+assert 'sys.argv[1] in json.load(sys.stdin)' not in s, 'broken bare-membership test'
+"
 # The COPR keeps retired packages until explicitly deleted; retired-packages.conf
 # drives delete-retired.sh. Guard that the packages we retired are listed.
 t "copr/retired-packages.conf lists retired COPR packages" python3 -c "
 names = [l.split('#')[0].strip() for l in open('fedora/rpm/copr/retired-packages.conf') if l.split('#')[0].strip()]
 assert 'elsewhen' in names, 'elsewhen must be listed for COPR deletion'
 assert 'openai-codex-bin' in names, 'openai-codex-bin must be listed for COPR deletion'
+assert 'tensaku' in names, 'tensaku must be listed for COPR deletion'
 "
 # auto-update.sh can prune those packages from the COPR as part of its run.
 t "auto-update.sh supports --prune-retired" python3 -c "
