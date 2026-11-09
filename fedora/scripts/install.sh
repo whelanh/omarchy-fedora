@@ -184,13 +184,14 @@ install_repos() {
     || die "failed to enable gpu-screen-recorder COPR"
   # First-party Omarchy packages (aether, cliamp, disktree-bin, gliff,
   # herdr, hype, hyprland-preview-share-picker, monologue, omacalc, omacut,
-  # omapresent, omarchy-emacs, omarchy-hyprland-titlebars, omawrite, omasnap,
-  # openai-codex-desktop, owe, owe-lockfeed, signed,
-  # superwhisper-bin, try, ttfx, voxtype-bin) live in the
-  # whelanh/omarchy COPR (see fedora/rpm/copr/README.md). The retired elsewhen,
-  # openai-codex-bin and tensaku RPMs are excluded via retired-packages.conf
-  # (upstream moved Elsewhen in-tree, the Codex CLI to mise, and screenshots to
-  # omasnap).
+  # omapresent, omarchy-hyprland-titlebars, omarchy-local-ai,
+  # omarchy-screensaver, omawrite, omasnap, owe, owe-lockfeed, signed,
+  # superwhisper-bin, try, ttfx) live in the whelanh/omarchy COPR (see
+  # fedora/rpm/copr/README.md) and are installed by default. omarchy-emacs,
+  # openai-codex-desktop and voxtype-bin are published there too, but installed
+  # on demand from Omarchy's Install menu. The retired elsewhen, openai-codex-bin
+  # and tensaku RPMs are excluded via retired-packages.conf (upstream moved
+  # Elsewhen in-tree, the Codex CLI to mise, and screenshots to omasnap).
   if [ "$INSTALL_FIRSTPARTY" = 1 ]; then
     omarchy_fedora_enable_optional_coprs whelanh/omarchy \
       || die "failed to enable whelanh/omarchy COPR"
@@ -545,16 +546,17 @@ install_omarchy_tree() {
     sudo chown -R root:root "$dest"
   fi
   log "Omarchy tree installed to $dest"
-  log "NOTE: the 23 first-party packages (aether, cliamp, disktree-bin," \
+  log "NOTE: the 22 first-party packages (aether, cliamp, disktree-bin," \
        "gliff, herdr, hype, hyprland-preview-share-picker," \
-       "monologue, omacalc, omacut, omapresent, omarchy-emacs," \
-       "omarchy-hyprland-titlebars, omawrite, omasnap," \
-       "openai-codex-desktop, owe, owe-lockfeed, signed, superwhisper-bin," \
-       "try, ttfx, voxtype-bin) are packaged" \
-       "under fedora/rpm and ship from the whelanh/omarchy COPR (see" \
-       "fedora/rpm/copr/README.md). The retired elsewhen, openai-codex-bin and" \
-       "tensaku RPMs are no longer installed (upstream moved Elsewhen in-tree," \
-       "the Codex CLI to mise, and screenshots to omasnap)."
+       "monologue, omacalc, omacut, omapresent, omarchy-hyprland-titlebars," \
+       "omarchy-local-ai, omarchy-screensaver, omasnap, omawrite, owe," \
+       "owe-lockfeed, signed, superwhisper-bin, try, ttfx) are packaged" \
+       "under fedora/rpm and installed from the whelanh/omarchy COPR (see" \
+       "fedora/rpm/copr/README.md). omarchy-emacs, openai-codex-desktop and" \
+       "voxtype-bin are also published there for on-demand install from the" \
+       "menu. The retired elsewhen, openai-codex-bin and tensaku RPMs are no" \
+       "longer installed (upstream moved Elsewhen in-tree, the Codex CLI to" \
+       "mise, and screenshots to omasnap)."
 }
 
 # Install the upstream user systemd units (bt-agent, sleep-lock, crash-watch,

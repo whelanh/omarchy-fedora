@@ -143,16 +143,29 @@ repositories:
     packages:
       - aether
       - cliamp
+      - disktree-bin
+      - gliff
       - herdr
+      - hype
       - hyprland-preview-share-picker
+      - monologue
       - omacalc
       - omacut
-      - omawrite
+      - omapresent
+      - omarchy-emacs
+      - omarchy-hyprland-titlebars
+      - omarchy-local-ai
+      - omarchy-screensaver
       - omasnap
+      - omawrite
+      - openai-codex-desktop
       - owe
       - owe-lockfeed
+      - signed
+      - superwhisper-bin
       - try
       - ttfx
+      - voxtype-bin
     why_not_official: >
       The Omarchy first-party packages are built/repacked from fedora/rpm/
       SPECs (see fedora/rpm/README.md) and published to this COPR; they are not

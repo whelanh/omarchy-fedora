@@ -29,7 +29,7 @@ mapped.
 |---|---|
 | fedora (official) | ~120 |
 | substitute | ~30 |
-| copr | ~11 + 26 first-party |
+| copr | ~11 + 25 first-party |
 | external (mise) | 1 |
 | unavailable | ~19 |
 | drop (Arch-only) | ~8 |
@@ -80,11 +80,14 @@ gpgcheck=1) enabled by the installer via `dnf config-manager --add-repo`. See
 `tobi-try → try`, `ttfx`, `voxtype-bin`) are
 source-built or repacked as Fedora RPMs. Specs live in `fedora/rpm/` (one SPEC
 per package) with a `manifest.yaml` (repo, build system, license, status) and
-publish tooling in `fedora/rpm/copr/`. Three former packages are now
-**retired**: `elsewhen` (`status: retired`; upstream moved it in-tree as
-`omarchy.elsewhen`), `openai-codex-bin` (upstream installs the Codex CLI
-through mise, and `omarchy-upgrade-to-quattro` removes the old pacman package),
-and `tensaku` (upstream replaced the screenshot annotator with `omasnap`).
+publish tooling in `fedora/rpm/copr/`. 22 of them are installed by the default
+first-party set; `omarchy-emacs`, `openai-codex-desktop` and `voxtype-bin` are
+published for on-demand install from Omarchy's Install menu. Three former
+packages are now **retired**: `elsewhen` (`status: retired`; upstream moved it
+in-tree as `omarchy.elsewhen`), `openai-codex-bin` (upstream installs the Codex
+CLI through mise, and `omarchy-upgrade-to-quattro` removes the old pacman
+package), and `tensaku` (upstream replaced the screenshot annotator with
+`omasnap`).
 The installer no longer installs any of them and `omarchy update` prunes them.
 The `elsewhen` spec is kept only as a reference for the Fedora-native migration
 that renames/dedups existing installs (`fedora/migrations/*-elsewhen-retire.sh`);
@@ -99,7 +102,8 @@ does the same (`fedora/scripts/lib/mise.sh`).
 **Status — 25 verified, 1 retired, 0 blocked.** Every verified package builds
 cleanly in a Fedora Rawhide container and is published from the
 `whelanh/omarchy` COPR. The default installer enables that COPR and installs
-the set (disable with `install.sh --no-firstparty`).
+the 22-package default set (disable with `install.sh --no-firstparty`); the
+three on-demand packages are installed from Omarchy's Install menu.
 
 | Package | Version | Notes |
 |---------|---------|-------|
@@ -139,8 +143,10 @@ Caveats:
 - `omarchy plugin enable/disable` talk to the running shell via
   `omarchy-shell shell enablePlugin`, so Quickshell must be running.
 - The 25 first-party binary packages are built and published from the
-  `whelanh/omarchy` COPR and installed by the default installer
-  (`--no-firstparty` to skip); all are `verified` in `fedora/rpm/manifest.yaml`.
+  `whelanh/omarchy` COPR; the default installer installs the 22-package default
+  set (`--no-firstparty` to skip) and `omarchy-emacs`, `openai-codex-desktop`
+  and `voxtype-bin` install on demand from the menu. All are `verified` in
+  `fedora/rpm/manifest.yaml`.
   (`elsewhen` is retired and no longer installed or published.)
 - `gum` and `git-delta` were added to `fedora/packages/base.txt` as
   dependencies of the CLI layer.

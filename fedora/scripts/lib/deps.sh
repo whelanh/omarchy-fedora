@@ -260,14 +260,14 @@ omarchy_fedora_install_applications() {
   omarchy_fedora_install_list "$PACKAGES_DIR/applications.txt" || return 1
 }
 
-# Install the first-party Omarchy packages from the whelanh/omarchy COPR
-# (aether, cliamp, disktree-bin, gliff, herdr, hype,
+# Install the 22 default first-party Omarchy packages from the whelanh/omarchy
+# COPR (aether, cliamp, disktree-bin, gliff, herdr, hype,
 # hyprland-preview-share-picker, monologue, omacalc, omacut, omapresent,
-# omarchy-emacs, omarchy-hyprland-titlebars, omarchy-local-ai,
-# omarchy-screensaver, omawrite, omasnap, openai-codex-desktop, owe,
-# owe-lockfeed, signed, superwhisper-bin, tobi-try, ttfx, voxtype-bin;
-# elsewhen, openai-codex-bin and tensaku retired upstream, pruned via
-# retired-packages.conf).
+# omarchy-hyprland-titlebars, omarchy-local-ai, omarchy-screensaver, omawrite,
+# omasnap, owe, owe-lockfeed, signed, superwhisper-bin, try, ttfx).
+# omarchy-emacs, openai-codex-desktop and voxtype-bin are published in the same
+# COPR but installed on demand; elsewhen, openai-codex-bin and tensaku retired
+# upstream, pruned via retired-packages.conf.
 # Requires the COPR enabled (install.sh does this in install_repos). They are
 # `source: copr` in packages.yaml; resolve.py --copr whelanh/omarchy emits the
 # exact set.
