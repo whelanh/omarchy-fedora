@@ -99,9 +99,13 @@ wl-clipboard
 wtype
 xdg-desktop-portal-gtk
 xdg-terminal-exec
-# xsetroot (Arch: xorg-xsetroot): restores the X11/XWayland root cursor from
-# upstream default/hypr/startup-cursor.lua (harmless with no Xwayland clients).
-xsetroot
+# xsetroot (Arch: xorg-xsetroot) is no longer installed: upstream dropped it
+# together with default/hypr/startup-cursor.lua, the only caller. That script
+# started Hyprland with a blank cursor theme and then reset the X root cursor,
+# which is what X11/XWayland apps (e.g. scid Community) inherited. Without it
+# nothing hides the root cursor, so no reset is needed. Existing installs keep
+# the package (it is not in retired-packages.conf, same as lazydocker), and it
+# stays available as a manual fix: `xsetroot -cursor_name left_ptr`.
 yt-dlp
 zbar
 zoxide

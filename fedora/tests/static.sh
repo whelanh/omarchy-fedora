@@ -59,7 +59,9 @@ echo "== Mapping consistency: fedora/substitute base packages are installed =="
 # mapping points at a nonexistent package (e.g. `dua` instead of `dua-cli`) or
 # the manifest is missing the entry. Offline proxy for "in the enabled repos".
 # Retired packages are the exception: they must NOT be installed (see the
-# retired-packages tests), so skip them here.
+# retired-packages tests), so skip them here. The same goes for packages we
+# deliberately stop installing while keeping the mapping for existing machines
+# (`kept_but_not_installed`, e.g. xsetroot).
 t "fedora/substitute base targets are in the install manifests" python3 -c "
 import glob, yaml
 installed = set()
@@ -74,6 +76,12 @@ for line in open('fedora/mappings/retired-packages.conf'):
     if line:
         retired.add(line)
 packages = yaml.safe_load(open('fedora/mappings/packages.yaml'))['packages']
+# Fedora targets we intentionally no longer install, but keep mapped (and keep
+# on existing machines) because they are a manual fallback:
+#   xsetroot - upstream dropped it with startup-cursor.lua; `xsetroot
+#   -cursor_name left_ptr` is the workaround for X11/XWayland apps that lose
+#   the cursor (e.g. scid Community).
+kept_but_not_installed = {'xsetroot'}
 missing = []
 for line in open('upstream/install/omarchy-base.packages'):
     name = line.split('#')[0].strip()
@@ -81,7 +89,7 @@ for line in open('upstream/install/omarchy-base.packages'):
         continue
     entry = packages.get(name)
     if entry and entry.get('source') in ('fedora', 'substitute') and entry.get('package'):
-        if entry['package'] in retired:
+        if entry['package'] in retired or entry['package'] in kept_but_not_installed:
             continue
         if entry['package'] not in installed:
             missing.append((name, entry['package']))
@@ -402,6 +410,51 @@ t "dua-cli and usbguard retired upstream" python3 -c "
 retired = [l.split('#')[0].strip() for l in open('fedora/mappings/retired-packages.conf')]
 for p in ('dua-cli', 'usbguard'):
     assert p in retired, p + ' must be retired'
+"
+
+echo "== Qt apps are themed by qtengine (upstream migrations/1792902457.sh) =="
+# Upstream switched QT_QPA_PLATFORMTHEME from gtk3 to qtengine and dropped
+# xorg-xsetroot with its startup-cursor.lua. qtengine is AUR-only, so the
+# Fedora port packages it first-party instead of enabling a third-party COPR
+# (celestelove/caelestia has no rawhide chroot).
+t "qtengine mapped, installed and packaged first-party" python3 -c "
+import glob, yaml
+entry = yaml.safe_load(open('fedora/mappings/packages.yaml'))['packages']['qtengine']
+assert entry.get('source') == 'copr', entry
+assert entry.get('repository') == 'whelanh/omarchy', entry
+assert entry.get('rpm') == 'fedora/rpm/qtengine/qtengine.spec', entry
+lists = [l.split('#')[0].strip() for p in glob.glob('fedora/packages/*.txt') for l in open(p)]
+assert 'qtengine' in lists, 'qtengine must be in an install manifest'
+manifest = yaml.safe_load(open('fedora/rpm/manifest.yaml'))['packages']['qtengine']
+assert manifest['status'] == 'verified', manifest
+assert manifest['version'] == '0.2.4', manifest
+"
+t "qtengine spec installs into Qt's plugin dir, Qt6 only" python3 -c "
+spec = open('fedora/rpm/qtengine/qtengine.spec').read()
+assert 'BUILD_QT5=OFF' in spec, 'must not build the unused Qt5 theme'
+assert '_libdir}/qt6/plugins' in spec, \"must install into qtpaths6 --query QT_INSTALL_PLUGINS\"
+assert 'kf6-kcolorscheme-devel' in spec, 'upstream requires KF6 color scheme'
+"
+t "qtengine migration refreshes the theme per user" python3 -c "
+import glob
+migs = glob.glob('fedora/migrations/*-qtengine-qt-theming.sh')
+assert len(migs) == 1, migs
+mig = open(migs[0]).read()
+assert 'omarchy-theme-refresh' in mig, 'must render the new qtengine.colors template'
+assert 'runuser' in mig, 'must render as the user, never as root'
+assert 'qtengine/config.json' in mig, 'must seed the config when missing'
+"
+t "xsetroot no longer installed but kept for existing machines" python3 -c "
+import glob
+lists = [l.split('#')[0].strip() for p in glob.glob('fedora/packages/*.txt') for l in open(p)]
+assert 'xsetroot' not in lists, 'xsetroot must not be installed (startup-cursor.lua is gone)'
+retired = [l.split('#')[0].strip() for l in open('fedora/mappings/retired-packages.conf')]
+assert 'xsetroot' not in retired, 'must not prune the X11 cursor fallback from existing machines'
+"
+t "ath12k-board-fallback mapped unavailable" python3 -c "
+import yaml
+entry = yaml.safe_load(open('fedora/mappings/packages.yaml'))['packages']['ath12k-board-fallback']
+assert entry.get('source') == 'unavailable', entry
 "
 
 echo "== Installer SELinux + update-window hygiene =="

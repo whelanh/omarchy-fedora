@@ -242,6 +242,22 @@ packages:
     status: verified
     version: 0.2.13
     note: Qt6 QML module Owe.LockFeed from the same omacom/owe tag archive as `owe`; this is the package Omarchy splits out of the AUR owe build. Container-built OK.
+  qtengine:
+    repo: https://github.com/kossLAN/qtengine
+    language: cpp
+    build: cmake (Qt6 only, -DBUILD_QT5=OFF)
+    binary: null
+    license: BSD-2-Clause
+    deps: [qt6-qtbase, qt6-qtdeclarative, kf6-kconfig, kf6-kcolorscheme, kf6-kiconthemes]
+    status: verified
+    version: 0.2.4
+    note: >
+      Qt platform theme behind QT_QPA_PLATFORMTHEME=qtengine (upstream
+      migrations/1792902457.sh). Installs the platformtheme + style plugins into
+      %{_libdir}/qt6/plugins. Not in Fedora official or official Arch (AUR
+      only), so packaged here rather than enabling the celestelove/caelestia
+      COPR, which has no rawhide chroot. Private Qt6 API: rebuild when Fedora
+      bumps the Qt6 minor. Container-built OK.
   tobi-try:
     repo: https://github.com/tobi/try
     language: ruby

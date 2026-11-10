@@ -355,6 +355,16 @@ packages:
     package: qt6-qtsvg
     source: substitute
     note: Fedora uses qt6-qt* prefix
+  qtengine:
+    package: qtengine
+    source: copr
+    repository: whelanh/omarchy
+    rpm: fedora/rpm/qtengine/qtengine.spec
+    note: >
+      Qt platform theme Omarchy uses for all Qt apps (QT_QPA_PLATFORMTHEME in
+      default/hypr/envs.lua); takes the palette from the theme's rendered
+      qtengine.colors. Not in Fedora official or official Arch; packaged here
+      Qt6-only rather than enabling a third-party COPR for a default component.
   ripgrep:               { package: ripgrep, source: fedora }
   rtkit:                 { package: rtkit, source: fedora }
   ruby:                  { package: ruby, source: fedora }
@@ -394,7 +404,15 @@ packages:
   wl-clipboard:          { package: wl-clipboard, source: fedora }
   wtype:                 { package: wtype, source: fedora }
   xdg-desktop-portal-gtk: { package: xdg-desktop-portal-gtk, source: fedora }
-  xorg-xsetroot:         { package: xsetroot, source: fedora }
+  xorg-xsetroot:
+    package: xsetroot
+    source: fedora
+    note: >
+      No longer installed: upstream dropped xorg-xsetroot together with
+      default/hypr/startup-cursor.lua, its only caller. The mapping and the
+      package stay available on existing machines (not retired) as the manual
+      fix for X11/XWayland apps that lose the cursor: xsetroot -cursor_name
+      left_ptr.
   xournalpp:             { package: xournalpp, source: fedora }
   yt-dlp:                { package: yt-dlp, source: fedora }
   zbar:                  { package: zbar, source: fedora }
@@ -657,3 +675,10 @@ packages:
   linux-t2:              { package: null, source: unavailable, note: Apple T2 kernel }
   linux-t2-headers:      { package: null, source: unavailable, note: Apple T2 kernel headers }
   t2fanrd:               { package: null, source: unavailable, note: Apple T2 fan daemon }
+  ath12k-board-fallback:
+    package: null
+    source: unavailable
+    note: >
+      AUR-only copy of a board-2.bin record for Qualcomm 17cb:1107/1112 Wi-Fi
+      cards. No Fedora package, and upstream's fix script only runs on that
+      hardware.

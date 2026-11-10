@@ -153,7 +153,7 @@ Categories:
   gliff, herdr, hype, hyprland-preview-share-picker, monologue,
   omacalc, omacut, omapresent, omarchy-emacs, omarchy-hyprland-titlebars,
   omarchy-local-ai, omarchy-screensaver, omawrite, omasnap,
-  openai-codex-desktop, owe, owe-lockfeed, signed, superwhisper-bin,
+  openai-codex-desktop, owe, owe-lockfeed, qtengine, signed, superwhisper-bin,
   tobi-try (RPM `try`), ttfx, voxtype-bin.
   (`elsewhen` is retired — upstream moved it in-tree as `omarchy.elsewhen`;
   `openai-codex-bin` is retired — upstream installs the Codex CLI via mise;
