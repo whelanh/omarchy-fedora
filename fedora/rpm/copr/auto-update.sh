@@ -48,6 +48,11 @@
 #     together to the same version.
 #   - The current version is read from each spec, not the manifest, so a stale
 #     manifest cannot hide a needed bump. Both are written on success.
+#   - A bump is skipped when the new release is missing a file the spec
+#     packages (HTTP 404/410 on a Source: URL). Upstream sometimes tags a
+#     release before publishing its platform builds — voxtype v1.2.0 shipped
+#     macOS-only because its Linux workflow failed — which would otherwise bump
+#     the spec and fail the SRPM build with nothing submitted.
 #   - All file edits happen in memory and are only written once every edit has
 #     succeeded, so a failure never leaves a half-bumped tree.
 #   - The maintainer identity in new %changelog entries is taken from the
@@ -142,7 +147,7 @@ else
   echo "   (tip: export GITHUB_TOKEN/GH_TOKEN to avoid the 60 req/hour API limit)"
 fi
 python3 - "$RPM_DIR" "$MANIFEST" "$PLAN" <<'PY'
-import json, os, re, sys, urllib.request, yaml
+import json, os, re, sys, urllib.error, urllib.request, yaml
 
 rpm_dir, manifest_path, plan_path = sys.argv[1], sys.argv[2], sys.argv[3]
 UA = {"User-Agent": "omarchy-fedora-auto-update", "Accept": "application/vnd.github+json"}
@@ -210,6 +215,54 @@ def spec_version(name):
     m = re.search(r"(?m)^Version:\s*(\S+)", src)
     return m.group(1) if m else None
 
+def spec_sources(name):
+    """HTTP(S) Source: URLs of a spec, macros still unexpanded."""
+    path = os.path.join(rpm_dir, name, name + ".spec")
+    try:
+        src = open(path).read()
+    except FileNotFoundError:
+        return []
+    m = re.search(r"(?m)^URL:\s*(\S+)", src)
+    base = m.group(1) if m else ""
+    urls = []
+    for url in re.findall(r"(?m)^Source\d*:\s*(\S+)", src):
+        if re.match(r"https?://", url):
+            urls.append(url.replace("%{url}", base))
+    return urls
+
+def http_status(url):
+    """HEAD status for url, or None when it could not be reached at all."""
+    url = url.split("#", 1)[0]
+    req = urllib.request.Request(url, method="HEAD",
+                                 headers={"User-Agent": UA["User-Agent"]})
+    try:
+        with urllib.request.urlopen(req, timeout=20) as r:
+            return r.status
+    except urllib.error.HTTPError as e:
+        return e.code
+    except Exception:
+        return None
+
+def missing_sources(name, version):
+    """Split the spec's sources at `version` into (missing, unverified).
+
+    `missing` holds URLs answering 404/410, i.e. files this spec packages that
+    upstream's release does not have. Upstream sometimes publishes a tag before
+    (or without) the platform builds: voxtype v1.2.0 went out macOS-only because
+    its Linux workflow failed, so bumping the repack would just fail the SRPM
+    build and leave a bumped tree behind. `unverified` holds URLs that could not
+    be checked (network error, 5xx); those are reported but never block a bump.
+    """
+    missing, unverified = [], []
+    for raw in spec_sources(name):
+        url = raw.replace("%{version}", version).replace("%{name}", name).split("#", 1)[0]
+        code = http_status(url)
+        if code in (404, 410):
+            missing.append((url, code))
+        elif code is None or code >= 500:
+            unverified.append((url, code))
+    return missing, unverified
+
 REPO_RE = re.compile(r"https://github\.com/([^/]+)/([^/]+?)(?:\.git)?/?$")
 
 d = yaml.safe_load(open(manifest_path))
@@ -231,6 +284,7 @@ for name, p in sorted(pkgs.items()):
         by_repo.setdefault(p["repo"], []).append(name)
 
 plan, unknown, drift = [], [], []
+blocked, unverified = [], []
 for repo, names in sorted(by_repo.items()):
     owner, rname = REPO_RE.match(repo).groups()
     tag = latest_github(owner, rname)
@@ -256,6 +310,14 @@ for repo, names in sorted(by_repo.items()):
         if n in held:
             continue
         if semver(cur[n]) < semver(newver):
+            # Never bump to a release whose files are not all published: the
+            # SRPM build is the first thing that would notice, and by then the
+            # spec is already bumped (auto-update writes before submitting).
+            missing, unverifiable = missing_sources(n, newver)
+            unverified.extend((n, url, code) for url, code in unverifiable)
+            if missing:
+                blocked.append((n, cur[n], newver, missing))
+                continue
             plan.append((n, newver, cur[n], tag))
 
 plan.sort(key=lambda r: r[0])
@@ -276,6 +338,24 @@ if held:
     print("held at the packaged version (blocked on a dependency, not a version):")
     for name, why in held.items():
         print(f"  {name}: {why}")
+
+if blocked:
+    print()
+    print("skipped: the upstream release is missing files this package needs")
+    print("(staying at the packaged version until upstream publishes them):")
+    for name, oldver, newver, missing in blocked:
+        url, code = missing[0]
+        more = f" (+{len(missing) - 1} more)" if len(missing) > 1 else ""
+        print(f"  {name}: {oldver} -> {newver}  HTTP {code} {url}{more}")
+    print("  If the release is permanently partial, add `hold:` to its")
+    print("  manifest.yaml entry instead of retrying every run.")
+
+if unverified:
+    print()
+    print("warning: could not verify these sources (bumping anyway; a 404 there")
+    print("would fail the SRPM build):")
+    for name, url, code in unverified:
+        print(f"  {name}: HTTP {code or 'no response'} {url}")
 
 if drift:
     print()

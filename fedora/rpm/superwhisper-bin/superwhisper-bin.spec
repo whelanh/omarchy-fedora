@@ -10,8 +10,8 @@
 %global __brp_check_rpaths %{nil}
 
 Name:           superwhisper-bin
-Version:        1.2.0
-Release:        2%{?dist}
+Version:        1.3.0
+Release:        1%{?dist}
 Summary:        Local and cloud voice dictation with Superwhisper
 
 License:        LicenseRef-proprietary AND MIT
@@ -134,6 +134,9 @@ sed 's|@LIBRARY@|/opt/superwhisper/lib/fcitx5/libsuperwhisper-fcitx5|' \
 /opt/superwhisper
 
 %changelog
+* Tue Nov 10 2026 whelanh <brickhousedevelopers@gmail.com> - 1.3.0-1
+- Automatic update to upstream v1.3.0
+
 * Fri Nov 6 2026 whelanh <brickhousedevelopers@gmail.com> - 1.2.0-2
 - Refresh the pinned omarchy-pkgs helpers to 11a0c28: setup-user now places a
   newly linked Superwhisper panel in the bar's tray section instead of the

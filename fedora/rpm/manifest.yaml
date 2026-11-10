@@ -180,7 +180,7 @@ packages:
     license: LicenseRef-proprietary AND MIT
     deps: [gtk4, gtk4-layer-shell, python3-gobject, pipewire-pulseaudio, foot]
     status: verified
-    version: 1.2.0
+    version: 1.3.0
     note: Proprietary Superwhisper dictation; verifies the vendor Minisign signature then installs under /opt/superwhisper (launcher, user service, desktop entries, fcitx5 addon, fonts/icons). Upstream lists it in omarchy-base.packages, so it is in the default first-party set. Container-built OK.
   signed:
     repo: https://github.com/omacom/signed
@@ -230,7 +230,7 @@ packages:
     license: MIT
     deps: [mpv, ffmpeg-free, socat, wayland-devel, libglvnd-devel, libepoxy-devel, systemd-devel]
     status: verified
-    version: 0.2.13
+    version: 0.2.15
     note: OWE wallpaper engine (owed daemon + owe CLI + owe-render); desktop video backgrounds, feeds the lock screen via owe-lockfeed. Container-built OK.
   owe-lockfeed:
     repo: https://github.com/omacom/owe
@@ -240,7 +240,7 @@ packages:
     license: MIT
     deps: [qt6-qtdeclarative]
     status: verified
-    version: 0.2.13
+    version: 0.2.15
     note: Qt6 QML module Owe.LockFeed from the same omacom/owe tag archive as `owe`; this is the package Omarchy splits out of the AUR owe build. Container-built OK.
   qtengine:
     repo: https://github.com/kossLAN/qtengine

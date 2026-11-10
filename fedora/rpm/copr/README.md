@@ -236,7 +236,12 @@ bash fedora/rpm/copr/auto-update.sh --yes --no-watch
 `status: verified` packages, bumps packages that share an upstream repo
 (`owe` + `owe-lockfeed`) together to the same version, reads the current
 version from the spec (so a stale manifest can't hide a bump), and writes all
-edits only after every edit has succeeded. It also runs `check-updates.sh
+edits only after every edit has succeeded. Before bumping it HEAD-checks the
+spec's `Source:` URLs at the new version and skips the package when one 404s
+(upstream sometimes publishes a tag before its platform builds — voxtype
+v1.2.0 shipped macOS-only because its Linux workflow failed — and bumping
+anyway would only fail the SRPM build and leave a bumped tree behind). It also
+runs `check-updates.sh
 --packages` (new unmapped/stale drift) and `--pins`, warning without blocking.
 `--verify` additionally runs `build-rpm-in-ci.sh` before submitting, and
 `--chroot <name>` (repeatable) submits to specific chroots. The submit step
