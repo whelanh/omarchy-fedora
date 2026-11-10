@@ -270,7 +270,7 @@ packages:
     license: MIT
     deps: [python3, systemd]
     status: verified
-    version: 0.4.0
+    version: 0.5.0
     note: Local model engine and its curated recipe catalog, installed as one tree under /usr/share/omarchy-local-ai with /usr/bin/omarchy-local-ai symlinked into it (the engine reads the catalog beside itself). %check runs upstream's `validate .` offline. The containers that run models (podman + crun) are optional and installed on demand by `omarchy agent local use`.
   omarchy-screensaver:
     repo: https://github.com/omacom/omarchy-screensaver
