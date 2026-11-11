@@ -71,11 +71,11 @@ systemctl reboot
 The installer is **idempotent** — running it again is safe.
 
 > Note: Omarchy's first-party binaries and plugins (aether, cliamp, disktree-bin,
-> gliff, herdr, hype, hyprland-preview-share-picker, monologue,
+> folio, gliff, herdr, hype, hyprland-preview-share-picker, monologue,
 > omacalc, omacut, omapresent, omarchy-hyprland-titlebars,
 > omarchy-local-ai, omarchy-screensaver, omawrite, omasnap, owe, owe-lockfeed,
-> qtengine, signed, superwhisper-bin, try, ttfx) are built as Fedora RPMs and
-> installed from the `whelanh/omarchy` COPR by the installer (see
+> plain, qtengine, signed, superwhisper-bin, try, ttfx) are built as Fedora RPMs
+> and installed from the `whelanh/omarchy` COPR by the installer (see
 > `fedora/rpm/copr/README.md`). Pass `--no-firstparty` to skip. `omarchy-emacs`,
 > `openai-codex-desktop` and `voxtype-bin` are published there for on-demand
 > install from the menu. (The `elsewhen` world-clock plugin is retired: upstream

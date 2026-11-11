@@ -59,6 +59,12 @@ packages:
     repository: whelanh/omarchy
     rpm: fedora/rpm/herdr/herdr.spec
     note: AI-agent workspace manager; Rust, repacked from herdrdev/herdr release binary.
+  folio:
+    package: folio
+    source: copr
+    repository: whelanh/omarchy
+    rpm: fedora/rpm/folio/folio.spec
+    note: "Files: Omarchy's file manager, replacing Nautilus (upstream migration 1794330979.sh installs it and drops nautilus/nautilus-python/sushi); Qt6/qmake6."
   hype:
     package: hype
     source: copr
@@ -137,6 +143,12 @@ packages:
     repository: whelanh/omarchy
     rpm: fedora/rpm/owe-lockfeed/owe-lockfeed.spec
     note: Qt6 QML module Owe.LockFeed for the lock screen; same omacom/owe source as `owe`, no AUR counterpart.
+  plain:
+    package: plain
+    source: copr
+    repository: whelanh/omarchy
+    rpm: fedora/rpm/plain/plain.spec
+    note: Omarchy's config/text file editor; the handler for text/plain and the "plain" editor choice (bin/omarchy-default-editor); Qt6/qmake6 + xdg-desktop-portal.
   signed:
     package: signed
     source: copr
@@ -294,8 +306,8 @@ packages:
       fedora/mappings/repositories.yaml. binary `mise`; Fedora has no -bin split.
   mpv:                   { package: mpv, source: fedora }
   mpv-mpris:             { package: mpv-mpris, source: fedora }
-  nautilus:              { package: nautilus, source: fedora }
-  nautilus-python:       { package: nautilus-python, source: fedora }
+  nautilus:              { package: nautilus, source: fedora, note: RETIRED — upstream replaced it with folio (upstream/migrations/1794330979.sh drops it) }
+  nautilus-python:       { package: nautilus-python, source: fedora, note: RETIRED — Nautilus extension support; dropped with nautilus }
   networkmanager:
     package: NetworkManager
     source: substitute
@@ -376,7 +388,7 @@ packages:
     source: copr
     repository: atim/starship
     note: not in official Fedora (was retired in 2019 due to Rust packaging rules); atim/starship COPR
-  sushi:                 { package: sushi, source: fedora }
+  sushi:                 { package: sushi, source: fedora, note: RETIRED — Nautilus quick-previewer that went with nautilus since folio has its own preview }
   system-config-printer: { package: system-config-printer, source: fedora }
   tesseract:             { package: tesseract, source: fedora }
   tesseract-data-eng:
@@ -404,6 +416,7 @@ packages:
   wl-clipboard:          { package: wl-clipboard, source: fedora }
   wtype:                 { package: wtype, source: fedora }
   xdg-desktop-portal-gtk: { package: xdg-desktop-portal-gtk, source: fedora }
+  xdg-user-dirs:         { package: xdg-user-dirs, source: fedora, note: omarchy-provision-user calls xdg-user-dirs-update to point TEMPLATES/DESKTOP/PUBLICSHARE at $HOME }
   xorg-xsetroot:
     package: xsetroot
     source: fedora
@@ -496,6 +509,10 @@ packages:
     package: moonlight-qt
     source: copr
     repository: ferdiu/moonlight
+    note: >
+      Upstream dropped moonlight-qt from omarchy-base.packages; the Fedora port
+      keeps it as an opt-in gaming extra (fedora/packages/optional.txt) rather
+      than pruning it from existing machines.
   obsidian:
     package: obsidian
     source: copr
@@ -653,12 +670,11 @@ packages:
   xdg-terminal-exec:
     package: xdg-terminal-exec
     source: official
-    note: ships the desktop default-terminal resolution Omarchy's launcher uses
+    note: ships the desktop default-terminal resolution Omarchy's launcher uses (Fedora 0.14.2 in rawhide)
   qt6-qtimageformats:
     package: qt6-qtimageformats
     source: official
     note: Qt image plugin formats (webp/jxl) — wallpapers render black without this
-    note: Fedora ships xdg-terminal-exec 0.14.2 (rawhide)
   intel-ipu7-camera:     { package: null, source: unavailable, note: Intel IPU7 camera, very niche }
   linux-ptl:             { package: null, source: unavailable, note: patched kernel; use stock Fedora kernel }
   linux-ptl-headers:     { package: null, source: unavailable, note: patched kernel headers }
@@ -672,6 +688,20 @@ packages:
   dell-xps13-sidecar-amps: { package: null, source: unavailable, note: Dell XPS13 specific }
   apple-bcm-firmware:    { package: null, source: unavailable, note: Apple T2 hardware }
   apple-t2-audio-config: { package: null, source: unavailable, note: Apple T2 hardware }
+  asus-proart-pz13-audio:
+    package: null
+    source: unavailable
+    note: >
+      AUR-only board topology for the ASUS ProArt PZ13 (Snapdragon X Plus)
+      speakers and microphones. Hardware-gated to an ARM Qualcomm laptop, which
+      this x86_64-only port does not support.
+  microsoft-surface-laptop-8-support:
+    package: null
+    source: unavailable
+    note: >
+      AUR-only driver package for the ARM Microsoft Surface Laptop 8 (panel,
+      keyboard and USB4 router firmware). Hardware-gated to an ARM device, which
+      this x86_64-only port does not support.
   linux-t2:              { package: null, source: unavailable, note: Apple T2 kernel }
   linux-t2-headers:      { package: null, source: unavailable, note: Apple T2 kernel headers }
   t2fanrd:               { package: null, source: unavailable, note: Apple T2 fan daemon }

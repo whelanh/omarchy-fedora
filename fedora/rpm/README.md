@@ -6,7 +6,7 @@ in Fedora official/COPR repos. They map to `source: copr` entries in
 `fedora/mappings/packages.yaml` and are distributed via the
 `whelanh/omarchy` COPR.
 
-> **Status: 27 VERIFIED, 1 RETIRED, 0 BLOCKED.** Every `verified` package builds
+> **Status: 28 VERIFIED, 1 RETIRED, 0 BLOCKED.** Every `verified` package builds
 > cleanly in the
 > Fedora Rawhide container (`manifest.yaml` status `verified`), driven by
 > `build-rpm-in-ci.sh` — the same path the CI `rpm-build` job runs. `retired`
@@ -51,6 +51,7 @@ FEDORA=1 bash fedora/rpm/build-in-container.sh omasnap
 | cliamp | bjarneo/cliamp | prebuilt-repack | MIT | verified |
 | disktree-bin | tobi/disktree | prebuilt-repack | MIT | verified |
 | elsewhen | omacom/elsewhen | noarch-repack | MIT | retired |
+| folio | omacom/folio | Qt6 / qmake6 | MIT | verified |
 | gliff | omacom/gliff | cargo (vendored) | MIT AND BSD-2-Clause | verified |
 | herdr | herdrdev/herdr | prebuilt-repack | Apache-2.0 | verified |
 | hype | omacom/hype | Qt6 / qmake6 | MIT | verified |
@@ -69,6 +70,7 @@ FEDORA=1 bash fedora/rpm/build-in-container.sh omasnap
 | signed | omacom/signed | Qt6 / qmake6 | MIT | verified |
 | owe | omacom/owe | meson (C) | MIT | verified |
 | owe-lockfeed | omacom/owe | cmake (Qt6 qml-plugin) | MIT | verified |
+| plain | omacom/plain | Qt6 / qmake6 | MIT | verified |
 | qtengine | kossLAN/qtengine | cmake (Qt6 only) | BSD-2-Clause | verified |
 | superwhisper-bin | superultrainc/… | vendor-repack (Minisign) | LicenseRef-proprietary AND MIT | verified |
 | tobi-try | tobi/try | Ruby gem | MIT | verified |

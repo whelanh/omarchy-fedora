@@ -144,6 +144,7 @@ repositories:
       - aether
       - cliamp
       - disktree-bin
+      - folio
       - gliff
       - herdr
       - hype
@@ -161,6 +162,7 @@ repositories:
       - openai-codex-desktop
       - owe
       - owe-lockfeed
+      - plain
       - qtengine
       - signed
       - superwhisper-bin

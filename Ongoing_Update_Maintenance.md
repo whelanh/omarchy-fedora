@@ -41,7 +41,7 @@ caught by `check-updates.sh --packages` (next), which `auto-update.sh` runs.
 ### 3. `check-updates.sh` (four modes)
 
 ```sh
-# version drift for the 26 first-party COPR packages
+# version drift for the 28 first-party COPR packages
 bash fedora/rpm/copr/check-updates.sh
 
 # package add/remove drift vs our mapping (also run by auto-update.sh)

@@ -417,14 +417,18 @@ echo "== Qt apps are themed by qtengine (upstream migrations/1792902457.sh) =="
 # xorg-xsetroot with its startup-cursor.lua. qtengine is AUR-only, so the
 # Fedora port packages it first-party instead of enabling a third-party COPR
 # (celestelove/caelestia has no rawhide chroot).
-t "qtengine mapped, installed and packaged first-party" python3 -c "
-import glob, yaml
+t "qtengine mapped and packaged first-party (installed via resolve --copr)" python3 -c "
+import subprocess, yaml
 entry = yaml.safe_load(open('fedora/mappings/packages.yaml'))['packages']['qtengine']
 assert entry.get('source') == 'copr', entry
 assert entry.get('repository') == 'whelanh/omarchy', entry
 assert entry.get('rpm') == 'fedora/rpm/qtengine/qtengine.spec', entry
-lists = [l.split('#')[0].strip() for p in glob.glob('fedora/packages/*.txt') for l in open(p)]
-assert 'qtengine' in lists, 'qtengine must be in an install manifest'
+# First-party packages with an upstream base entry are installed by
+# omarchy_fedora_install_firstparty (resolve.py --copr), not from a *.txt list.
+resolved = subprocess.check_output(
+    ['python3', 'fedora/scripts/lib/resolve.py', '--copr', 'whelanh/omarchy'],
+    text=True).split()
+assert 'qtengine' in resolved, 'qtengine must resolve from the whelanh/omarchy COPR'
 manifest = yaml.safe_load(open('fedora/rpm/manifest.yaml'))['packages']['qtengine']
 assert manifest['status'] == 'verified', manifest
 assert manifest['version'] == '0.2.4', manifest
@@ -451,10 +455,79 @@ assert 'xsetroot' not in lists, 'xsetroot must not be installed (startup-cursor.
 retired = [l.split('#')[0].strip() for l in open('fedora/mappings/retired-packages.conf')]
 assert 'xsetroot' not in retired, 'must not prune the X11 cursor fallback from existing machines'
 "
-t "ath12k-board-fallback mapped unavailable" python3 -c "
+t "hardware-gated AUR packages mapped unavailable" python3 -c "
 import yaml
-entry = yaml.safe_load(open('fedora/mappings/packages.yaml'))['packages']['ath12k-board-fallback']
-assert entry.get('source') == 'unavailable', entry
+pkgs = yaml.safe_load(open('fedora/mappings/packages.yaml'))['packages']
+for name in ('ath12k-board-fallback', 'asus-proart-pz13-audio',
+             'microsoft-surface-laptop-8-support'):
+    entry = pkgs[name]
+    assert entry.get('source') == 'unavailable', entry
+    assert entry.get('package') is None, entry
+"
+
+echo "== Folio replaces Nautilus; Plain is the config editor (upstream migrations/1794330979.sh) =="
+# Upstream added folio (first-party file manager), plain (first-party editor for
+# config files) and xdg-user-dirs to omarchy-base.packages, and dropped
+# moonlight-qt, nautilus, nautilus-python and sushi.
+t "folio and plain are first-party and default-installed" python3 -c "
+import subprocess, yaml
+pkgs = yaml.safe_load(open('fedora/mappings/packages.yaml'))['packages']
+for name in ('folio', 'plain'):
+    entry = pkgs[name]
+    assert entry.get('source') == 'copr', entry
+    assert entry.get('repository') == 'whelanh/omarchy', entry
+    assert entry.get('rpm') == 'fedora/rpm/%s/%s.spec' % (name, name), entry
+resolved = subprocess.check_output(
+    ['python3', 'fedora/scripts/lib/resolve.py', '--copr', 'whelanh/omarchy'],
+    text=True).split()
+for name in ('folio', 'plain'):
+    assert name in resolved, name + ' must be in the default first-party set'
+manifest = yaml.safe_load(open('fedora/rpm/manifest.yaml'))['packages']
+for name in ('folio', 'plain'):
+    assert manifest[name]['status'] == 'verified', manifest[name]
+    assert manifest[name]['version'] == '0.2.0', manifest[name]
+"
+t "xdg-user-dirs mapped to Fedora and installed" python3 -c "
+import glob, yaml
+entry = yaml.safe_load(open('fedora/mappings/packages.yaml'))['packages']['xdg-user-dirs']
+assert entry.get('source') == 'fedora' and entry.get('package') == 'xdg-user-dirs', entry
+lists = [l.split('#')[0].strip() for p in glob.glob('fedora/packages/*.txt') for l in open(p)]
+assert 'xdg-user-dirs' in lists, 'xdg-user-dirs must be in an install manifest'
+"
+t "nautilus, nautilus-python and sushi retired, not installed" python3 -c "
+import glob
+retired = [l.split('#')[0].strip() for l in open('fedora/mappings/retired-packages.conf')]
+for p in ('nautilus', 'nautilus-python', 'sushi'):
+    assert p in retired, p + ' must be retired (upstream replaced it with folio)'
+lists = [l.split('#')[0].strip() for p in glob.glob('fedora/packages/*.txt') for l in open(p)]
+for p in ('nautilus', 'nautilus-python', 'sushi'):
+    assert p not in lists, p + ' must not be installed'
+"
+t "moonlight-qt stays an opt-in extra with a baseline row" python3 -c "
+import glob
+lists = [l.split('#')[0].strip() for p in glob.glob('fedora/packages/*.txt') for l in open(p)]
+assert 'moonlight-qt' in lists, 'moonlight-qt stays in optional.txt'
+baseline = [l.split('#')[0].strip() for l in open('fedora/mappings/package-audit-baseline.conf')]
+assert 'moonlight-qt' in baseline, 'stale mapping needs a baseline row'
+"
+t "folio-replaces-nautilus migration rewrites per-user state as the user" python3 -c "
+import glob
+migs = glob.glob('fedora/migrations/*-folio-replaces-nautilus.sh')
+assert len(migs) == 1, migs
+mig = open(migs[0]).read()
+assert 'folio.desktop' in mig, 'must repoint Nautilus mime associations at folio'
+assert 'org\\.gnome\\.Nautilus' in mig, 'must rewrite personal mimeapps + dock pins'
+assert 'runuser' in mig, 'must rewrite files as the user, never as root'
+assert 'nautilus-python' in mig and 'sushi' in mig, 'must prune the Nautilus family'
+"
+t "folio and plain specs are Qt6 qmake builds that ship the desktop bits" python3 -c "
+for name in ('folio', 'plain'):
+    spec = open('fedora/rpm/%s/%s.spec' % (name, name)).read()
+    assert './bin/build' in spec, name + ' must use the upstream qmake6 build'
+    assert 'qt6-qtdeclarative-devel' in spec, name + ' needs Qt Quick headers'
+    assert 'pkgbuild/%s.svg' % name in spec, name + ' must ship its icon'
+    assert 'pkgbuild/%s.desktop' % name in spec, name + ' must ship its desktop entry'
+assert 'glib2-devel' in open('fedora/rpm/folio/folio.spec').read(), 'folio links gio'
 "
 
 echo "== Installer SELinux + update-window hygiene =="

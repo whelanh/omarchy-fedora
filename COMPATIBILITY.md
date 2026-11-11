@@ -23,13 +23,13 @@ human-readable summary. Classifications:
 for each classification. Static tests verify every upstream base package is
 mapped.
 
-## Summary counts (from packages.yaml, 234 entries)
+## Summary counts (from packages.yaml, 237 entries)
 
 | Classification | ~Count |
 |---|---|
 | fedora (official) | ~120 |
 | substitute | ~30 |
-| copr | ~11 + 26 first-party |
+| copr | ~11 + 28 first-party |
 | external (mise) | 1 |
 | unavailable | ~19 |
 | drop (Arch-only) | ~8 |
@@ -72,15 +72,15 @@ gpgcheck=1) enabled by the installer via `dnf config-manager --add-repo`. See
 `fedora/mappings/repositories.yaml` (entry `mise`).
 
 ### First-party Omarchy binaries (FIRST_PARTY, COPR `whelanh/omarchy`)
-26 Omarchy packages (`aether`, `cliamp`, `disktree-bin`, `gliff`,
+28 Omarchy packages (`aether`, `cliamp`, `disktree-bin`, `folio`, `gliff`,
 `herdr`, `hype`, `hyprland-preview-share-picker`, `monologue`, `omacalc`,
 `omacut`, `omapresent`, `omarchy-emacs`, `omarchy-hyprland-titlebars`,
 `omarchy-local-ai`, `omarchy-screensaver`, `omawrite`, `omasnap`,
-`openai-codex-desktop`, `owe`, `owe-lockfeed`, `qtengine`, `signed`,
+`openai-codex-desktop`, `owe`, `owe-lockfeed`, `plain`, `qtengine`, `signed`,
 `superwhisper-bin`, `tobi-try → try`, `ttfx`, `voxtype-bin`) are
 source-built or repacked as Fedora RPMs. Specs live in `fedora/rpm/` (one SPEC
 per package) with a `manifest.yaml` (repo, build system, license, status) and
-publish tooling in `fedora/rpm/copr/`. 23 of them are installed by the default
+publish tooling in `fedora/rpm/copr/`. 25 of them are installed by the default
 first-party set; `omarchy-emacs`, `openai-codex-desktop` and `voxtype-bin` are
 published for on-demand install from Omarchy's Install menu. Three former
 packages are now **retired**: `elsewhen` (`status: retired`; upstream moved it
@@ -99,16 +99,17 @@ default agents) are **not** RPMs — upstream installs them through mise at user
 setup (`install/user/mise.sh` → `omarchy-mise-install`), and the Fedora layer
 does the same (`fedora/scripts/lib/mise.sh`).
 
-**Status — 26 verified, 1 retired, 0 blocked.** Every verified package builds
+**Status — 28 verified, 1 retired, 0 blocked.** Every verified package builds
 cleanly in a Fedora Rawhide container and is published from the
 `whelanh/omarchy` COPR. The default installer enables that COPR and installs
-the 23-package default set (disable with `install.sh --no-firstparty`); the
+the 25-package default set (disable with `install.sh --no-firstparty`); the
 three on-demand packages are installed from Omarchy's Install menu.
 
 | Package | Version | Notes |
 |---------|---------|-------|
 | aether | v4.30.0 | Go/Wails, repacked release binary |
 | cliamp  | v2.2.0 | Go/CGO, repacked release binary |
+| folio   | v0.2.0 | Qt6/qmake6 file manager (Files); replaces Nautilus |
 | herdr   | v0.9.1 | Rust, repacked release binary (herdrdev/herdr) |
 | hype    | v0.4.3 | Qt6/qmake6 Markdown presentation editor |
 | hyprland-preview-share-picker | v0.2.1 | Rust/GTK4, source-built |
@@ -119,6 +120,7 @@ three on-demand packages are installed from Omarchy's Install menu.
 | omasnap | v1.21.0 | repacked Arch release (supersedes tensaku) |
 | owe     | v0.2.7 | meson/C wallpaper engine (mpv + ffmpeg-free) |
 | owe-lockfeed | v0.2.7 | Qt6 QML lock-screen feed module |
+| plain   | v0.2.0 | Qt6/qmake6 text editor for config files |
 | qtengine | v0.2.4 | Qt6 platform theme (replaces `gtk3`); AUR-only, first-party |
 | try (tobi-try) | v1.10.1 | Ruby gem |
 | ttfx    | v0.3.3 | pure Rust/cargo |
@@ -143,8 +145,8 @@ session — no package manager. The installer wires them onto PATH by symlinking
 Caveats:
 - `omarchy plugin enable/disable` talk to the running shell via
   `omarchy-shell shell enablePlugin`, so Quickshell must be running.
-- The 26 first-party binary packages are built and published from the
-  `whelanh/omarchy` COPR; the default installer installs the 23-package default
+- The 28 first-party binary packages are built and published from the
+  `whelanh/omarchy` COPR; the default installer installs the 25-package default
   set (`--no-firstparty` to skip) and `omarchy-emacs`, `openai-codex-desktop`
   and `voxtype-bin` install on demand from the menu. All are `verified` in
   `fedora/rpm/manifest.yaml`.

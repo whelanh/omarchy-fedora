@@ -99,6 +99,10 @@ wl-clipboard
 wtype
 xdg-desktop-portal-gtk
 xdg-terminal-exec
+# omarchy-provision-user calls xdg-user-dirs-update to point TEMPLATES, DESKTOP
+# and PUBLICSHARE at $HOME; already a default Fedora package, listed for parity
+# with upstream omarchy-base.packages.
+xdg-user-dirs
 # xsetroot (Arch: xorg-xsetroot) is no longer installed: upstream dropped it
 # together with default/hypr/startup-cursor.lua, the only caller. That script
 # started Hyprland with a blank cursor theme and then reset the X root cursor,

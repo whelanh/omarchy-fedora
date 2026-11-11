@@ -69,6 +69,20 @@ packages:
     status: verified
     version: 0.4.2
     note: Hyprland remote desktop over SSH (GPU H.264 4:4:4); Rust workspace with gliff + gliff-server + gliff-probe. Crates vendored via fedora/rpm/vendor-rust.sh; cargo build --offline --locked. Container-built OK.
+  folio:
+    repo: https://github.com/omacom/folio
+    language: cpp
+    build: qmake6
+    binary: folio
+    license: MIT
+    deps: [glib2, zlib, qt6-qtbase, qt6-qtdeclarative, qt6-qtwayland, hicolor-icon-theme, xdg-utils]
+    status: verified
+    version: 0.2.0
+    note: >
+      Files: Omarchy's file manager and the inode/directory handler, replacing
+      Nautilus (upstream migration 1794330979.sh). Qt6/qmake6 via ./bin/build
+      (QML compiled into the binary); previews, gvfs and sharing stay optional
+      Recommends, matching upstream's optdepends. Container-built OK.
   herdr:
     repo: https://github.com/herdrdev/herdr
     language: rust
@@ -242,6 +256,20 @@ packages:
     status: verified
     version: 0.2.15
     note: Qt6 QML module Owe.LockFeed from the same omacom/owe tag archive as `owe`; this is the package Omarchy splits out of the AUR owe build. Container-built OK.
+  plain:
+    repo: https://github.com/omacom/plain
+    language: cpp
+    build: qmake6
+    binary: plain
+    license: MIT
+    deps: [qt6-qtbase, qt6-qtdeclarative, qt6-qtwayland, hicolor-icon-theme, xdg-desktop-portal]
+    status: verified
+    version: 0.2.0
+    note: >
+      Omarchy's text editor for config files, the handler for text/plain and the
+      "plain" editor choice (bin/omarchy-default-editor). Qt6/qmake6 via
+      ./bin/build, QML compiled in, file picker through xdg-desktop-portal.
+      Container-built OK.
   qtengine:
     repo: https://github.com/kossLAN/qtengine
     language: cpp

@@ -26,9 +26,6 @@ qt6-qtsvg
 qt6-qtwayland
 qt6-qtimageformats
 qt6-qtmultimedia
-# Qt platform theme Omarchy selects with QT_QPA_PLATFORMTHEME=qtengine; follows
-# the theme's rendered qtengine.colors. First-party RPM (see fedora/rpm/qtengine).
-qtengine
 gpu-screen-recorder
 
 # IME

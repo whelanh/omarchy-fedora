@@ -4,11 +4,12 @@
 # evince, kdenlive, obs-studio and xournalpp are retired upstream; they live in
 # fedora/mappings/retired-packages.conf instead, so they are never installed and
 # existing installs prune them. papers replaces evince as the document viewer
-# (upstream migrations/1794165002.sh).
+# (upstream migrations/1794165002.sh), and folio (first-party RPM) replaces
+# nautilus + sushi as the file manager (upstream migrations/1794330979.sh).
+# folio and plain are `source: copr` in packages.yaml, so they are installed by
+# omarchy_fedora_install_firstparty (resolve.py --copr whelanh/omarchy) rather
+# than listed here.
 
 gnome-disk-utility
 libreoffice-core
-nautilus
-nautilus-python
 papers
-sushi

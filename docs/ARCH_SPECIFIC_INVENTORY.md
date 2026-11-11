@@ -150,11 +150,11 @@ Categories:
 - **FLATPAK**: obsidian, localsend (some have native/Deb too), etc.
 - **FIRST_PARTY (COPR `whelanh/omarchy`)**: Omarchy's own binaries/plugins,
   rebuilt or repacked as RPMs from `fedora/rpm/` — aether, cliamp, disktree-bin,
-  gliff, herdr, hype, hyprland-preview-share-picker, monologue,
+  folio, gliff, herdr, hype, hyprland-preview-share-picker, monologue,
   omacalc, omacut, omapresent, omarchy-emacs, omarchy-hyprland-titlebars,
   omarchy-local-ai, omarchy-screensaver, omawrite, omasnap,
-  openai-codex-desktop, owe, owe-lockfeed, qtengine, signed, superwhisper-bin,
-  tobi-try (RPM `try`), ttfx, voxtype-bin.
+  openai-codex-desktop, owe, owe-lockfeed, plain, qtengine, signed,
+  superwhisper-bin, tobi-try (RPM `try`), ttfx, voxtype-bin.
   (`elsewhen` is retired — upstream moved it in-tree as `omarchy.elsewhen`;
   `openai-codex-bin` is retired — upstream installs the Codex CLI via mise;
   `tensaku` is retired — upstream replaced it with `omasnap`.)

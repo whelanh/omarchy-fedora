@@ -1,16 +1,16 @@
 # whelanh/omarchy COPR publishing
 
-This directory holds the tooling that publishes the 26 first-party Omarchy
+This directory holds the tooling that publishes the 28 first-party Omarchy
 RPMs (specs in `fedora/rpm/<pkg>/`) to the **`whelanh/omarchy`** COPR, so a
 stock Fedora install gets them with a plain `dnf install` — no local builds.
 
-## The 26 packages
+## The 28 packages
 
-aether, cliamp, disktree-bin, gliff, herdr, hype,
+aether, cliamp, disktree-bin, folio, gliff, herdr, hype,
 hyprland-preview-share-picker, monologue, omacalc, omacut, omapresent,
 omarchy-emacs, omarchy-hyprland-titlebars, omarchy-local-ai,
 omarchy-screensaver, omawrite, omasnap, openai-codex-desktop, owe,
-owe-lockfeed, qtengine, signed, superwhisper-bin, try (tobi-try), ttfx,
+owe-lockfeed, plain, qtengine, signed, superwhisper-bin, try (tobi-try), ttfx,
 voxtype-bin. All are `status: verified` in
 `fedora/rpm/manifest.yaml` and built green end-to-end on `fedora:rawhide`
 via `fedora/rpm/build-rpm-in-ci.sh`. (`elsewhen` and `openai-codex-bin` are

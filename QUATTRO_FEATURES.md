@@ -9,7 +9,7 @@ out of scope.
 |---|---|---|---|---|
 | Hyprland | yes | yes | PASS | installed (official Rawhide); needs session/driver validation in VM |
 | Quickshell | yes | yes | PASS | installed (COPR/rawhide); shell integration pending |
-| Omarchy CLI | yes | yes | PASS | first-party binaries/plugins packaged in the `whelanh/omarchy` COPR (26 verified; elsewhen retired in-tree, openai-codex-bin retired to mise, tensaku replaced by omasnap) |
+| Omarchy CLI | yes | yes | PASS | first-party binaries/plugins packaged in the `whelanh/omarchy` COPR (28 verified; elsewhen retired in-tree, openai-codex-bin retired to mise, tensaku replaced by omasnap) |
 | Themes | yes | yes | PASS | config tree copied |
 | Web apps | yes | yes | PASS | |
 | Notifications | yes |yes | PASS | |
@@ -19,7 +19,7 @@ out of scope.
 | System updates | yes | yes | PASS | omarchy update |
 | Snapshots | yes | yes  | PASS | pre & postsnapper present; grub-btrfs enabled |
 | Session (SDDM/Wayland) | yes | yes | PASS | |
-| File manager | yes | yes | PASS | nautilus installed |
+| File manager | yes | yes | PASS | folio (first-party RPM) installed; nautilus retired |
 | Terminal | yes | yes | PASS | foot installed |
 | Launcher/menu | yes | yes | PASS | |
 
