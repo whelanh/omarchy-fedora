@@ -459,10 +459,36 @@ t "hardware-gated AUR packages mapped unavailable" python3 -c "
 import yaml
 pkgs = yaml.safe_load(open('fedora/mappings/packages.yaml'))['packages']
 for name in ('ath12k-board-fallback', 'asus-proart-pz13-audio',
-             'microsoft-surface-laptop-8-support'):
+             'acer-aspire-16-ai-audio', 'microsoft-surface-laptop-8-support'):
     entry = pkgs[name]
     assert entry.get('source') == 'unavailable', entry
     assert entry.get('package') is None, entry
+"
+
+t "cmake mapped to Fedora and installed (omarchy-app builds with CMake)" python3 -c "
+import glob, yaml
+entry = yaml.safe_load(open('fedora/mappings/packages.yaml'))['packages']['cmake']
+assert entry.get('source') == 'fedora' and entry.get('package') == 'cmake', entry
+lists = [l.split('#')[0].strip() for p in glob.glob('fedora/packages/*.txt') for l in open(p)]
+assert 'cmake' in lists, 'cmake must be in an install manifest'
+"
+t "google-chrome substitutes Fedora chromium; real Chrome stays an Install row" python3 -c "
+import glob, yaml
+entry = yaml.safe_load(open('fedora/mappings/packages.yaml'))['packages']['google-chrome']
+assert entry.get('source') == 'substitute', entry
+assert entry.get('package') == 'chromium', entry
+lists = [l.split('#')[0].strip() for p in glob.glob('fedora/packages/*.txt') for l in open(p)]
+assert 'chromium' in lists, 'chromium is the browser for the google-chrome role'
+# the on-demand path must stay: Google only ships Chrome from its own RPM
+menu = open('fedora/mappings/menu-packages.conf').read()
+assert 'google-chrome|rpm|google-chrome-stable' in menu, 'Install row for real Chrome required'
+"
+t "yaru-icon-theme retired with upstream's switch to Adwaita" python3 -c "
+import glob
+retired = [l.split('#')[0].strip() for l in open('fedora/mappings/retired-packages.conf')]
+assert 'yaru-icon-theme' in retired, 'upstream dropped Yaru (ccff66882); must not be installed'
+lists = [l.split('#')[0].strip() for p in glob.glob('fedora/packages/*.txt') for l in open(p)]
+assert 'yaru-icon-theme' not in lists, 'yaru-icon-theme must not be installed any more'
 "
 
 echo "== Folio replaces Nautilus; Plain is the config editor (upstream migrations/1794330979.sh) =="
@@ -809,7 +835,9 @@ def safe(name):
 icons = {safe(os.path.splitext(os.path.basename(p))[0])
          for p in glob.glob('upstream/applications/icons/*')}
 # foot and mpv are real programs whose icons come from their own packages.
-system = {'foot', 'mpv'}
+# text-editor is a themed icon name (Adwaita/Yaru legacy), used by
+# omarchy-launch-editor.desktop, not an Omarchy asset.
+system = {'foot', 'mpv', 'text-editor'}
 wanted = set()
 for d in glob.glob('upstream/applications/*.desktop'):
     m = re.search(r'^Icon=(.+)\$', open(d).read(), re.M)

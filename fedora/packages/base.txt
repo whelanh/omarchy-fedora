@@ -13,7 +13,14 @@ bluez-tools
 bolt
 brightnessctl
 btop
+# Chromium stands in for google-chrome: Fedora does not package Google Chrome
+# (proprietary, Google's own RPM repo only), and upstream made Chrome the
+# default browser for new installs in b10da7e59. Real Chrome stays installable
+# from the Omarchy Install menu. See fedora/mappings/packages.yaml.
 chromium
+# The omarchy-app agent skill builds with CMake now, not qmake6, so upstream
+# added cmake to omarchy-base.packages (migrations/1794396478.sh).
+cmake
 curl
 cups
 cups-filters
@@ -125,7 +132,6 @@ google-noto-color-emoji-fonts
 google-noto-sans-cjk-fonts
 google-noto-sans-fonts
 jetbrains-mono-fonts
-yaru-icon-theme
 
 # development
 lua

@@ -23,18 +23,18 @@ human-readable summary. Classifications:
 for each classification. Static tests verify every upstream base package is
 mapped.
 
-## Summary counts (from packages.yaml, 237 entries)
+## Summary counts (from packages.yaml, 249 entries)
 
-| Classification | ~Count |
+| Classification | Count |
 |---|---|
-| fedora (official) | ~120 |
-| substitute | ~30 |
-| copr | ~11 + 28 first-party |
+| fedora (official) | 123 |
+| substitute | 38 |
+| copr | 15 + 26 first-party |
 | external (mise) | 1 |
-| unavailable | ~19 |
-| drop (Arch-only) | ~8 |
-| rpmfusion | ~8 |
-| flatpak | 1 |
+| unavailable | 23 |
+| drop (Arch-only) | 14 |
+| rpmfusion | 7 |
+| flatpak | 2 |
 
 ## Notable decisions (not mechanical renames)
 
@@ -70,6 +70,38 @@ both drive everything through `mise use -g`, so it must be present. It ships
 from the upstream mise RPM repo (`https://mise.jdx.dev/rpm/mise.repo`, signed,
 gpgcheck=1) enabled by the installer via `dnf config-manager --add-repo`. See
 `fedora/mappings/repositories.yaml` (entry `mise`).
+
+### Default browser: Chromium instead of Google Chrome
+Upstream made Google Chrome the default browser for new installs in
+`b10da7e59` (Nov 2026): `google-chrome` replaced `chromium` in
+`omarchy-base.packages`, and link handling, the dock, the web-app fallback and
+`omarchy-provision-user`'s `xdg-settings set default-web-browser` all name
+Chrome; Chromium became an optional browser in Install/Remove.
+
+Fedora cannot follow that mechanically: Google Chrome is proprietary and
+distributed only from Google's own RPM repository
+(`https://dl.google.com/linux/chrome/rpm/stable/x86_64`, no official `.repo`
+file — the definition is vendored as a baseurl). Enabling a proprietary
+third-party repo for every install is a policy change this port has so far not
+made for defaults (`rpmfusion` is opt-in via `--nvidia`). So:
+
+- `google-chrome` maps `source: substitute` to Fedora's `chromium`, which
+  `fedora/packages/base.txt` installs and which is the browser XDG resolves for
+  `x-scheme-handler/http(s)` on an install without Chrome;
+- the existing `chromium.desktop` / `chromium` compat shim in
+  `fedora/scripts/install.sh` keeps Omarchy's `chromium.desktop`-based code
+  paths working;
+- real Chrome remains one click away: the Install menu
+  (`fedora/mappings/menu-packages.conf`, row `google-chrome`) installs
+  `google-chrome-stable` from Google's signed direct RPM, and a user who
+  installs it gets Chrome as their browser (existing installs keep their
+  browser upstream too).
+
+If full parity is wanted later, the change is: add Google's repo to
+`fedora/mappings/repositories.yaml` as `kind: external-repo` (needs a baseurl
+definition, as Google ships no `.repo`), swap `chromium` for
+`google-chrome-stable` in `base.txt`, and add a `google-chrome.desktop` stub
+only for machines without Chrome.
 
 ### First-party Omarchy binaries (FIRST_PARTY, COPR `whelanh/omarchy`)
 28 Omarchy packages (`aether`, `cliamp`, `disktree-bin`, `folio`, `gliff`,

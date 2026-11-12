@@ -202,6 +202,7 @@ packages:
   btop:                  { package: btop, source: fedora }
   chromium:              { package: chromium, source: fedora }
   clang:                 { package: clang, source: fedora }
+  cmake:                 { package: cmake, source: fedora, note: upstream added it to omarchy-base.packages because omarchy-app now builds with CMake (upstream/migrations/1794396478.sh) }
   cups:                  { package: cups, source: fedora }
   cups-filters:          { package: cups-filters, source: fedora }
   cups-pk-helper:        { package: cups-pk-helper, source: fedora }
@@ -244,6 +245,19 @@ packages:
   gnome-disk-utility:    { package: gnome-disk-utility, source: fedora }
   gnome-keyring:         { package: gnome-keyring, source: fedora }
   gnome-themes-extra:    { package: null, source: drop, note: retired on Fedora; modern GTK ships its own themes }
+  google-chrome:
+    package: chromium
+    source: substitute
+    note: >
+      Fedora does not package Google Chrome: it is proprietary and only
+      distributed from Google's own RPM repository. The port keeps Fedora's
+      chromium (in omarchy-base.packages) as the browser for this role, with
+      the chromium.desktop compat shim in fedora/scripts/install.sh. Real
+      Chrome stays available from the Install menu, where
+      fedora/mappings/menu-packages.conf installs google-chrome-stable from
+      Google's signed direct RPM. Upstream made Chrome its default browser for
+      new installs in b10da7e59 (chromium became optional); see
+      COMPATIBILITY.md for the deliberate divergence.
   grim:                  { package: grim, source: fedora }
   gum:                   { package: gum, source: fedora }
   gvfs-mtp:              { package: gvfs-mtp, source: fedora }
@@ -427,6 +441,7 @@ packages:
       fix for X11/XWayland apps that lose the cursor: xsetroot -cursor_name
       left_ptr.
   xournalpp:             { package: xournalpp, source: fedora }
+  yaru-icon-theme:       { package: yaru-icon-theme, source: fedora, note: RETIRED — upstream dropped Yaru for stock Adwaita (upstream commit ccff66882); not installed, pruned by fedora/mappings/retired-packages.conf }
   yt-dlp:                { package: yt-dlp, source: fedora }
   zbar:                  { package: zbar, source: fedora }
   zoxide:                { package: zoxide, source: fedora }
@@ -452,7 +467,6 @@ packages:
     package: fontawesome-fonts-web
     source: substitute
     note: Font Awesome is FA6 on Fedora 44 and FA7 on F45+; fontawesome-fonts-web ships the woff2 files on every supported release
-  yaru-icon-theme:       { package: yaru-icon-theme, source: fedora }
 
   # --- libvips / postgresql-libs name differences ---
   libvips:
@@ -688,6 +702,14 @@ packages:
   dell-xps13-sidecar-amps: { package: null, source: unavailable, note: Dell XPS13 specific }
   apple-bcm-firmware:    { package: null, source: unavailable, note: Apple T2 hardware }
   apple-t2-audio-config: { package: null, source: unavailable, note: Apple T2 hardware }
+  acer-aspire-16-ai-audio:
+    package: null
+    source: unavailable
+    note: >
+      AUR-only audio topology for the Acer Aspire 16 AI (Snapdragon X, Aspire
+      A16-11M) speakers. Hardware-gated to an ARM Qualcomm laptop
+      (upstream/migrations/1794432305.sh), which this x86_64-only port does not
+      support.
   asus-proart-pz13-audio:
     package: null
     source: unavailable
