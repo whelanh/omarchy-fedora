@@ -519,6 +519,10 @@ assert 'folio.desktop' in mig, 'must repoint Nautilus mime associations at folio
 assert 'org\\.gnome\\.Nautilus' in mig, 'must rewrite personal mimeapps + dock pins'
 assert 'runuser' in mig, 'must rewrite files as the user, never as root'
 assert 'nautilus-python' in mig and 'sushi' in mig, 'must prune the Nautilus family'
+# update.sh writes the one-shot marker only on exit 0, so bailing out must fail:
+# otherwise a machine that updates before the folio RPM is available records the
+# migration as done and never rewrites its mimeapps.
+assert 'exit 1' in mig, 'must fail (no marker) when folio is missing, so it retries'
 "
 t "folio and plain specs are Qt6 qmake builds that ship the desktop bits" python3 -c "
 for name in ('folio', 'plain'):

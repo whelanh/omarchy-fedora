@@ -15,9 +15,15 @@
 # the packaged defaults.
 set -euo pipefail
 
+# Bail out *unsuccessfully* if folio is missing: update.sh records a marker only
+# on exit 0, and repointing a user's association at a desktop file that is not
+# installed would leave them with no file manager. A non-zero exit leaves no
+# marker, so the next `omarchy update` retries once the COPR RPM has published.
+# (This window is real: retired-packages.conf prunes nautilus on the same
+# update, whether or not the first-party install succeeded.)
 if ! rpm -q folio >/dev/null 2>&1; then
-  echo "folio-replaces-nautilus: folio not installed yet; nothing to configure" >&2
-  exit 0
+  echo "folio-replaces-nautilus: folio is not installed; retrying on the next update" >&2
+  exit 1
 fi
 
 # Dependency-aware removal, like omarchy_fedora_prune_retired. Honor the
