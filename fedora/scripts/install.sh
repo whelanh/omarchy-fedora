@@ -1363,6 +1363,25 @@ configure_user() {
     warn "no config tree at $cfg_src; user configs not seeded"
   fi
 
+  # Compose Omarchy's launcher wrappers in ~/.local/share/applications, which is
+  # what upstream's omarchy-provision-user does (omarchy-refresh-applications).
+  # The port never ran it, so Omarchy's own launchers - omarchy-browser,
+  # omarchy-terminal, omarchy-launch-editor, imv/mpv - were only present on
+  # machines converted from an Arch install. They matter: the default dock pins
+  # omarchy-browser and omarchy-terminal, and the menu's "install" rows launch
+  # through them. Only missing launchers are copied, so a launcher the user
+  # removed (or edited) is not resurrected or overwritten on every update.
+  if [ "$COPY_OMARCHY" = 1 ] && [ -d /usr/share/omarchy/applications ]; then
+    local launcher
+    $as_user mkdir -p "$home/.local/share/applications"
+    for launcher in /usr/share/omarchy/applications/*.desktop; do
+      [ -f "$launcher" ] || continue
+      [ -e "$home/.local/share/applications/$(basename "$launcher")" ] && continue
+      $as_user cp "$launcher" "$home/.local/share/applications/"
+    done
+    $as_user update-desktop-database "$home/.local/share/applications" 2>/dev/null || true
+  fi
+
   # Make Files (folio) the directory handler. Upstream ships
   # default/applications/mimeapps.list with inode/directory=folio.desktop and
   # installs it to /usr/share/applications/mimeapps.list, but on Fedora that

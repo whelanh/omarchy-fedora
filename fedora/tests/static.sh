@@ -592,6 +592,78 @@ inst = open('fedora/scripts/install.sh').read()
 assert 'xdg-mime default folio.desktop inode/directory' in inst, \
     'fresh installs must get the association without waiting for the migration'
 "
+# Upstream 00147cf6d (#18667, 2026-11-12) changed the *default* dock pins without
+# a migration, so installs that copied the old list into ~/.config keep it. The
+# port's `cp -a -n` seeding freezes it at install time, which is why a machine
+# installed before that commit pins foot/X/YouTube and never hype/monologue.
+t "dock pins migration hands a legacy default back to upstream's defaults" python3 -c "
+import glob
+migs = glob.glob('fedora/migrations/*-dock-pins-follow-defaults.sh')
+assert len(migs) == 1, migs
+mig = open(migs[0]).read()
+assert 'dock-pins.py' in mig, 'must use the checked-in helper'
+assert 'runuser' in mig, 'the dock lives in \$HOME: never rewrite it as root'
+assert 'reloadConfig' in mig, 'a running shell should pick the change up'
+assert 'command -v python3' in mig, 'must degrade when python3 is missing'
+assert migs[0].split('/')[-1] > '1794412800', 'must run after the folio rewrite'
+"
+t "dock-pins.py only touches an exact legacy default" python3 -c "
+import json, os, subprocess, tempfile
+helper = 'fedora/scripts/lib/dock-pins.py'
+legacy = ['folio', 'foot', 'omacalc', 'omawrite', 'X', 'YouTube']
+current = ['folio', 'omarchy-browser', 'omarchy-terminal', 'omacalc', 'omawrite', 'hype', 'monologue', 'cliamp']
+with tempfile.TemporaryDirectory() as d:
+    def write(name, pins):
+        p = os.path.join(d, name + '.json')
+        dock = {'position': 'bottom'}
+        if pins is not None:
+            dock['pinned'] = pins
+        json.dump({'version': 1, 'dock': dock}, open(p, 'w'))
+        return p
+
+    def run(mode, path):
+        return subprocess.run(['python3', helper, mode, path],
+                              capture_output=True).returncode
+
+    # The exact pre-#18667 default is dropped to the packaged default, and the
+    # rest of the dock config survives.
+    p = write('legacy', legacy)
+    assert run('--check', p) == 0
+    assert run('--fix', p) == 0
+    dock = json.load(open(p))['dock']
+    assert 'pinned' not in dock, 'legacy default must fall back to the packaged pins'
+    assert dock['position'] == 'bottom', 'the rest of the dock config must survive'
+
+    # Anything the user chose - including the current default - is left alone.
+    for name, pins in (('current', current), ('custom', ['folio', 'foot']), ('none', None)):
+        p = write(name, pins)
+        assert run('--check', p) == 1, name
+        before = open(p).read()
+        assert run('--fix', p) == 1, name
+        assert open(p).read() == before, name + ' must not be rewritten'
+
+    # Reordered legacy pins are a user choice: the dock order is editable.
+    p = write('reordered', list(reversed(legacy)))
+    assert run('--check', p) == 1, 'a reordered dock must be left alone'
+"
+# The new default pins name Omarchy's own launcher wrappers, which live in
+# upstream/applications/ and are composed into ~/.local/share/applications by
+# upstream's omarchy-provision-user. The port never ran that, so on Fedora the
+# dock would pin launchers that do not exist (and the app grid loses them too).
+t "the default dock's launchers are composed on Fedora" python3 -c "
+import json, os
+pins = json.load(open('upstream/config/omarchy/shell.json'))['dock']['pinned']
+for id in ('omarchy-browser', 'omarchy-terminal'):
+    assert id in pins, 'default dock should pin ' + id
+    assert os.path.exists('upstream/applications/%s.desktop' % id), id + ' launcher'
+inst = open('fedora/scripts/install.sh').read()
+assert '/usr/share/omarchy/applications/*.desktop' in inst, \
+    'install.sh must compose the launchers into ~/.local/share/applications'
+assert 'update-desktop-database' in inst, 'and rebuild the desktop database'
+# Missing-only: an update must not resurrect a launcher the user removed.
+assert 'basename \"\$launcher\"' in inst and '&& continue' in inst, \
+    'only copy launchers that are absent'
+"
 t "retirements with a replacement wait for it (nautilus until folio)" python3 -c "
 import glob, subprocess
 conf = 'fedora/mappings/retired-replacements.conf'
