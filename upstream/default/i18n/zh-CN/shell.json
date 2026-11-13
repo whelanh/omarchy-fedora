@@ -84,6 +84,9 @@
   "agents.networkOffline": "离线",
   "agents.networkOnHost": "在 %1 上",
   "agents.networkPair": "与 %1 配对以使用",
+  "agents.networkPairFailed": "无法与 %1 配对",
+  "agents.networkPairOutputTip": "在终端中打开配对输出",
+  "agents.networkPairing": "正在与 %1 配对…",
   "agents.networkRunning": "运行中",
   "agents.networkShare": "在 tailnet 上共享",
   "agents.networkSharedUsers": {
@@ -546,6 +549,8 @@
   "tailscale.phrase7": "封锁端口",
   "tailscale.phrase8": "整理 tailnet",
   "tailscale.phrase9": "洗牌密钥",
+  "tailscale.renameConnection": "重命名连接",
+  "tailscale.renameFailed": "无法重命名 Tailscale 连接",
   "tailscale.searchMachines": "搜索设备  ( / )",
   "tailscale.searchRegions": "搜索地区",
   "tailscale.sendFiles": "发送文件",

@@ -87,6 +87,9 @@
   "agents.networkOffline": "Офлайн",
   "agents.networkOnHost": "На %1",
   "agents.networkPair": "Сдвои се с %1, за да го използваш",
+  "agents.networkPairFailed": "Сдвояването с %1 се провали",
+  "agents.networkPairOutputTip": "Отвори изхода от сдвояването в терминал",
+  "agents.networkPairing": "Сдвояване с %1…",
   "agents.networkRunning": "Работи",
   "agents.networkShare": "Сподели в tailnet-а си",
   "agents.networkSharedUsers": {
@@ -559,6 +562,8 @@
   "tailscale.phrase7": "Запечатваме портове",
   "tailscale.phrase8": "Подреждаме tailnet мрежи",
   "tailscale.phrase9": "Разбъркваме ключове",
+  "tailscale.renameConnection": "Преименувай връзка",
+  "tailscale.renameFailed": "Връзката на Tailscale не можа да се преименува",
   "tailscale.searchMachines": "Търси машини  ( / )",
   "tailscale.searchRegions": "Търси региони",
   "tailscale.sendFiles": "Изпрати файлове",

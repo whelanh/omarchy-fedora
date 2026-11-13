@@ -87,6 +87,9 @@
   "agents.networkOffline": "Offline",
   "agents.networkOnHost": "Op %1",
   "agents.networkPair": "Koppel met %1 om het te gebruiken",
+  "agents.networkPairFailed": "Kon niet koppelen met %1",
+  "agents.networkPairOutputTip": "Open de uitvoer van het koppelen in een terminal",
+  "agents.networkPairing": "Koppelen met %1…",
   "agents.networkRunning": "Draait",
   "agents.networkShare": "Delen op je tailnet",
   "agents.networkSharedUsers": {
@@ -559,6 +562,8 @@
   "tailscale.phrase7": "Poorten verzegelen",
   "tailscale.phrase8": "Tailnets sorteren",
   "tailscale.phrase9": "Sleutels husselen",
+  "tailscale.renameConnection": "Verbinding hernoemen",
+  "tailscale.renameFailed": "Kon Tailscale-verbinding niet hernoemen",
   "tailscale.searchMachines": "Machines zoeken  ( / )",
   "tailscale.searchRegions": "Regio's zoeken",
   "tailscale.sendFiles": "Bestanden verzenden",

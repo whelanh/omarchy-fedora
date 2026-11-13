@@ -87,6 +87,9 @@
   "agents.networkOffline": "Oflayn",
   "agents.networkOnHost": "%1 da",
   "agents.networkPair": "Foydalanish uchun %1 bilan juftlang",
+  "agents.networkPairFailed": "%1 bilan juftlashtirib boʻlmadi",
+  "agents.networkPairOutputTip": "Juftlashtirish chiqarganini terminalda oching",
+  "agents.networkPairing": "%1 bilan juftlashtirilmoqda…",
   "agents.networkRunning": "Ishlayapti",
   "agents.networkShare": "Tailnetingizda ulashish",
   "agents.networkSharedUsers": {
@@ -559,6 +562,8 @@
   "tailscale.phrase7": "Portlar muhrlanyapti",
   "tailscale.phrase8": "Tailnetlar saralanyapti",
   "tailscale.phrase9": "Kalitlar aralashtirilyapti",
+  "tailscale.renameConnection": "Ulanishni qayta nomlash",
+  "tailscale.renameFailed": "Tailscale ulanishini qayta nomlash amalga oshmadi",
   "tailscale.searchMachines": "Qurilmalarni qidirish  ( / )",
   "tailscale.searchRegions": "Mintaqalarni qidirish",
   "tailscale.sendFiles": "Fayllarni yuborish",

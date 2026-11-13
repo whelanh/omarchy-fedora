@@ -87,6 +87,9 @@
   "agents.networkOffline": "ऑफ़लाइन",
   "agents.networkOnHost": "%1 पर",
   "agents.networkPair": "उपयोग के लिए %1 से पेयर करें",
+  "agents.networkPairFailed": "%1 के साथ पेयर नहीं हो सका",
+  "agents.networkPairOutputTip": "पेयरिंग ने जो छापा है, उसे टर्मिनल में खोलें",
+  "agents.networkPairing": "%1 के साथ पेयर कर रहे हैं…",
   "agents.networkRunning": "चल रहा है",
   "agents.networkShare": "अपने tailnet पर साझा करें",
   "agents.networkSharedUsers": {
@@ -559,6 +562,8 @@
   "tailscale.phrase7": "पोर्ट सील करते",
   "tailscale.phrase8": "tailnet छांटते हुए",
   "tailscale.phrase9": "कुंजियां फेंटते हुए",
+  "tailscale.renameConnection": "कनेक्शन का नाम बदलें",
+  "tailscale.renameFailed": "Tailscale कनेक्शन का नाम नहीं बदला जा सका",
   "tailscale.searchMachines": "मशीनें खोजें  ( / )",
   "tailscale.searchRegions": "क्षेत्र खोजें",
   "tailscale.sendFiles": "फ़ाइलें भेजें",

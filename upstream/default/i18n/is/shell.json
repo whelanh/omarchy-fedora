@@ -87,6 +87,9 @@
   "agents.networkOffline": "Ótengt",
   "agents.networkOnHost": "Á %1",
   "agents.networkPair": "Paraðu við %1 til að nota það",
+  "agents.networkPairFailed": "Ekki tókst að parast við %1",
+  "agents.networkPairOutputTip": "Opnaðu það sem pörunin prentaði út í terminal",
+  "agents.networkPairing": "Parast við %1…",
   "agents.networkRunning": "Í gangi",
   "agents.networkShare": "Deila á tailnetinu þínu",
   "agents.networkSharedUsers": {
@@ -559,6 +562,8 @@
   "tailscale.phrase7": "Innsiglar gáttir",
   "tailscale.phrase8": "Raðar tailnetum",
   "tailscale.phrase9": "Stokkar lykla",
+  "tailscale.renameConnection": "Endurnefna tengingu",
+  "tailscale.renameFailed": "Ekki tókst að endurnefna Tailscale-tengingu",
   "tailscale.searchMachines": "Leita að vélum  ( / )",
   "tailscale.searchRegions": "Leita að svæðum",
   "tailscale.sendFiles": "Senda skrár",
