@@ -1,5 +1,5 @@
 # Omarchy Quattro - plain (text editor for config files)
-# Upstream: https://github.com/omacom/plain (Qt6/qmake6, MIT).
+# Upstream: https://github.com/omacom/plain (Qt6/CMake, MIT).
 #
 # Omarchy's default editor for config and text files: default/applications/
 # mimeapps.list points text/plain (and the config-ish types) at plain.desktop,
@@ -15,13 +15,14 @@
 
 Name:           plain
 Version:        0.3.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Omarchy's text editor for config files
 
 License:        MIT
 URL:            https://github.com/omacom/plain
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz
 
+BuildRequires:  cmake
 BuildRequires:  gcc-c++
 BuildRequires:  make
 BuildRequires:  qt6-qtbase-devel
@@ -59,6 +60,9 @@ install -Dm644 pkgbuild/plain.desktop \
 %{_datadir}/applications/plain.desktop
 
 %changelog
+* Fri Nov 13 2026 whelanh <brickhousedevelopers@gmail.com> - 0.3.3-2
+- Declare CMake explicitly (bin/build drives CMake, not qmake6)
+
 * Thu Nov 12 2026 whelanh <brickhousedevelopers@gmail.com> - 0.3.3-1
 - Automatic update to upstream v0.3.3
 

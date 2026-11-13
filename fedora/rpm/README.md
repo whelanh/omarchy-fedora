@@ -51,26 +51,26 @@ FEDORA=1 bash fedora/rpm/build-in-container.sh omasnap
 | cliamp | bjarneo/cliamp | prebuilt-repack | MIT | verified |
 | disktree-bin | tobi/disktree | prebuilt-repack | MIT | verified |
 | elsewhen | omacom/elsewhen | noarch-repack | MIT | retired |
-| folio | omacom/folio | Qt6 / qmake6 | MIT | verified |
+| folio | omacom/folio | Qt6 / CMake | MIT | verified |
 | gliff | omacom/gliff | cargo (vendored) | MIT AND BSD-2-Clause | verified |
 | herdr | herdrdev/herdr | prebuilt-repack | Apache-2.0 | verified |
-| hype | omacom/hype | Qt6 / qmake6 | MIT | verified |
+| hype | omacom/hype | Qt6 / CMake | MIT | verified |
 | hyprland-preview-share-picker | WhySoBad/… | cargo (stable Rust) | MIT | verified |
-| monologue | omacom/monologue | Qt6 / qmake6 | MIT | verified |
-| omacalc | omacom/omacalc | Qt6 / qmake6 | MIT | verified |
-| omacut | omacom/omacut | Qt6 / qmake6 | MIT | verified |
-| omawrite | omacom/omawrite | Qt6 / qmake6 | MIT | verified |
+| monologue | omacom/monologue | Qt6 / CMake | MIT | verified |
+| omacalc | omacom/omacalc | Qt6 / CMake | MIT | verified |
+| omacut | omacom/omacut | Qt6 / CMake | MIT | verified |
+| omawrite | omacom/omawrite | Qt6 / CMake | MIT | verified |
 | omapresent | jethrojones/omapresent | Qt6 / qmake6 + QtWebEngine | MIT AND LicenseRef-Omarchy | verified |
 | omarchy-emacs | scottjones/omarchy-emacs | noarch-repack | MIT | verified |
 | omarchy-hyprland-titlebars | omacom/omarchy-hyprland-titlebars | cmake (Hyprland plugin) | BSD-3-Clause AND MIT | verified |
 | omarchy-local-ai | omacom/omarchy-local-ai | noarch-repack (Python + TOML catalog) | MIT | verified |
 | omarchy-screensaver | omacom/omarchy-screensaver | cargo (vendored) | MIT | verified |
-| omasnap | tobi/omasnap | prebuilt-repack | MIT | verified |
+| omasnap | tobi/omasnap | cmake (Qt6, source) | MIT | verified |
 | openai-codex-desktop | chatgpt.com/codex | Debian .deb repack | LicenseRef-proprietary | verified |
-| signed | omacom/signed | Qt6 / qmake6 | MIT | verified |
+| signed | omacom/signed | Qt6 / CMake | MIT | verified |
 | owe | omacom/owe | meson (C) | MIT | verified |
 | owe-lockfeed | omacom/owe | cmake (Qt6 qml-plugin) | MIT | verified |
-| plain | omacom/plain | Qt6 / qmake6 | MIT | verified |
+| plain | omacom/plain | Qt6 / CMake | MIT | verified |
 | qtengine | kossLAN/qtengine | cmake (Qt6 only) | BSD-2-Clause | verified |
 | superwhisper-bin | superultrainc/… | vendor-repack (Minisign) | LicenseRef-proprietary AND MIT | verified |
 | tobi-try | tobi/try | Ruby gem | MIT | verified |
@@ -92,14 +92,16 @@ These are intentionally **not** RPMs here:
 
 ## Build notes (the repacks)
 
-- **aether / cliamp / disktree-bin / herdr / omasnap** — upstream ships a single
+- **aether / cliamp / disktree-bin / herdr** — upstream ships a single
   prebuilt release asset (`*-linux-amd64` / `*-linux-x86_64`, or a full tree),
   which is exactly what Omarchy's Arch PKGBUILDs install; the specs repackage the
   release asset plus the desktop/icon/license bits. `%global debug_package
   %{nil}` because the prebuilt ELF carries no DWARF. `herdr` uses
   `herdrdev/herdr` release assets (the `omacom-io/herdr` fork has tags but no
   release binaries); `disktree-bin` mirrors the AUR name and adds
-  `Provides: disktree`.
+  `Provides: disktree`. `omasnap` used to be a repack too, but its Arch binaries
+  link against Qt 6.12 (Fedora ships 6.11), so it builds from source with
+  `%cmake`.
 - **superwhisper-bin** — proprietary; repacks the vendor's portable x86_64
   Linux archive under `/opt/superwhisper`, but only after verifying its Minisign
   signature against the vendor key checked into `omacom/omarchy-pkgs`

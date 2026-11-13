@@ -602,14 +602,46 @@ d = open('fedora/scripts/lib/deps.sh').read()
 assert 'repoquery --available' in d, 'must ask the repos what actually exists'
 assert 'not published in whelanh/omarchy yet' in d, 'must warn instead of failing'
 "
-t "folio and plain specs are Qt6 qmake builds that ship the desktop bits" python3 -c "
+t "folio and plain specs are Qt6 CMake builds that ship the desktop bits" python3 -c "
 for name in ('folio', 'plain'):
     spec = open('fedora/rpm/%s/%s.spec' % (name, name)).read()
-    assert './bin/build' in spec, name + ' must use the upstream qmake6 build'
+    assert './bin/build' in spec, name + ' must use the upstream build script'
+    assert 'BuildRequires:  cmake' in spec, name + ' builds with CMake'
     assert 'qt6-qtdeclarative-devel' in spec, name + ' needs Qt Quick headers'
-    assert 'pkgbuild/%s.svg' % name in spec, name + ' must ship its icon'
-    assert 'pkgbuild/%s.desktop' % name in spec, name + ' must ship its desktop entry'
+    # upstream has shipped these under pkgbuild/ and, for folio 0.4.0, share/
+    dirs = [d for d in ('pkgbuild', 'share') if '%s/%s.svg' % (d, name) in spec]
+    assert len(dirs) == 1, name + ' must ship its icon from exactly one in-tree dir'
+    d = dirs[0]
+    assert '%s/%s.desktop' % (d, name) in spec, name + ' must ship its desktop entry'
 assert 'glib2-devel' in open('fedora/rpm/folio/folio.spec').read(), 'folio links gio'
+"
+
+t "omasnap packages the icon upstream installs" python3 -c "
+spec = open('fedora/rpm/omasnap/omasnap.spec').read()
+files = spec.split('%files', 1)[1].split('%changelog', 1)[0]
+# %cmake_install is opaque: upstream 1.26.2 started installing an SVG and the
+# container build failed on an unpackaged file. Keep the desktop bits in %files.
+assert '%{_datadir}/applications/omasnap.desktop' in files
+assert '%{_datadir}/icons/hicolor/scalable/apps/omasnap.svg' in files
+"
+t "first-party specs declare the build tool they invoke" python3 -c "
+import glob, os, yaml
+man = yaml.safe_load(open('fedora/rpm/manifest.yaml'))['packages']
+for spec in glob.glob('fedora/rpm/*/*.spec'):
+    s = open(spec).read()
+    if './bin/build' not in s:
+        continue
+    name = os.path.basename(os.path.dirname(spec))
+    # Upstream apps have mostly moved from qmake6 to CMake while keeping the
+    # same ./bin/build entry point, so BuildRequires must name the tool.
+    if man[name].get('build') == 'cmake':
+        assert 'BuildRequires:  cmake' in s, name + ' builds through CMake via ./bin/build'
+"
+t "folio installs upstream 0.4.0's share/ assets" python3 -c "
+s = open('fedora/rpm/folio/folio.spec').read()
+install = s.split('%install', 1)[1].split('%files', 1)[0]
+assert 'pkgbuild/' not in install, 'folio 0.4.0 moved its desktop entry and icon to share/'
+assert 'share/folio.svg' in install and 'share/folio.desktop' in install
 "
 
 echo "== Installer SELinux + update-window hygiene =="

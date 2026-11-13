@@ -1,19 +1,21 @@
 # Omarchy Quattro - monologue (theme-synced webcam recorder)
-# Upstream: https://github.com/omacom/monologue (C++/Qt6, qmake6)
-# Verified against upstream pkgbuild/PKGBUILD + bin/build (v0.3.0). Qt6
-# Multimedia (FFmpeg backend) for capture and libpulse for metering; the app
-# shells out to `ffmpeg`/`ffprobe` to finalize and probe takes.
+# Upstream: https://github.com/omacom/monologue (C++/Qt6, CMake)
+# Checked against upstream v0.4.0: bin/build drives CMake. Qt6 Multimedia
+# (FFmpeg backend) for capture, libpulse for metering, and libturbojpeg for the
+# editor's frame thumbnails (added upstream in v0.4.0); the app shells out to
+# `ffmpeg`/`ffprobe` to finalize and probe takes.
 %global debug_package %{nil}
 
 Name:           monologue
 Version:        0.4.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Simple, theme-synced webcam recorder for Omarchy
 
 License:        MIT
 URL:            https://github.com/omacom/monologue
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz
 
+BuildRequires:  cmake
 BuildRequires:  gcc-c++
 BuildRequires:  make
 BuildRequires:  pkgconf-pkg-config
@@ -21,6 +23,7 @@ BuildRequires:  qt6-qtbase-devel
 BuildRequires:  qt6-qtdeclarative-devel
 BuildRequires:  qt6-qtmultimedia-devel
 BuildRequires:  pulseaudio-libs-devel
+BuildRequires:  turbojpeg-devel
 
 Requires:       qt6-qtbase
 Requires:       qt6-qtdeclarative
@@ -54,6 +57,11 @@ install -Dm644 pkgbuild/monologue.desktop %{buildroot}%{_datadir}/applications/m
 %{_datadir}/applications/monologue.desktop
 
 %changelog
+* Fri Nov 13 2026 whelanh <brickhousedevelopers@gmail.com> - 0.4.0-2
+- Add upstream v0.4.0's libturbojpeg dependency (the editor's thumbnails
+  need it; the build failed without turbojpeg-devel)
+- Declare CMake, which bin/build now drives
+
 * Thu Nov 12 2026 whelanh <brickhousedevelopers@gmail.com> - 0.4.0-1
 - Automatic update to upstream v0.4.0
 

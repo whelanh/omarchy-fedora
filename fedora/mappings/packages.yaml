@@ -64,13 +64,13 @@ packages:
     source: copr
     repository: whelanh/omarchy
     rpm: fedora/rpm/folio/folio.spec
-    note: "Files: Omarchy's file manager, replacing Nautilus (upstream migration 1794330979.sh installs it and drops nautilus/nautilus-python/sushi); Qt6/qmake6."
+    note: "Files: Omarchy's file manager, replacing Nautilus (upstream migration 1794330979.sh installs it and drops nautilus/nautilus-python/sushi); Qt6/CMake."
   hype:
     package: hype
     source: copr
     repository: whelanh/omarchy
     rpm: fedora/rpm/hype/hype.spec
-    note: Markdown presentation editor with a visual slide editor; Qt6/qmake6, shells out to source-highlight + ffmpeg.
+    note: Markdown presentation editor with a visual slide editor; Qt6/CMake, shells out to source-highlight + ffmpeg.
   hyprland-preview-share-picker:
     package: hyprland-preview-share-picker
     source: copr
@@ -82,25 +82,25 @@ packages:
     source: copr
     repository: whelanh/omarchy
     rpm: fedora/rpm/monologue/monologue.spec
-    note: Theme-synced webcam recorder with a built-in trim/cut editor; Qt6/qmake6 + libpulse, shells out to ffmpeg/ffprobe.
+    note: Theme-synced webcam recorder with a built-in trim/cut editor; Qt6/CMake + libpulse, shells out to ffmpeg/ffprobe.
   omacalc:
     package: omacalc
     source: copr
     repository: whelanh/omarchy
     rpm: fedora/rpm/omacalc/omacalc.spec
-    note: Calculator; Qt6/qmake6.
+    note: Calculator; Qt6/CMake.
   omacut:
     package: omacut
     source: copr
     repository: whelanh/omarchy
     rpm: fedora/rpm/omacut/omacut.spec
-    note: Video length trimmer; Qt6/qmake6, needs qt6-multimedia + ffmpeg.
+    note: Video length trimmer; Qt6/CMake, needs qt6-multimedia + ffmpeg.
   omawrite:
     package: omawrite
     source: copr
     repository: whelanh/omarchy
     rpm: fedora/rpm/omawrite/omawrite.spec
-    note: Markdown editor; Qt6/qmake6 with quickcontrols2.
+    note: Markdown editor; Qt6/CMake with quickcontrols2.
   omapresent:
     package: omapresent
     source: copr
@@ -148,13 +148,13 @@ packages:
     source: copr
     repository: whelanh/omarchy
     rpm: fedora/rpm/plain/plain.spec
-    note: Omarchy's config/text file editor; the handler for text/plain and the "plain" editor choice (bin/omarchy-default-editor); Qt6/qmake6 + xdg-desktop-portal.
+    note: Omarchy's config/text file editor; the handler for text/plain and the "plain" editor choice (bin/omarchy-default-editor); Qt6/CMake + xdg-desktop-portal.
   signed:
     package: signed
     source: copr
     repository: whelanh/omarchy
     rpm: fedora/rpm/signed/signed.spec
-    note: Omarchy PDF signing app; Qt6/qmake6, XDG desktop portal + qpdf. Upstream lists it in omarchy-base.packages, so it is in the default first-party set.
+    note: Omarchy PDF signing app; Qt6/CMake, XDG desktop portal + qpdf. Upstream lists it in omarchy-base.packages, so it is in the default first-party set.
   superwhisper-bin:
     package: superwhisper-bin
     source: copr

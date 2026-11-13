@@ -1,5 +1,5 @@
 # Omarchy Quattro - omacalc (calculator)
-# Upstream: https://github.com/omacom/omacalc (Qt6/qmake6)
+# Upstream: https://github.com/omacom/omacalc (Qt6/CMake)
 # Verified against upstream bin/build + source tree (v0.3.1). Upstream ships the
 # desktop entry and icon in-tree under pkgbuild/.
 %global debug_package %{nil}
@@ -13,6 +13,7 @@ License:        MIT
 URL:            https://github.com/omacom/omacalc
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz
 
+BuildRequires:  cmake
 BuildRequires:  gcc-c++
 BuildRequires:  make
 BuildRequires:  qt6-qtbase-devel

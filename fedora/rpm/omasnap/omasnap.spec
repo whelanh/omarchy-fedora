@@ -18,6 +18,7 @@ Requires:       hyprland
 Requires:       layer-shell-qt
 Requires:       wl-clipboard
 Requires:       qt6-qtbase
+Requires:       hicolor-icon-theme
 Requires:       xdg-utils
 Recommends:     tesseract
 Suggests:       tesseract-langpack-eng
@@ -50,9 +51,14 @@ install -Dm644 LICENSE %{buildroot}%{_datadir}/licenses/omasnap/LICENSE
 %files
 %{_bindir}/omasnap
 %{_datadir}/applications/omasnap.desktop
+%{_datadir}/icons/hicolor/scalable/apps/omasnap.svg
 %{_datadir}/licenses/omasnap/
 
 %changelog
+* Fri Nov 13 2026 whelanh <brickhousedevelopers@gmail.com> - 1.26.2-2
+- Package the application icon upstream started installing (the build failed
+  with an unpackaged /usr/share/icons/hicolor/scalable/apps/omasnap.svg)
+
 * Thu Nov 12 2026 whelanh <brickhousedevelopers@gmail.com> - 1.26.2-1
 - Automatic update to upstream v1.26.2
 

@@ -1,5 +1,5 @@
 # Omarchy Quattro - hype (Markdown presentations with a visual slide editor)
-# Upstream: https://github.com/omacom/hype (C++/Qt6, qmake6)
+# Upstream: https://github.com/omacom/hype (C++/Qt6, CMake)
 # Verified against upstream pkgbuild/PKGBUILD + bin/build (v0.5.0). The app
 # shells out to `source-highlight` (code blocks) and `ffmpeg` (video/animated
 # media export), and links zlib + libwebp for image compression. v0.5.0 adds
@@ -15,6 +15,7 @@ License:        MIT
 URL:            https://github.com/omacom/hype
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz
 
+BuildRequires:  cmake
 BuildRequires:  gcc-c++
 BuildRequires:  make
 BuildRequires:  qt6-qtbase-devel

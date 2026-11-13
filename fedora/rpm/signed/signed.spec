@@ -1,5 +1,5 @@
 # Omarchy Quattro - signed (sign PDFs and fill them in)
-# Upstream: https://github.com/omacom/signed (Qt6/qmake6, MIT). Native Omarchy
+# Upstream: https://github.com/omacom/signed (Qt6/CMake, MIT). Native Omarchy
 # app: signs PDFs and stamps text/dates, exports via qpdf, file access through
 # the desktop portal.
 %global debug_package %{nil}
@@ -13,6 +13,7 @@ License:        MIT
 URL:            https://github.com/omacom/signed
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz
 
+BuildRequires:  cmake
 BuildRequires:  gcc-c++
 BuildRequires:  make
 BuildRequires:  qt6-qtbase-devel

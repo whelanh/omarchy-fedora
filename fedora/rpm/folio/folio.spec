@@ -6,21 +6,22 @@
 # 1794330979.sh installs folio and drops nautilus, nautilus-python and sushi.
 # Folio is not in Fedora or Arch, so the Fedora port packages it first-party.
 #
-# Checked against upstream v0.2.0 (bin/build + pkgbuild/PKGBUILD): qmake6 build,
-# QML compiled into the binary through src/resources.qrc, desktop entry and icon
-# shipped in-tree under pkgbuild/. The only linked libraries beyond Qt are
-# glib/gio (pkgconfig gio-2.0, gio-unix-2.0) and zlib.
+# Checked against upstream v0.4.0: bin/build drives CMake, QML is compiled into
+# the binary through src/resources.qrc, and the desktop entry and icon ship
+# in-tree under share/ (v0.2.0 had them under pkgbuild/). The only linked
+# libraries beyond Qt are glib/gio (pkgconfig gio-2.0, gio-unix-2.0) and zlib.
 %global debug_package %{nil}
 
 Name:           folio
 Version:        0.4.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Files: Omarchy's quiet, keyboard-first file manager
 
 License:        MIT
 URL:            https://github.com/omacom/folio
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz
 
+BuildRequires:  cmake
 BuildRequires:  gcc-c++
 BuildRequires:  make
 BuildRequires:  glib2-devel
@@ -59,9 +60,9 @@ theme. It handles inode/directory in Omarchy in place of Nautilus.
 
 %install
 install -Dm755 build/folio %{buildroot}%{_bindir}/folio
-install -Dm644 pkgbuild/folio.svg \
+install -Dm644 share/folio.svg \
     %{buildroot}%{_datadir}/icons/hicolor/scalable/apps/folio.svg
-install -Dm644 pkgbuild/folio.desktop \
+install -Dm644 share/folio.desktop \
     %{buildroot}%{_datadir}/applications/folio.desktop
 
 %files
@@ -71,6 +72,11 @@ install -Dm644 pkgbuild/folio.desktop \
 %{_datadir}/applications/folio.desktop
 
 %changelog
+* Fri Nov 13 2026 whelanh <brickhousedevelopers@gmail.com> - 0.4.0-2
+- Follow upstream's 0.4.0 layout: the desktop entry and icon moved from
+  pkgbuild/ to share/, and bin/build now drives CMake
+- Declare the CMake build requirement explicitly
+
 * Thu Nov 12 2026 whelanh <brickhousedevelopers@gmail.com> - 0.4.0-1
 - Automatic update to upstream v0.4.0
 

@@ -1,5 +1,5 @@
 # Omarchy Quattro - omacut (video length trimmer)
-# Upstream: https://github.com/omacom/omacut (Qt6/qmake6)
+# Upstream: https://github.com/omacom/omacut (Qt6/CMake)
 # Verified against upstream pkgbuild/PKGBUILD + bin/build (v0.4.0).
 %global debug_package %{nil}
 
@@ -12,6 +12,7 @@ License:        MIT
 URL:            https://github.com/omacom/omacut
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz
 
+BuildRequires:  cmake
 BuildRequires:  gcc-c++
 BuildRequires:  make
 BuildRequires:  qt6-qtbase-devel

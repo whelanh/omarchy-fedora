@@ -1,5 +1,5 @@
 # Omarchy Quattro - omawrite (markdown editor)
-# Upstream: https://github.com/omacom/omawrite (Qt6/qmake6)
+# Upstream: https://github.com/omacom/omawrite (Qt6/CMake)
 # Verified against upstream pkgbuild/PKGBUILD + bin/build (v0.5.0).
 %global debug_package %{nil}
 
@@ -12,6 +12,7 @@ License:        MIT
 URL:            https://github.com/omacom/omawrite
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz
 
+BuildRequires:  cmake
 BuildRequires:  gcc-c++
 BuildRequires:  make
 BuildRequires:  qt6-qtbase-devel

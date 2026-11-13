@@ -72,7 +72,7 @@ packages:
   folio:
     repo: https://github.com/omacom/folio
     language: cpp
-    build: qmake6
+    build: cmake
     binary: folio
     license: MIT
     deps: [glib2, zlib, qt6-qtbase, qt6-qtdeclarative, qt6-qtwayland, hicolor-icon-theme, xdg-utils]
@@ -80,7 +80,7 @@ packages:
     version: 0.4.0
     note: >
       Files: Omarchy's file manager and the inode/directory handler, replacing
-      Nautilus (upstream migration 1794330979.sh). Qt6/qmake6 via ./bin/build
+      Nautilus (upstream migration 1794330979.sh). Qt6/CMake via ./bin/build
       (QML compiled into the binary); previews, gvfs and sharing stay optional
       Recommends, matching upstream's optdepends. Container-built OK.
   herdr:
@@ -96,13 +96,13 @@ packages:
   hype:
     repo: https://github.com/omacom/hype
     language: cpp
-    build: qmake6
+    build: cmake
     binary: hype
     license: MIT
     deps: [qt6-qtbase, qt6-qtdeclarative, qt6-qtmultimedia, qt6-qtimageformats, qt6-qtsvg, libwebp, source-highlight, ffmpeg-free, xdg-desktop-portal]
     status: verified
     version: 0.7.1
-    note: Markdown presentation editor with a visual slide editor; Qt6/qmake6, shells out to source-highlight (code blocks) and ffmpeg (video/animated media export), links zlib + libwebp. Container-built OK.
+    note: Markdown presentation editor with a visual slide editor; Qt6/CMake, shells out to source-highlight (code blocks) and ffmpeg (video/animated media export), links zlib + libwebp. Container-built OK.
   hyprland-preview-share-picker:
     repo: https://github.com/WhySoBad/hyprland-preview-share-picker
     language: rust
@@ -116,27 +116,27 @@ packages:
   monologue:
     repo: https://github.com/omacom/monologue
     language: cpp
-    build: qmake6
+    build: cmake
     binary: monologue
     license: MIT
-    deps: [qt6-qtbase, qt6-qtdeclarative, qt6-qtmultimedia, pulseaudio-libs, ffmpeg-free, xdg-desktop-portal]
+    deps: [qt6-qtbase, qt6-qtdeclarative, qt6-qtmultimedia, pulseaudio-libs, turbojpeg, ffmpeg-free, xdg-desktop-portal]
     status: verified
     version: 0.4.0
-    note: Theme-synced webcam recorder with a built-in trim/cut editor; Qt6/qmake6 with libpulse for metering, shells out to ffmpeg/ffprobe. Container-built OK.
+    note: Theme-synced webcam recorder with a built-in trim/cut editor; Qt6/CMake with libpulse for metering and libturbojpeg for editor thumbnails (v0.4.0+), shells out to ffmpeg/ffprobe. Container-built OK.
   omacalc:
     repo: https://github.com/omacom/omacalc
     language: cpp
-    build: qmake6
+    build: cmake
     binary: omacalc
     license: MIT
     deps: [qt6-base, qt6-declarative, xdg-desktop-portal]
     status: verified
     version: 0.4.2
-    note: Built in Fedora Rawhide container; Qt6 qmake6 via ./bin/build; desktop entry + svg icon + OFL added.
+    note: Built in Fedora Rawhide container; Qt6 CMake via ./bin/build; desktop entry + svg icon + OFL added.
   omacut:
     repo: https://github.com/omacom/omacut
     language: cpp
-    build: qmake6
+    build: cmake
     binary: omacut
     license: MIT
     deps: [qt6-base, qt6-declarative, qt6-multimedia, ffmpeg, ffprobe]
@@ -199,17 +199,17 @@ packages:
   signed:
     repo: https://github.com/omacom/signed
     language: cpp
-    build: qmake6
+    build: cmake
     binary: signed
     license: MIT
     deps: [poppler-qt6, qpdf, qt6-qtbase, qt6-qtdeclarative, qt6-qtwayland, xdg-desktop-portal]
     status: verified
     version: 0.3.2
-    note: Omarchy PDF signing app; Qt6/qmake6, opens documents through the XDG desktop portal and exports the stamped PDF with qpdf. Upstream lists it in omarchy-base.packages, so it is in the default first-party set. Container-built OK.
+    note: Omarchy PDF signing app; Qt6/CMake, opens documents through the XDG desktop portal and exports the stamped PDF with qpdf. Upstream lists it in omarchy-base.packages, so it is in the default first-party set. Container-built OK.
   omawrite:
     repo: https://github.com/omacom/omawrite
     language: cpp
-    build: qmake6
+    build: cmake
     binary: omawrite
     license: MIT
     deps: [qt6-base, qt6-declarative, qt6-quickcontrols2, xdg-desktop-portal]
@@ -225,7 +225,7 @@ packages:
     deps: [hyprland, layer-shell-qt, wl-clipboard, qt6-qtbase, xdg-utils]
     status: verified
     version: 1.26.2
-    note: Repack of omasnap-1.21.0-archlinux-x86_64.tar.gz (mirrors AUR omasnap-bin); screenshot/annotation editor that supersedes tensaku. Container-built OK.
+    note: Built from upstream source (the Arch release binaries link against Qt 6.12, which Fedora does not ship); screenshot/annotation editor that supersedes tensaku. Ships its own SVG icon, packaged since 1.26.2-2. Container-built OK.
   openai-codex-desktop:
     repo: https://chatgpt.com/codex/
     language: binary
@@ -259,7 +259,7 @@ packages:
   plain:
     repo: https://github.com/omacom/plain
     language: cpp
-    build: qmake6
+    build: cmake
     binary: plain
     license: MIT
     deps: [qt6-qtbase, qt6-qtdeclarative, qt6-qtwayland, hicolor-icon-theme, xdg-desktop-portal]
@@ -267,7 +267,7 @@ packages:
     version: 0.3.3
     note: >
       Omarchy's text editor for config files, the handler for text/plain and the
-      "plain" editor choice (bin/omarchy-default-editor). Qt6/qmake6 via
+      "plain" editor choice (bin/omarchy-default-editor). Qt6/CMake via
       ./bin/build, QML compiled in, file picker through xdg-desktop-portal.
       Container-built OK.
   qtengine:
