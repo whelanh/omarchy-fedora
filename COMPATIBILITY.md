@@ -138,8 +138,11 @@ cleanly in a Fedora Rawhide container and is published from the
 the 25-package default set (disable with `install.sh --no-firstparty`); the
 three on-demand packages are installed from Omarchy's Install menu.
 
-`omarchy-folio` and `plain` are verified and queued for their first publication; while a
-first-party RPM is unpublished the port degrades instead of breaking:
+All 28 are now published: `omarchy-folio` (formerly `folio`, renamed because
+Fedora owns that name) and `plain` landed in the COPR. The machinery that kept
+installs working during the gap stays, because a future publish can lag a
+release; while a first-party RPM is unpublished the port degrades instead of
+breaking:
 
 - `omarchy_fedora_install_firstparty` asks the enabled repos what actually
   exists (`dnf repoquery --available`) and installs the rest, warning about the
