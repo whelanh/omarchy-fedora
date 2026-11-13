@@ -511,7 +511,8 @@ for name in ('folio', 'plain'):
 manifest = yaml.safe_load(open('fedora/rpm/manifest.yaml'))['packages']
 for name in ('folio', 'plain'):
     assert manifest[name]['status'] == 'verified', manifest[name]
-    assert manifest[name]['version'] == '0.2.0', manifest[name]
+# Versions are checked against each spec's Version: by the generic
+# 'manifest/spec version: <pkg>' test, so do not pin them here.
 "
 t "xdg-user-dirs mapped to Fedora and installed" python3 -c "
 import glob, yaml
@@ -834,6 +835,11 @@ def safe(name):
     return name
 icons = {safe(os.path.splitext(os.path.basename(p))[0])
          for p in glob.glob('upstream/applications/icons/*')}
+# Launchers may also use themed icons: omarchy-theme-set-icons renders
+# default/themed/icons/<name>.svg.tpl into the user's icon theme at runtime
+# (omarchy-terminal, omarchy-browser, ...), so a template covers the name too.
+themed = {os.path.splitext(os.path.splitext(os.path.basename(p))[0])[0]
+          for p in glob.glob('upstream/default/themed/icons/*.svg.tpl')}
 # foot and mpv are real programs whose icons come from their own packages.
 # text-editor is a themed icon name (Adwaita/Yaru legacy), used by
 # omarchy-launch-editor.desktop, not an Omarchy asset.
@@ -843,7 +849,7 @@ for d in glob.glob('upstream/applications/*.desktop'):
     m = re.search(r'^Icon=(.+)\$', open(d).read(), re.M)
     if m:
         wanted.add(m.group(1).strip())
-missing = wanted - system - icons
+missing = wanted - system - icons - themed
 assert not missing, 'launchers reference icons the tree never installs: %s' % sorted(missing)
 "
 
