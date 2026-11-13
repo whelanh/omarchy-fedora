@@ -90,6 +90,9 @@
   "agents.networkOffline": "Offline",
   "agents.networkOnHost": "Em %1",
   "agents.networkPair": "Pareie com %1 para usá-lo",
+  "agents.networkPairFailed": "Não foi possível emparelhar com %1",
+  "agents.networkPairOutputTip": "Abra a saída do emparelhamento em um terminal",
+  "agents.networkPairing": "Emparelhando com %1…",
   "agents.networkRunning": "Em execução",
   "agents.networkShare": "Compartilhar na sua tailnet",
   "agents.networkSharedUsers": {
@@ -572,6 +575,8 @@
   "tailscale.phrase7": "Lacrando portas",
   "tailscale.phrase8": "Ordenando tailnets",
   "tailscale.phrase9": "Embaralhando chaves",
+  "tailscale.renameConnection": "Renomear conexão",
+  "tailscale.renameFailed": "Não foi possível renomear a conexão do Tailscale",
   "tailscale.searchMachines": "Buscar máquinas  ( / )",
   "tailscale.searchRegions": "Buscar regiões",
   "tailscale.sendFiles": "Enviar arquivos",

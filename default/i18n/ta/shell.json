@@ -87,6 +87,9 @@
   "agents.networkOffline": "ஆஃப்லைன்",
   "agents.networkOnHost": "%1 இல்",
   "agents.networkPair": "பயன்படுத்த %1 உடன் இணைக்கவும்",
+  "agents.networkPairFailed": "%1 உடன் இணைக்க முடியவில்லை",
+  "agents.networkPairOutputTip": "இணைத்தல் அச்சிட்டதை டெர்மினலில் திறக்கவும்",
+  "agents.networkPairing": "%1 உடன் இணைக்கிறது…",
   "agents.networkRunning": "இயங்குகிறது",
   "agents.networkShare": "உங்கள் tailnet இல் பகிரவும்",
   "agents.networkSharedUsers": {
@@ -559,6 +562,8 @@
   "tailscale.phrase7": "போர்ட்டுகளை அடைத்தல்",
   "tailscale.phrase8": "tailnet-களை வரிசைப்படுத்துதல்",
   "tailscale.phrase9": "சாவிகளைக் கலக்குதல்",
+  "tailscale.renameConnection": "இணைப்பை மறுபெயரிடு",
+  "tailscale.renameFailed": "Tailscale இணைப்பை மறுபெயரிட முடியவில்லை",
   "tailscale.searchMachines": "சாதனங்களைத் தேடு  ( / )",
   "tailscale.searchRegions": "பகுதிகளைத் தேடு",
   "tailscale.sendFiles": "கோப்புகளை அனுப்பு",

@@ -87,6 +87,9 @@
   "agents.networkOffline": "Offline",
   "agents.networkOnHost": "Auf %1",
   "agents.networkPair": "Mit %1 koppeln, um es zu nutzen",
+  "agents.networkPairFailed": "Kopplung mit %1 fehlgeschlagen",
+  "agents.networkPairOutputTip": "Öffne die Ausgabe der Kopplung in einem Terminal",
+  "agents.networkPairing": "Wird mit %1 gekoppelt…",
   "agents.networkRunning": "Läuft",
   "agents.networkShare": "Im Tailnet freigeben",
   "agents.networkSharedUsers": {
@@ -559,6 +562,8 @@
   "tailscale.phrase7": "Ports versiegeln",
   "tailscale.phrase8": "Tailnets sortieren",
   "tailscale.phrase9": "Schlüssel mischen",
+  "tailscale.renameConnection": "Verbindung umbenennen",
+  "tailscale.renameFailed": "Tailscale-Verbindung konnte nicht umbenannt werden",
   "tailscale.searchMachines": "Geräte suchen  ( / )",
   "tailscale.searchRegions": "Regionen suchen",
   "tailscale.sendFiles": "Dateien senden",

@@ -90,6 +90,9 @@
   "agents.networkOffline": "Neprisijungęs",
   "agents.networkOnHost": "Įrenginyje: %1",
   "agents.networkPair": "Susieti su %1, kad galėtumėte naudoti",
+  "agents.networkPairFailed": "Nepavyko susieti su %1",
+  "agents.networkPairOutputTip": "Atidaryti susiejimo išvestį terminale",
+  "agents.networkPairing": "Susiejama su %1…",
   "agents.networkRunning": "Veikiantis",
   "agents.networkShare": "Bendrinti savo tailnet",
   "agents.networkSharedUsers": {
@@ -572,6 +575,8 @@
   "tailscale.phrase7": "Sandariname prievadus",
   "tailscale.phrase8": "Rūšiuojame tailnet tinklus",
   "tailscale.phrase9": "Maišome raktus",
+  "tailscale.renameConnection": "Pervadinti jungtį",
+  "tailscale.renameFailed": "Nepavyko pervadinti Tailscale jungties",
   "tailscale.searchMachines": "Ieškoti įrenginių  ( / )",
   "tailscale.searchRegions": "Ieškoti regionų",
   "tailscale.sendFiles": "Siųsti failus",

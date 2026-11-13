@@ -84,6 +84,9 @@
   "agents.networkOffline": "Luring",
   "agents.networkOnHost": "Di %1",
   "agents.networkPair": "Pasangkan dengan %1 untuk menggunakannya",
+  "agents.networkPairFailed": "Gagal memasangkan dengan %1",
+  "agents.networkPairOutputTip": "Buka output pemasangan di terminal",
+  "agents.networkPairing": "Memasangkan dengan %1…",
   "agents.networkRunning": "Berjalan",
   "agents.networkShare": "Bagikan di tailnet Anda",
   "agents.networkSharedUsers": {
@@ -546,6 +549,8 @@
   "tailscale.phrase7": "Menyegel port",
   "tailscale.phrase8": "Menyusun tailnet",
   "tailscale.phrase9": "Mengacak kunci",
+  "tailscale.renameConnection": "Ganti nama koneksi",
+  "tailscale.renameFailed": "Tidak dapat mengganti nama koneksi Tailscale",
   "tailscale.searchMachines": "Cari mesin  ( / )",
   "tailscale.searchRegions": "Cari wilayah",
   "tailscale.sendFiles": "Kirim berkas",
