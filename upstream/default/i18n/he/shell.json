@@ -90,6 +90,9 @@
   "agents.networkOffline": "לא מחובר",
   "agents.networkOnHost": "ב-%1",
   "agents.networkPair": "לצמד עם %1 כדי להשתמש בו",
+  "agents.networkPairFailed": "הצימוד עם %1 נכשל",
+  "agents.networkPairOutputTip": "פתחו את פלט הצימוד בטרמינל",
+  "agents.networkPairing": "מבצע צימוד עם %1…",
   "agents.networkRunning": "פועל",
   "agents.networkShare": "שיתוף ב-tailnet שלך",
   "agents.networkSharedUsers": {
@@ -572,6 +575,8 @@
   "tailscale.phrase7": "אוטם פורטים",
   "tailscale.phrase8": "ממיין tailnets",
   "tailscale.phrase9": "מערבב מפתחות",
+  "tailscale.renameConnection": "שינוי שם חיבור",
+  "tailscale.renameFailed": "לא ניתן לשנות את שם חיבור Tailscale",
   "tailscale.searchMachines": "חיפוש מכונות  ( / )",
   "tailscale.searchRegions": "חיפוש אזורים",
   "tailscale.sendFiles": "שליחת קבצים",
