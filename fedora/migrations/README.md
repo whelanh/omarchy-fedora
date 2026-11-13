@@ -39,6 +39,26 @@ dnf -y install newPackage
 The timestamp (Unix epoch) determines run order and must increase; use
 `date +%s`.
 
+## Exit codes
+
+`omarchy update` treats the three cases differently:
+
+| exit | meaning | marker written | update reports |
+|---|---|---|---|
+| `0` | done | yes | nothing |
+| `75` (`EX_TEMPFAIL`) | precondition not met yet, retry later | no | `deferred` |
+| anything else | failed | no | `failed` |
+
+Use `75` when the script can tell that the machine simply is not ready — for
+example when a replacement package has not been published in the COPR yet.
+Never exit `0` without doing the work: that records the migration as complete
+and it will not run again.
+
+If a retirement is the reason for the wait, add the old→new pair to
+`fedora/mappings/retired-replacements.conf` as well, so `omarchy_fedora_prune_retired`
+does not remove the old package (and leave the user without the capability)
+before the new one is installed.
+
 ## Rules
 
 - Scripts run as root (they are invoked with `sudo` from `omarchy update`).

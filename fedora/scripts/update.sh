@@ -41,7 +41,7 @@ omarchy_fedora_migrate() {
   local state="/var/lib/omarchy-fedora/migrations"
   [ -d "$mdir" ] || return 0
 
-  local file name ran=0
+  local file name ran=0 rc
   for file in "$mdir"/*.sh; do
     [ -f "$file" ] || continue
     name="$(basename "$file")"
@@ -49,11 +49,27 @@ omarchy_fedora_migrate() {
       continue
     fi
     log "Running Fedora migration: $name"
+    rc=0
     if (( EUID == 0 )); then
-      bash "$file" && { mkdir -p "$state"; touch "$state/$name"; }
+      bash "$file" || rc=$?
+      if (( rc == 0 )); then
+        mkdir -p "$state" && touch "$state/$name" || rc=1
+      fi
     else
-      sudo bash "$file" && { sudo mkdir -p "$state"; sudo touch "$state/$name"; }
-    fi && ran=1 || warn "migration $name failed (will retry next update)"
+      sudo bash "$file" || rc=$?
+      if (( rc == 0 )); then
+        sudo mkdir -p "$state" && sudo touch "$state/$name" || rc=1
+      fi
+    fi
+    ran=1
+    case "$rc" in
+      0) ;;
+      # 75 (EX_TEMPFAIL): the script deliberately did nothing because its
+      # precondition is not met yet (e.g. a replacement RPM is not published).
+      # No marker is written, so the next update retries; this is not a failure.
+      75) warn "migration $name deferred (will retry next update)" ;;
+      *) warn "migration $name failed (will retry next update)" ;;
+    esac
   done
   [ "$ran" = 1 ] || log "No pending Fedora migrations."
 }

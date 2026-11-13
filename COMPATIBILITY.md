@@ -137,25 +137,40 @@ cleanly in a Fedora Rawhide container and is published from the
 the 25-package default set (disable with `install.sh --no-firstparty`); the
 three on-demand packages are installed from Omarchy's Install menu.
 
+`folio` and `plain` are verified and queued for their first publication; while a
+first-party RPM is unpublished the port degrades instead of breaking:
+
+- `omarchy_fedora_install_firstparty` asks the enabled repos what actually
+  exists (`dnf repoquery --available`) and installs the rest, warning about the
+  ones still missing — a fresh install does not abort and an update keeps
+  working, with the next run backfilling.
+- a retired package is not pruned while its replacement is missing
+  (`fedora/mappings/retired-replacements.conf`: nautilus until folio is
+  installed), so nobody is left without a file manager in the gap.
+- a migration whose precondition is not met yet exits `75` (EX_TEMPFAIL) rather
+  than failing: `omarchy update` reports it as **deferred**, writes no
+  one-shot marker, and retries on the next update (see
+  `fedora/migrations/README.md`).
+
 | Package | Version | Notes |
 |---------|---------|-------|
-| aether | v4.30.0 | Go/Wails, repacked release binary |
-| cliamp  | v2.2.0 | Go/CGO, repacked release binary |
-| folio   | v0.2.0 | Qt6/qmake6 file manager (Files); replaces Nautilus |
-| herdr   | v0.9.1 | Rust, repacked release binary (herdrdev/herdr) |
-| hype    | v0.4.3 | Qt6/qmake6 Markdown presentation editor |
-| hyprland-preview-share-picker | v0.2.1 | Rust/GTK4, source-built |
-| monologue | v0.3.0 | Qt6/qmake6 webcam recorder + libpulse |
-| omacalc | v0.2.2 | Qt6/qmake6 |
-| omacut  | v0.4.0 | Qt6/qmake6 + ffmpeg |
-| omawrite| v0.5.0 | Qt6/qmake6 |
-| omasnap | v1.21.0 | repacked Arch release (supersedes tensaku) |
-| owe     | v0.2.7 | meson/C wallpaper engine (mpv + ffmpeg-free) |
-| owe-lockfeed | v0.2.7 | Qt6 QML lock-screen feed module |
-| plain   | v0.2.0 | Qt6/qmake6 text editor for config files |
+| aether | v4.32.0 | Go/Wails, repacked release binary |
+| cliamp | v2.4.1 | Go/CGO, repacked release binary |
+| folio | v0.4.0 | Qt6/qmake6 file manager (Files); replaces Nautilus |
+| herdr | v0.9.5 | Rust, repacked release binary (herdrdev/herdr) |
+| hype | v0.7.1 | Qt6/qmake6 Markdown presentation editor |
+| hyprland-preview-share-picker | v0.3.1 | Rust/GTK4, source-built |
+| monologue | v0.4.0 | Qt6/qmake6 webcam recorder + libpulse |
+| omacalc | v0.4.2 | Qt6/qmake6 |
+| omacut | v0.8.3 | Qt6/qmake6 + ffmpeg |
+| omawrite | v0.7.5 | Qt6/qmake6 |
+| omasnap | v1.26.2 | repacked Arch release (supersedes tensaku) |
+| owe | v0.2.15 | meson/C wallpaper engine (mpv + ffmpeg-free) |
+| owe-lockfeed | v0.2.15 | Qt6 QML lock-screen feed module |
+| plain | v0.3.3 | Qt6/qmake6 text editor for config files |
 | qtengine | v0.2.4 | Qt6 platform theme (replaces `gtk3`); AUR-only, first-party |
 | try (tobi-try) | v1.10.1 | Ruby gem |
-| ttfx    | v0.3.3 | pure Rust/cargo |
+| ttfx | v0.5.1 | pure Rust/cargo |
 
 Dropped from RPM scope (were in the original 13): `asdcontrol` (archived
 upstream, Apple-display-only), `omarchy-nvim` (in-tree LazyVim cache

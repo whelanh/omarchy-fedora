@@ -37,7 +37,8 @@ This has been sucessfully deployed in Fedora Rawhide, Fedora 44 and Fedora 45.  
 fedora/
   packages/       Fedora package manifests (base, desktop, applications, optional)
   mappings/       packages.yaml (Arch->Fedora), repositories.yaml (COPR/rpmfusion),
-                  retired-packages.conf and package-audit-baseline.conf
+                  retired-packages.conf, retired-replacements.conf and
+                  package-audit-baseline.conf
   system/         systemd, sysctl, udev, dracut configs
   scripts/        bootstrap.sh, install.sh, update.sh, uninstall.sh, lib/
   tests/          static + VM test suites

@@ -39,6 +39,14 @@ done
 echo "== YAML mapping parses =="
 t "packages.yaml parses" python3 -c "import yaml; d=yaml.safe_load(open('fedora/mappings/packages.yaml')); assert 'packages' in d"
 t "repositories.yaml parses" python3 -c "import yaml; d=yaml.safe_load(open('fedora/mappings/repositories.yaml')); assert 'repositories' in d"
+t "retired-replacements.conf parses as two columns" python3 -c "
+for i, line in enumerate(open('fedora/mappings/retired-replacements.conf'), 1):
+    line = line.split('#')[0].strip()
+    if not line:
+        continue
+    cols = line.split()
+    assert len(cols) == 2, ('bad row', i, sorted(cols))
+"
 
 echo "== Resolver =="
 t "resolve --source fedora" python3 fedora/scripts/lib/resolve.py --source fedora
@@ -212,6 +220,21 @@ orphans = [s for s in specs if s not in d['packages']]
 assert not orphans, f'specs without a manifest entry: {orphans}'
 "
 # Every manifest package must have a matching <pkg>/<pkg>.spec.
+t "COMPATIBILITY.md first-party versions match the manifest" python3 -c "
+import re, yaml
+man = yaml.safe_load(open('fedora/rpm/manifest.yaml'))['packages']
+alias = {'try (tobi-try)': 'tobi-try'}
+bad = []
+for line in open('COMPATIBILITY.md'):
+    m = re.match(r'\|\s*([^|]+?)\s*\|\s*v?([0-9][^|\s]*)\s*\|', line)
+    if not m:
+        continue
+    name = m.group(1).strip()
+    key = alias.get(name, name)
+    if key in man and str(man[key].get('version')) != m.group(2).strip():
+        bad.append((name, m.group(2).strip(), man[key].get('version')))
+assert not bad, 'doc versions drifted from manifest.yaml: %r' % (bad,)
+"
 t "build-rpm.sh bash -n" bash -n fedora/rpm/build-rpm.sh
 t "build-in-container.sh bash -n" bash -n fedora/rpm/build-in-container.sh
 t "build-rpm-in-ci.sh bash -n" bash -n fedora/rpm/build-rpm-in-ci.sh
@@ -546,10 +569,38 @@ assert 'folio.desktop' in mig, 'must repoint Nautilus mime associations at folio
 assert 'org\\.gnome\\.Nautilus' in mig, 'must rewrite personal mimeapps + dock pins'
 assert 'runuser' in mig, 'must rewrite files as the user, never as root'
 assert 'nautilus-python' in mig and 'sushi' in mig, 'must prune the Nautilus family'
-# update.sh writes the one-shot marker only on exit 0, so bailing out must fail:
-# otherwise a machine that updates before the folio RPM is available records the
-# migration as done and never rewrites its mimeapps.
-assert 'exit 1' in mig, 'must fail (no marker) when folio is missing, so it retries'
+# update.sh writes the one-shot marker only on exit 0, so a deferral must not
+# look like success: otherwise a machine that updates before the folio RPM is
+# available records the migration as done and never rewrites its mimeapps.
+assert 'exit 75' in mig, 'must defer (EX_TEMPFAIL, no marker) until folio is installed'
+"
+t "retirements with a replacement wait for it (nautilus until folio)" python3 -c "
+import glob, subprocess
+conf = 'fedora/mappings/retired-replacements.conf'
+rows = {}
+for line in open(conf):
+    line = line.split('#')[0].split()
+    if len(line) == 2:
+        rows[line[0]] = line[1]
+for old in ('nautilus', 'nautilus-python', 'sushi'):
+    assert rows.get(old) == 'folio', (old, rows)
+    assert old in open('fedora/mappings/retired-packages.conf').read(), old
+# the guard must be wired into the pruner, not just documented
+deps = open('fedora/scripts/lib/deps.sh').read()
+assert 'retired-replacements.conf' in deps, 'prune must read the replacement map'
+assert 'omarchy_fedora_retired_prunable' in deps, 'prune must consult the guard'
+"
+t "update.sh treats EX_TEMPFAIL as deferred, not failed" python3 -c "
+u = open('fedora/scripts/update.sh').read()
+assert '75)' in u, 'migration runner must special-case exit 75'
+assert 'deferred' in u, 'deferral must be reported distinctly from failure'
+# a failed migration must still write no marker
+assert '/var/lib/omarchy-fedora/migrations' in u, 'marker state dir'
+"
+t "first-party install skips RPMs the COPR has not published yet" python3 -c "
+d = open('fedora/scripts/lib/deps.sh').read()
+assert 'repoquery --available' in d, 'must ask the repos what actually exists'
+assert 'not published in whelanh/omarchy yet' in d, 'must warn instead of failing'
 "
 t "folio and plain specs are Qt6 qmake builds that ship the desktop bits" python3 -c "
 for name in ('folio', 'plain'):

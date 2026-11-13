@@ -21,6 +21,7 @@ RESOLVE="$OMARCHY_ROOT/fedora/scripts/lib/resolve.py"
 REPOS_YAML="$OMARCHY_ROOT/fedora/mappings/repositories.yaml"
 PACKAGES_DIR="$OMARCHY_ROOT/fedora/packages"
 RETIRED_FILE="$OMARCHY_ROOT/fedora/mappings/retired-packages.conf"
+RETIRED_REPLACEMENTS_FILE="$OMARCHY_ROOT/fedora/mappings/retired-replacements.conf"
 
 # ---------------------------------------------------------------------------
 # Retired packages
@@ -49,6 +50,35 @@ _omarchy_retired_load() {
 omarchy_fedora_is_retired() {
   _omarchy_retired_load
   [ -n "${_OMARCHY_RETIRED[$1]:-}" ]
+}
+
+# Retired packages that must not be pruned before their replacement exists
+# (fedora/mappings/retired-replacements.conf). Removing nautilus while folio is
+# not installable yet would leave a user with no file manager, which is exactly
+# what happens when a first-party RPM is still unpublished.
+declare -A _OMARCHY_REPLACEMENT_OF=()
+_OMARCHY_REPLACEMENTS_LOADED=""
+
+_omarchy_retired_replacements_load() {
+  [ -n "$_OMARCHY_REPLACEMENTS_LOADED" ] && return 0
+  _OMARCHY_REPLACEMENTS_LOADED=1
+  [ -r "$RETIRED_REPLACEMENTS_FILE" ] || return 0
+  local line retired replacement
+  while IFS= read -r line || [ -n "$line" ]; do
+    line="${line%%#*}"
+    read -r retired replacement <<<"$line" || continue
+    [ -n "${retired:-}" ] && [ -n "${replacement:-}" ] || continue
+    _OMARCHY_REPLACEMENT_OF["$retired"]="$replacement"
+  done < "$RETIRED_REPLACEMENTS_FILE"
+}
+
+# True if a retired package may be removed now: either nothing replaces it, or
+# its replacement is installed.
+omarchy_fedora_retired_prunable() {
+  _omarchy_retired_replacements_load
+  local replacement="${_OMARCHY_REPLACEMENT_OF[$1]:-}"
+  [ -z "$replacement" ] && return 0
+  rpm -q "$replacement" >/dev/null 2>&1
 }
 
 # ---------------------------------------------------------------------------
@@ -167,7 +197,12 @@ omarchy_fedora_prune_retired() {
   local p
   local -a batch=()
   for p in "${!_OMARCHY_RETIRED[@]}"; do
-    rpm -q "$p" >/dev/null 2>&1 && batch+=("$p")
+    rpm -q "$p" >/dev/null 2>&1 || continue
+    if ! omarchy_fedora_retired_prunable "$p"; then
+      echo "omarchy: keeping '$p' for now (its replacement, ${_OMARCHY_REPLACEMENT_OF[$p]}, is not installed)" >&2
+      continue
+    fi
+    batch+=("$p")
   done
   (( ${#batch[@]} > 0 )) || return 0
 
@@ -283,7 +318,32 @@ omarchy_fedora_install_firstparty() {
     echo "omarchy: no first-party packages resolved from whelanh/omarchy" >&2
     return 0
   fi
-  omarchy_pkg_install "${firstparty[@]}" || return 1
+  # A first-party RPM that has not been published yet (build still queued, a
+  # failed publish, or a COPR outage such as the Pulp migration) must not fail
+  # the run: dnf would refuse the request and the user would get nothing.
+  # Install what the enabled repo offers now; the next `omarchy update` (or the
+  # first-party backfill) picks up the rest.
+  local available
+  available="$(dnf -q repoquery --available --qf '%{name}\n' "${firstparty[@]}" 2>/dev/null | sort -u || true)"
+  # Nothing came back (repos disabled, metadata unavailable): let dnf try the
+  # whole set rather than silently skipping every first-party package.
+  if [ -z "$available" ]; then
+    omarchy_pkg_install "${firstparty[@]}" || return 1
+    return 0
+  fi
+  local -a installable=() unpublished=()
+  for p in "${firstparty[@]}"; do
+    if rpm -q "$p" >/dev/null 2>&1 || grep -qx "$p" <<<"$available"; then
+      installable+=("$p")
+    else
+      unpublished+=("$p")
+    fi
+  done
+  if (( ${#unpublished[@]} > 0 )); then
+    echo "omarchy: not published in whelanh/omarchy yet, skipping: ${unpublished[*]}" >&2
+  fi
+  (( ${#installable[@]} > 0 )) || return 0
+  omarchy_pkg_install "${installable[@]}" || return 1
   return 0
 }
 
