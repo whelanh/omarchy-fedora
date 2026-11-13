@@ -110,6 +110,11 @@ xdg-terminal-exec
 # and PUBLICSHARE at $HOME; already a default Fedora package, listed for parity
 # with upstream omarchy-base.packages.
 xdg-user-dirs
+  # `xrandr` (Arch: xorg-xrandr) is installed so X11/XWayland apps can be
+  # placed correctly: upstream migration 1794518371.sh adds it for
+  # bin/omarchy-tray-context-menu, which reads Xwayland's monitor layout to
+  # open a Wine app's own tray menu at the pointer.
+xrandr
 # xsetroot (Arch: xorg-xsetroot) is no longer installed: upstream dropped it
 # together with default/hypr/startup-cursor.lua, the only caller. That script
 # started Hyprland with a blank cursor theme and then reset the X root cursor,

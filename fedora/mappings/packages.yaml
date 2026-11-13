@@ -431,6 +431,14 @@ packages:
   wtype:                 { package: wtype, source: fedora }
   xdg-desktop-portal-gtk: { package: xdg-desktop-portal-gtk, source: fedora }
   xdg-user-dirs:         { package: xdg-user-dirs, source: fedora, note: omarchy-provision-user calls xdg-user-dirs-update to point TEMPLATES/DESKTOP/PUBLICSHARE at $HOME }
+  xorg-xrandr:
+    package: xrandr
+    source: fedora
+    note: >
+      Fedora ships the xrandr client as `xrandr` (same /usr/bin/xrandr).
+      upstream migration 1794518371.sh installs it because
+      bin/omarchy-tray-context-menu reads Xwayland's monitor layout with xrandr
+      to open a Wine app's own tray menu at the pointer.
   xorg-xsetroot:
     package: xsetroot
     source: fedora
