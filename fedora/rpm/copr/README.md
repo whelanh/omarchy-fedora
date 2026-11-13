@@ -6,7 +6,7 @@ stock Fedora install gets them with a plain `dnf install` — no local builds.
 
 ## The 28 packages
 
-aether, cliamp, disktree-bin, folio, gliff, herdr, hype,
+aether, cliamp, disktree-bin, gliff, herdr, hype,
 hyprland-preview-share-picker, monologue, omacalc, omacut, omapresent,
 omarchy-emacs, omarchy-hyprland-titlebars, omarchy-local-ai,
 omarchy-screensaver, omawrite, omasnap, openai-codex-desktop, owe,

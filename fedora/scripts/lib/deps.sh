@@ -53,9 +53,9 @@ omarchy_fedora_is_retired() {
 }
 
 # Retired packages that must not be pruned before their replacement exists
-# (fedora/mappings/retired-replacements.conf). Removing nautilus while folio is
-# not installable yet would leave a user with no file manager, which is exactly
-# what happens when a first-party RPM is still unpublished.
+# (fedora/mappings/retired-replacements.conf). Removing nautilus while
+# omarchy-folio is not installable yet would leave a user with no file manager,
+# which is exactly what happens when a first-party RPM is still unpublished.
 declare -A _OMARCHY_REPLACEMENT_OF=()
 _OMARCHY_REPLACEMENTS_LOADED=""
 
@@ -296,11 +296,11 @@ omarchy_fedora_install_applications() {
 }
 
 # Install the 25 default first-party Omarchy packages from the whelanh/omarchy
-# COPR (aether, cliamp, disktree-bin, folio, gliff, herdr, hype,
+# COPR (aether, cliamp, disktree-bin, gliff, herdr, hype,
 # hyprland-preview-share-picker, monologue, omacalc, omacut, omapresent,
-# omarchy-hyprland-titlebars, omarchy-local-ai, omarchy-screensaver, omawrite,
-# omasnap, owe, owe-lockfeed, plain, qtengine, signed, superwhisper-bin, try,
-# ttfx).
+# omarchy-folio, omarchy-hyprland-titlebars, omarchy-local-ai,
+# omarchy-screensaver, omawrite, omasnap, owe, owe-lockfeed, plain, qtengine,
+# signed, superwhisper-bin, try, ttfx).
 # omarchy-emacs, openai-codex-desktop and voxtype-bin are published in the same
 # COPR but installed on demand; elsewhen, openai-codex-bin and tensaku retired
 # upstream, pruned via retired-packages.conf.

@@ -15,14 +15,21 @@
 # the packaged defaults.
 set -euo pipefail
 
-# Bail out *unsuccessfully* if folio is missing: update.sh records a marker only
-# on exit 0, and repointing a user's association at a desktop file that is not
-# installed would leave them with no file manager. 75 (EX_TEMPFAIL) says "not
-# now, retry later", so the update reports it as deferred instead of failed.
-# (This window is real: while folio is unpublished, retired-replacements.conf
-# also keeps nautilus installed, so nobody loses a file manager in the meantime.)
-if ! rpm -q folio >/dev/null 2>&1; then
-  echo "folio-replaces-nautilus: folio is not installed yet; deferring to the next update" >&2
+# Bail out *unsuccessfully* if the file manager is missing: update.sh records a
+# marker only on exit 0, and repointing a user's association at a desktop file
+# that is not installed would leave them with no file manager. 75 (EX_TEMPFAIL)
+# says "not now, retry later", so the update reports it as deferred instead of
+# failed. (This window is real: while the RPM is unpublished,
+# retired-replacements.conf also keeps nautilus installed, so nobody loses a
+# file manager in the meantime.)
+#
+# Check the desktop file, not `rpm -q folio`: Fedora has its own unrelated
+# `folio` package (Toolstack's note-taking app), and the first release of this
+# migration trusted that name, saw Fedora's package, recorded itself as done on
+# machines that had no file manager at all. Our RPM is now omarchy-folio, but
+# the app-facing contract is folio.desktop, so test that.
+if [ ! -f /usr/share/applications/folio.desktop ]; then
+  echo "folio-replaces-nautilus: the Files app is not installed yet; deferring to the next update" >&2
   exit 75
 fi
 

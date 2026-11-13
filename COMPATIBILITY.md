@@ -104,10 +104,11 @@ definition, as Google ships no `.repo`), swap `chromium` for
 only for machines without Chrome.
 
 ### First-party Omarchy binaries (FIRST_PARTY, COPR `whelanh/omarchy`)
-28 Omarchy packages (`aether`, `cliamp`, `disktree-bin`, `folio`, `gliff`,
+28 Omarchy packages (`aether`, `cliamp`, `disktree-bin`, `gliff`,
 `herdr`, `hype`, `hyprland-preview-share-picker`, `monologue`, `omacalc`,
-`omacut`, `omapresent`, `omarchy-emacs`, `omarchy-hyprland-titlebars`,
-`omarchy-local-ai`, `omarchy-screensaver`, `omawrite`, `omasnap`,
+`omacut`, `omapresent`, `omarchy-emacs`, `omarchy-folio`,
+`omarchy-hyprland-titlebars`, `omarchy-local-ai`, `omarchy-screensaver`,
+`omawrite`, `omasnap`,
 `openai-codex-desktop`, `owe`, `owe-lockfeed`, `plain`, `qtengine`, `signed`,
 `superwhisper-bin`, `tobi-try → try`, `ttfx`, `voxtype-bin`) are
 source-built or repacked as Fedora RPMs. Specs live in `fedora/rpm/` (one SPEC
@@ -137,7 +138,7 @@ cleanly in a Fedora Rawhide container and is published from the
 the 25-package default set (disable with `install.sh --no-firstparty`); the
 three on-demand packages are installed from Omarchy's Install menu.
 
-`folio` and `plain` are verified and queued for their first publication; while a
+`omarchy-folio` and `plain` are verified and queued for their first publication; while a
 first-party RPM is unpublished the port degrades instead of breaking:
 
 - `omarchy_fedora_install_firstparty` asks the enabled repos what actually
@@ -145,7 +146,7 @@ first-party RPM is unpublished the port degrades instead of breaking:
   ones still missing — a fresh install does not abort and an update keeps
   working, with the next run backfilling.
 - a retired package is not pruned while its replacement is missing
-  (`fedora/mappings/retired-replacements.conf`: nautilus until folio is
+  (`fedora/mappings/retired-replacements.conf`: nautilus until omarchy-folio is
   installed), so nobody is left without a file manager in the gap.
 - a migration whose precondition is not met yet exits `75` (EX_TEMPFAIL) rather
   than failing: `omarchy update` reports it as **deferred**, writes no
@@ -156,7 +157,7 @@ first-party RPM is unpublished the port degrades instead of breaking:
 |---------|---------|-------|
 | aether | v4.32.0 | Go/Wails, repacked release binary |
 | cliamp | v2.4.1 | Go/CGO, repacked release binary |
-| folio | v0.4.0 | Qt6/CMake file manager (Files); replaces Nautilus |
+| omarchy-folio | v0.4.0 | Qt6/CMake file manager (Files); replaces Nautilus |
 | herdr | v0.9.5 | Rust, repacked release binary (herdrdev/herdr) |
 | hype | v0.7.1 | Qt6/CMake Markdown presentation editor |
 | hyprland-preview-share-picker | v0.3.1 | Rust/GTK4, source-built |

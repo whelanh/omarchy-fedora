@@ -51,7 +51,7 @@ FEDORA=1 bash fedora/rpm/build-in-container.sh omasnap
 | cliamp | bjarneo/cliamp | prebuilt-repack | MIT | verified |
 | disktree-bin | tobi/disktree | prebuilt-repack | MIT | verified |
 | elsewhen | omacom/elsewhen | noarch-repack | MIT | retired |
-| folio | omacom/folio | Qt6 / CMake | MIT | verified |
+| omarchy-folio | omacom/folio | Qt6 / CMake | MIT | verified |
 | gliff | omacom/gliff | cargo (vendored) | MIT AND BSD-2-Clause | verified |
 | herdr | herdrdev/herdr | prebuilt-repack | Apache-2.0 | verified |
 | hype | omacom/hype | Qt6 / CMake | MIT | verified |

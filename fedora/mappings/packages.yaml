@@ -60,11 +60,11 @@ packages:
     rpm: fedora/rpm/herdr/herdr.spec
     note: AI-agent workspace manager; Rust, repacked from herdrdev/herdr release binary.
   folio:
-    package: folio
+    package: omarchy-folio
     source: copr
     repository: whelanh/omarchy
-    rpm: fedora/rpm/folio/folio.spec
-    note: "Files: Omarchy's file manager, replacing Nautilus (upstream migration 1794330979.sh installs it and drops nautilus/nautilus-python/sushi); Qt6/CMake."
+    rpm: fedora/rpm/omarchy-folio/omarchy-folio.spec
+    note: "Files: Omarchy's file manager, replacing Nautilus (upstream migration 1794330979.sh installs it and drops nautilus/nautilus-python/sushi); Qt6/CMake. RPM named omarchy-folio because Fedora's `folio` is an unrelated note-taking app."
   hype:
     package: hype
     source: copr

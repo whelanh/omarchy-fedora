@@ -85,6 +85,19 @@ PY
   )
 
   dnf_builddep_retry "$topdir/SPECS/$pkg.spec" || return 1
+  # A first-party RPM must not share its name with an official Fedora package.
+  # dnf resolves by NEVRA, so `dnf install folio` quietly installed Fedora's
+  # unrelated note-taking app instead of Omarchy's file manager (which is why
+  # that package is now omarchy-folio). COPRs are excluded: they are ours or
+  # third-party by definition and the whole point is to publish these there.
+  local official
+  official="$(dnf -q repoquery --available --qf '%{name} %{repoid}\n' "$pkg" 2>/dev/null \
+    | awk -v p="$pkg" '$1 == p && $2 !~ /copr/ { print $2 }' | sort -u || true)"
+  if [ -n "$official" ]; then
+    echo "omarchy: '$pkg' is also an official Fedora package ($(tr '\n' ' ' <<<"$official"));" \
+         "rename the RPM (see omarchy-folio) so dnf cannot pick the wrong one" >&2
+    return 1
+  fi
   # Rust packages build offline from a vendored crates.io tarball; generate it
   # here (network + cargo are available in this container after builddep).
   . "$RPM_DIR/vendor-rust.sh"

@@ -19,7 +19,7 @@ out of scope.
 | System updates | yes | yes | PASS | omarchy update |
 | Snapshots | yes | yes  | PASS | pre & postsnapper present; grub-btrfs enabled |
 | Session (SDDM/Wayland) | yes | yes | PASS | |
-| File manager | yes | yes | PASS | folio (first-party RPM) installed; nautilus retired |
+| File manager | yes | yes | PASS | omarchy-folio (first-party RPM) installed; nautilus retired |
 | Terminal | yes | yes | PASS | foot installed |
 | Launcher/menu | yes | yes | PASS | |
 

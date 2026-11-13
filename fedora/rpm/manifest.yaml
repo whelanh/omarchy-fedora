@@ -69,7 +69,7 @@ packages:
     status: verified
     version: 0.4.3
     note: Hyprland remote desktop over SSH (GPU H.264 4:4:4); Rust workspace with gliff + gliff-server + gliff-probe. Crates vendored via fedora/rpm/vendor-rust.sh; cargo build --offline --locked. Container-built OK.
-  folio:
+  omarchy-folio:
     repo: https://github.com/omacom/folio
     language: cpp
     build: cmake
@@ -82,7 +82,9 @@ packages:
       Files: Omarchy's file manager and the inode/directory handler, replacing
       Nautilus (upstream migration 1794330979.sh). Qt6/CMake via ./bin/build
       (QML compiled into the binary); previews, gvfs and sharing stay optional
-      Recommends, matching upstream's optdepends. Container-built OK.
+      Recommends, matching upstream's optdepends. RPM named omarchy-folio
+      because Fedora's own `folio` is an unrelated note-taking app; files stay
+      /usr/bin/folio + folio.desktop. Container-built OK.
   herdr:
     repo: https://github.com/herdrdev/herdr
     language: rust

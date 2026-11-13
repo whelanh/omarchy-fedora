@@ -259,6 +259,7 @@ names = [l.split('#')[0].strip() for l in open('fedora/rpm/copr/retired-packages
 assert 'elsewhen' in names, 'elsewhen must be listed for COPR deletion'
 assert 'openai-codex-bin' in names, 'openai-codex-bin must be listed for COPR deletion'
 assert 'tensaku' in names, 'tensaku must be listed for COPR deletion'
+assert 'folio' in names, 'the old `folio` COPR package must be deleted (renamed to omarchy-folio)'
 "
 # auto-update.sh can prune those packages from the COPR as part of its run.
 t "auto-update.sh supports --prune-retired" python3 -c "
@@ -521,19 +522,22 @@ echo "== Folio replaces Nautilus; Plain is the config editor (upstream migration
 t "folio and plain are first-party and default-installed" python3 -c "
 import subprocess, yaml
 pkgs = yaml.safe_load(open('fedora/mappings/packages.yaml'))['packages']
-for name in ('folio', 'plain'):
-    entry = pkgs[name]
+# 'folio' is the upstream/Arch name; the RPM is omarchy-folio because Fedora's
+# own `folio` is an unrelated note-taking app (see the spec header).
+for arch, rpm in (('folio', 'omarchy-folio'), ('plain', 'plain')):
+    entry = pkgs[arch]
     assert entry.get('source') == 'copr', entry
     assert entry.get('repository') == 'whelanh/omarchy', entry
-    assert entry.get('rpm') == 'fedora/rpm/%s/%s.spec' % (name, name), entry
+    assert entry.get('package') == rpm, entry
+    assert entry.get('rpm') == 'fedora/rpm/%s/%s.spec' % (rpm, rpm), entry
 resolved = subprocess.check_output(
     ['python3', 'fedora/scripts/lib/resolve.py', '--copr', 'whelanh/omarchy'],
     text=True).split()
-for name in ('folio', 'plain'):
-    assert name in resolved, name + ' must be in the default first-party set'
+for rpm in ('omarchy-folio', 'plain'):
+    assert rpm in resolved, rpm + ' must be in the default first-party set'
 manifest = yaml.safe_load(open('fedora/rpm/manifest.yaml'))['packages']
-for name in ('folio', 'plain'):
-    assert manifest[name]['status'] == 'verified', manifest[name]
+for rpm in ('omarchy-folio', 'plain'):
+    assert manifest[rpm]['status'] == 'verified', manifest[rpm]
 # Versions are checked against each spec's Version: by the generic
 # 'manifest/spec version: <pkg>' test, so do not pin them here.
 "
@@ -583,7 +587,7 @@ for line in open(conf):
     if len(line) == 2:
         rows[line[0]] = line[1]
 for old in ('nautilus', 'nautilus-python', 'sushi'):
-    assert rows.get(old) == 'folio', (old, rows)
+    assert rows.get(old) == 'omarchy-folio', (old, rows)
     assert old in open('fedora/mappings/retired-packages.conf').read(), old
 # the guard must be wired into the pruner, not just documented
 deps = open('fedora/scripts/lib/deps.sh').read()
@@ -603,17 +607,18 @@ assert 'repoquery --available' in d, 'must ask the repos what actually exists'
 assert 'not published in whelanh/omarchy yet' in d, 'must warn instead of failing'
 "
 t "folio and plain specs are Qt6 CMake builds that ship the desktop bits" python3 -c "
-for name in ('folio', 'plain'):
-    spec = open('fedora/rpm/%s/%s.spec' % (name, name)).read()
-    assert './bin/build' in spec, name + ' must use the upstream build script'
-    assert 'BuildRequires:  cmake' in spec, name + ' builds with CMake'
-    assert 'qt6-qtdeclarative-devel' in spec, name + ' needs Qt Quick headers'
+for rpm, app in (('omarchy-folio', 'folio'), ('plain', 'plain')):
+    spec = open('fedora/rpm/%s/%s.spec' % (rpm, rpm)).read()
+    assert './bin/build' in spec, rpm + ' must use the upstream build script'
+    assert 'BuildRequires:  cmake' in spec, rpm + ' builds with CMake'
+    assert 'qt6-qtdeclarative-devel' in spec, rpm + ' needs Qt Quick headers'
     # upstream has shipped these under pkgbuild/ and, for folio 0.4.0, share/
-    dirs = [d for d in ('pkgbuild', 'share') if '%s/%s.svg' % (d, name) in spec]
-    assert len(dirs) == 1, name + ' must ship its icon from exactly one in-tree dir'
+    dirs = [d for d in ('pkgbuild', 'share') if '%s/%s.svg' % (d, app) in spec]
+    assert len(dirs) == 1, app + ' must ship its icon from exactly one in-tree dir'
     d = dirs[0]
-    assert '%s/%s.desktop' % (d, name) in spec, name + ' must ship its desktop entry'
-assert 'glib2-devel' in open('fedora/rpm/folio/folio.spec').read(), 'folio links gio'
+    assert '%s/%s.desktop' % (d, app) in spec, app + ' must ship its desktop entry'
+    assert '/usr/bin/%s' % app in spec or '%%{_bindir}/%s' % app in spec, app + ' binary'
+assert 'glib2-devel' in open('fedora/rpm/omarchy-folio/omarchy-folio.spec').read(), 'folio links gio'
 "
 
 t "omasnap packages the icon upstream installs" python3 -c "
@@ -638,10 +643,32 @@ for spec in glob.glob('fedora/rpm/*/*.spec'):
         assert 'BuildRequires:  cmake' in s, name + ' builds through CMake via ./bin/build'
 "
 t "folio installs upstream 0.4.0's share/ assets" python3 -c "
-s = open('fedora/rpm/folio/folio.spec').read()
+s = open('fedora/rpm/omarchy-folio/omarchy-folio.spec').read()
 install = s.split('%install', 1)[1].split('%files', 1)[0]
 assert 'pkgbuild/' not in install, 'folio 0.4.0 moved its desktop entry and icon to share/'
 assert 'share/folio.svg' in install and 'share/folio.desktop' in install
+"
+# Fedora ships its own unrelated `folio` (Toolstack's note-taking app, 26.x).
+# An RPM named `folio` loses dnf's version comparison and silently installs the
+# wrong app, so the package name carries the omarchy- prefix while the files keep
+# upstream's names (bin/omarchy-launch-files runs `folio`; mimeapps points at
+# folio.desktop). Obsoletes must be version-bounded or we would hijack it.
+t "the file manager RPM is omarchy-folio, never the Fedora-owned name folio" python3 -c "
+s = open('fedora/rpm/omarchy-folio/omarchy-folio.spec').read()
+assert 'Name:           omarchy-folio' in s, 'RPM must not be named folio (Fedora owns it)'
+assert 'Obsoletes:      folio < 1' in s, 'only replace our own old 0.4.0 build, not Fedora 26.x'
+assert '%autosetup -n folio-%{version}' in s, 'the upstream tarball unpacks as folio-<version>'
+files = s.split('%files', 1)[1].split('%changelog', 1)[0]
+assert '%{_bindir}/folio' in files, 'file names stay as upstream ships them'
+assert '%{_datadir}/applications/folio.desktop' in files, 'mimeapps points at folio.desktop'
+import os
+assert not os.path.exists('fedora/rpm/folio'), 'the old folio/ spec dir must be gone'
+"
+t "CI refuses to build a first-party RPM whose name Fedora already owns" python3 -c "
+s = open('fedora/rpm/build-rpm-in-ci.sh').read()
+assert 'repoquery --available' in s, 'must ask what the official repos provide'
+assert \"!~ /copr/\" in s, 'COPR repoids are ours; only official repos count'
+assert 'rename the RPM' in s, 'must fail loudly instead of publishing a shadowing name'
 "
 
 echo "== Installer SELinux + update-window hygiene =="

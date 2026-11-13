@@ -144,7 +144,6 @@ repositories:
       - aether
       - cliamp
       - disktree-bin
-      - folio
       - gliff
       - herdr
       - hype
@@ -154,6 +153,7 @@ repositories:
       - omacut
       - omapresent
       - omarchy-emacs
+      - omarchy-folio
       - omarchy-hyprland-titlebars
       - omarchy-local-ai
       - omarchy-screensaver

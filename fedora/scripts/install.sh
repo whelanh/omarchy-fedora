@@ -546,10 +546,11 @@ install_omarchy_tree() {
     sudo chown -R root:root "$dest"
   fi
   log "Omarchy tree installed to $dest"
-  log "NOTE: the 25 first-party packages (aether, cliamp, disktree-bin, folio," \
+  log "NOTE: the 25 first-party packages (aether, cliamp, disktree-bin," \
        "gliff, herdr, hype, hyprland-preview-share-picker, monologue, omacalc," \
-       "omacut, omapresent, omarchy-hyprland-titlebars, omarchy-local-ai," \
-       "omarchy-screensaver, omasnap, omawrite, owe, owe-lockfeed, plain," \
+       "omacut, omapresent, omarchy-folio, omarchy-hyprland-titlebars," \
+       "omarchy-local-ai, omarchy-screensaver, omasnap, omawrite, owe," \
+       "owe-lockfeed, plain," \
        "qtengine, signed, superwhisper-bin, try, ttfx) are packaged" \
        "under fedora/rpm and installed from the whelanh/omarchy COPR (see" \
        "fedora/rpm/copr/README.md). omarchy-emacs, openai-codex-desktop and" \
