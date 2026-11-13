@@ -28,6 +28,10 @@ set -euo pipefail
 # migration trusted that name, saw Fedora's package, recorded itself as done on
 # machines that had no file manager at all. Our RPM is now omarchy-folio, but
 # the app-facing contract is folio.desktop, so test that.
+#
+# This is also why the file was re-dated (1794412800 -> 1794581000): the marker
+# name includes the timestamp, so every machine that recorded the broken run
+# runs the corrected one on its next update. Everything below is idempotent.
 if [ ! -f /usr/share/applications/folio.desktop ]; then
   echo "folio-replaces-nautilus: the Files app is not installed yet; deferring to the next update" >&2
   exit 75
@@ -84,6 +88,21 @@ for user in $users; do
       sed --follow-symlinks -i \
         's/"org\.gnome\.Nautilus"/"folio"/g' "$shell_json" \
       && echo "folio-replaces-nautilus: repointed the dock pin in $shell_json"
+  fi
+
+  # Make Files the directory handler. On Arch this comes from the packaged
+  # /usr/share/applications/mimeapps.list, but on Fedora that path belongs to
+  # shared-mime-info, so nothing set inode/directory and an arbitrary app that
+  # merely lists MimeType=inode/directory (disktree) won the association.
+  # xdg-mime edits the user's own mimeapps.list in place and is idempotent.
+  if command -v xdg-mime >/dev/null 2>&1; then
+    current="$(runuser -u "$user" -- env HOME="$home" \
+      xdg-mime query default inode/directory 2>/dev/null || true)"
+    if [ "$current" != folio.desktop ]; then
+      runuser -u "$user" -- env HOME="$home" \
+        xdg-mime default folio.desktop inode/directory \
+        && echo "folio-replaces-nautilus: made Files the directory handler for $user"
+    fi
   fi
 done
 

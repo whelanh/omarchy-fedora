@@ -1363,6 +1363,20 @@ configure_user() {
     warn "no config tree at $cfg_src; user configs not seeded"
   fi
 
+  # Make Files (folio) the directory handler. Upstream ships
+  # default/applications/mimeapps.list with inode/directory=folio.desktop and
+  # installs it to /usr/share/applications/mimeapps.list, but on Fedora that
+  # file belongs to shared-mime-info, so no association exists and any app that
+  # merely lists MimeType=inode/directory (disktree) can win it. Same fix as
+  # fedora/migrations/*-folio-replaces-nautilus.sh, applied at install time so
+  # fresh installs never see the wrong handler.
+  if [ -f /usr/share/applications/folio.desktop ] && command -v xdg-mime >/dev/null 2>&1; then
+    if [ "$($as_user env HOME="$home" xdg-mime query default inode/directory 2>/dev/null || true)" != folio.desktop ]; then
+      $as_user env HOME="$home" xdg-mime default folio.desktop inode/directory \
+        && log "  made Files (folio) the default handler for directories"
+    fi
+  fi
+
   # uwsm runs /etc/xdg/autostart entries for the Omarchy session through
   # systemd-xdg-autostart-generator. Most KDE Plasma entries are guarded with
   # OnlyShowIn=KDE or X-systemd-skip, but org.kde.xwaylandvideobridge is not:

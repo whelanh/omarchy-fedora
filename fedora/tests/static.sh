@@ -577,6 +577,20 @@ assert 'nautilus-python' in mig and 'sushi' in mig, 'must prune the Nautilus fam
 # look like success: otherwise a machine that updates before the folio RPM is
 # available records the migration as done and never rewrites its mimeapps.
 assert 'exit 75' in mig, 'must defer (EX_TEMPFAIL, no marker) until folio is installed'
+# The marker is named after the file, so a corrected migration must be re-dated
+# or machines that recorded the *broken* run (Fedora's `folio` satisfied the old
+# `rpm -q folio` guard) never run the fix.
+assert migs[0].split('/')[-1].split('-')[0] > '1794412800', \
+    'must be re-dated past the broken run for machines that already marked it done'
+"
+t "Files is the directory handler (Fedora cannot ship the packaged mimeapps)" python3 -c "
+import glob
+mig = open(glob.glob('fedora/migrations/*-folio-replaces-nautilus.sh')[0]).read()
+assert 'xdg-mime default folio.desktop inode/directory' in mig, \
+    '/usr/share/applications/mimeapps.list is shared-mime-info on Fedora: set it per user'
+inst = open('fedora/scripts/install.sh').read()
+assert 'xdg-mime default folio.desktop inode/directory' in inst, \
+    'fresh installs must get the association without waiting for the migration'
 "
 t "retirements with a replacement wait for it (nautilus until folio)" python3 -c "
 import glob, subprocess
