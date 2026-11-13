@@ -4,7 +4,7 @@
 %global debug_package %{nil}
 
 Name:           omawrite
-Version:        0.7.2
+Version:        0.7.5
 Release:        1%{?dist}
 Summary:        Dead-simple Markdown writing app built with Qt Quick
 
@@ -46,6 +46,9 @@ install -Dm644 pkgbuild/omawrite.desktop %{buildroot}%{_datadir}/applications/om
 %{_datadir}/applications/omawrite.desktop
 
 %changelog
+* Thu Nov 12 2026 whelanh <brickhousedevelopers@gmail.com> - 0.7.5-1
+- Automatic update to upstream v0.7.5
+
 * Mon Oct 19 2026 whelanh <brickhousedevelopers@gmail.com> - 0.7.2-1
 - Automatic update to upstream v0.7.2
 

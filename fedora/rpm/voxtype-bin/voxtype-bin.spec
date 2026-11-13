@@ -14,7 +14,7 @@
 %global __requires_exclude ^(libvulkan\.so.*|libgtk-4\.so.*|libgtk4-layer-shell.*)$
 
 Name:           voxtype-bin
-Version:        1.1.1
+Version:        1.2.1
 Release:        1%{?dist}
 Summary:        Push-to-talk voice-to-text for Linux (Whisper; prebuilt binaries)
 
@@ -144,6 +144,9 @@ fi
 %{_datadir}/fish/vendor_completions.d/voxtype.fish
 
 %changelog
+* Thu Nov 12 2026 whelanh <brickhousedevelopers@gmail.com> - 1.2.1-1
+- Automatic update to upstream v1.2.1
+
 * Thu Oct 15 2026 whelanh <brickhousedevelopers@gmail.com> - 1.1.1-1
 - Automatic update to upstream v1.1.1
 

@@ -7,7 +7,7 @@
 %global debug_package %{nil}
 
 Name:           hype
-Version:        0.6.0
+Version:        0.7.1
 Release:        1%{?dist}
 Summary:        Simple Markdown presentations with a visual slide editor
 
@@ -61,6 +61,9 @@ install -Dm644 README.md %{buildroot}%{_datadir}/doc/%{name}/README.md
 %{_datadir}/doc/%{name}/README.md
 
 %changelog
+* Thu Nov 12 2026 whelanh <brickhousedevelopers@gmail.com> - 0.7.1-1
+- Automatic update to upstream v0.7.1
+
 * Thu Oct 15 2026 whelanh <brickhousedevelopers@gmail.com> - 0.6.0-1
 - Automatic update to upstream v0.6.0
 

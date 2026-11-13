@@ -14,7 +14,7 @@
 %global debug_package %{nil}
 
 Name:           plain
-Version:        0.2.0
+Version:        0.3.3
 Release:        1%{?dist}
 Summary:        Omarchy's text editor for config files
 
@@ -59,5 +59,8 @@ install -Dm644 pkgbuild/plain.desktop \
 %{_datadir}/applications/plain.desktop
 
 %changelog
+* Thu Nov 12 2026 whelanh <brickhousedevelopers@gmail.com> - 0.3.3-1
+- Automatic update to upstream v0.3.3
+
 * Wed Nov 11 2026 whelanh <brickhousedevelopers@gmail.com> - 0.2.0-1
 - Initial Fedora package (v0.2.0): Omarchy's config-file editor

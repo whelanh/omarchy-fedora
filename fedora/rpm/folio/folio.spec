@@ -13,7 +13,7 @@
 %global debug_package %{nil}
 
 Name:           folio
-Version:        0.2.0
+Version:        0.4.0
 Release:        1%{?dist}
 Summary:        Files: Omarchy's quiet, keyboard-first file manager
 
@@ -71,5 +71,8 @@ install -Dm644 pkgbuild/folio.desktop \
 %{_datadir}/applications/folio.desktop
 
 %changelog
+* Thu Nov 12 2026 whelanh <brickhousedevelopers@gmail.com> - 0.4.0-1
+- Automatic update to upstream v0.4.0
+
 * Wed Nov 11 2026 whelanh <brickhousedevelopers@gmail.com> - 0.2.0-1
 - Initial Fedora package (v0.2.0): Omarchy's Files app, replacing Nautilus

@@ -5,7 +5,7 @@
 %global debug_package %{nil}
 
 Name:           omacalc
-Version:        0.3.1
+Version:        0.4.2
 Release:        1%{?dist}
 Summary:        A fast, native calculator built with Qt 6 for the Omarchy desktop
 
@@ -47,6 +47,9 @@ install -Dm644 pkgbuild/omacalc.desktop %{buildroot}%{_datadir}/applications/oma
 %{_datadir}/applications/omacalc.desktop
 
 %changelog
+* Thu Nov 12 2026 whelanh <brickhousedevelopers@gmail.com> - 0.4.2-1
+- Automatic update to upstream v0.4.2
+
 * Wed Oct 14 2026 whelanh <brickhousedevelopers@gmail.com> - 0.3.1-1
 - Automatic update to upstream v0.3.1
 
