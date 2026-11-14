@@ -293,9 +293,25 @@ assert 'rows = []' in s and 'rows.append' in s, 'checklist rows missing'
 assert 'for name, oldver, tag, status in rows' in s, 'the plan table must iterate every row'
 assert '\"ok\"' in s, 'current packages need an ok row'
 assert '(manual)' in s, 'vendor-URL packages must appear in the checklist'
-assert '(unknown)' in s, 'unreachable repos must show up instead of vanishing'
+assert '(no releases or tags)' in s, 'a repo with neither must show up instead of vanishing'
 assert s.index('for name, oldver, tag, status in rows') < s.index('package(s) to bump'), \
     'the table must print before the summary'
+"
+# A run that exhausts GitHub's unauthenticated 60 requests/hour used to print
+# \"?\" for every package after the cutoff, which reads as \"no update check ran\".
+# Reuse the gh CLI login and abort loudly on a failed request instead.
+t "auto-update.sh authenticates via gh and fails loudly on API errors" python3 -c "
+s = open('fedora/rpm/copr/auto-update.sh').read()
+assert 'gh auth token' in s, 'must reuse the gh CLI token when the env has none'
+assert 'class ApiError' in s and 'except ApiError' in s, 'API errors must be distinguishable'
+assert 'GitHub API request failed' in s, 'a failed lookup must be explained'
+assert 'could not check' in s and 'sys.exit(2)' in s, 'must abort instead of reporting unknown'
+"
+t "check-updates.sh reports API failures instead of (unknown)" python3 -c "
+s = open('fedora/rpm/copr/check-updates.sh').read()
+assert 'gh auth token' in s, 'must reuse the gh CLI token when the env has none'
+assert 'class ApiError' in s and 'GitHub API request failed' in s, \
+    'a 403/rate limit must not read as a package with no newer version'
 "
 t "check-updates.sh marks held packages HELD" python3 -c "
 s = open('fedora/rpm/copr/check-updates.sh').read()

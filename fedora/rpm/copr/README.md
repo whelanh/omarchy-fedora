@@ -254,8 +254,11 @@ watches the builds and retries transient chroot failures as described in
 [Build + submit](#2-build--submit); `--no-watch` restores fire-and-forget.
 Retired packages are pruned from the COPR by default (`delete-retired.sh`,
 best-effort; `--no-prune-retired` skips it, `--srpms-only` implies skip and
-`--dry-run` previews it). Set `GITHUB_TOKEN`/`GH_TOKEN` (or use `gh auth
-token`) to avoid the 60-requests/hour unauthenticated API limit.
+`--dry-run` previews it). Both scripts reuse `gh auth token` when
+`GITHUB_TOKEN`/`GH_TOKEN` is unset. If no token is available and a request is
+refused (the unauthenticated API allows 60/hour, and a run needs one per
+upstream repo), they stop with an explanation instead of reporting unchecked
+packages as `(unknown)`.
 
 ## Why COPR and not official Fedora
 

@@ -50,6 +50,16 @@ REPO_ROOT="$(cd -- "$RPM_DIR/../.." && pwd)"
 
 command -v python3 >/dev/null 2>&1 || { echo "python3 required" >&2; exit 2; }
 
+# Reuse the GitHub CLI's token when the environment has none: the
+# unauthenticated API allows 60 requests/hour and this report needs one per
+# upstream repo, so without a token later packages read "(unknown)".
+if [ -z "${GITHUB_TOKEN:-}${GH_TOKEN:-}" ] && command -v gh >/dev/null 2>&1; then
+  if _gh_token="$(gh auth token 2>/dev/null)" && [ -n "$_gh_token" ]; then
+    GH_TOKEN="$_gh_token"
+    export GH_TOKEN
+  fi
+fi
+
 if [ "${1:-}" = "--packages" ]; then
   python3 - "$REPO_ROOT" <<'PY'
 import sys, yaml
@@ -284,20 +294,33 @@ PY
 fi
 
 python3 - "$MANIFEST" <<'PY'
-import json, os, re, sys, urllib.request, yaml
+import json, os, re, sys, urllib.error, urllib.request, yaml
 
 UA = {"User-Agent": "omarchy-fedora-check", "Accept": "application/vnd.github+json"}
-# Same token support as auto-update.sh: without it this report is capped at 60
-# unauthenticated requests/hour (~2 per upstream repo) and mostly prints
-# "(unknown)" for every package.
+# Same token support as auto-update.sh: the wrapper exports `gh auth token`
+# when the environment has none. Without it this report is capped at 60
+# unauthenticated requests/hour (one per upstream repo), and a refused request
+# now aborts instead of printing "(unknown)" for every package.
 _token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
 if _token:
     UA["Authorization"] = f"Bearer {_token}"
 
+class ApiError(Exception):
+    """A GitHub API call that could not be answered (HTTP status or transport)."""
+
+    def __init__(self, url, code, detail=""):
+        self.url, self.code, self.detail = url, code, detail
+        super().__init__(f"HTTP {code} from {url}" if code else f"{detail or 'no response'} ({url})")
+
 def gh_get(url):
     req = urllib.request.Request(url, headers=UA)
-    with urllib.request.urlopen(req, timeout=20) as r:
-        return json.load(r)
+    try:
+        with urllib.request.urlopen(req, timeout=20) as r:
+            return json.load(r)
+    except urllib.error.HTTPError as e:
+        raise ApiError(url, e.code) from e
+    except Exception as e:
+        raise ApiError(url, None, str(e)) from e
 
 def semver(v):
     v = str(v).lstrip("vV").strip().split("-")[0].split("+")[0]
@@ -325,8 +348,12 @@ def latest_github(owner, repo):
         data = gh_get(f"https://api.github.com/repos/{owner}/{repo}/releases/latest")
         if isinstance(data, dict) and data.get("tag_name"):
             return data["tag_name"]
-    except Exception:
-        pass
+    except ApiError as e:
+        # 404 just means "no published release": fall back to tags below. Any
+        # other status (403 rate limit, 5xx, network) is a failed check, not a
+        # package with no newer version.
+        if e.code != 404:
+            raise
     cand = set()
     try:
         data = gh_get(f"https://api.github.com/repos/{owner}/{repo}/tags?per_page=50")
@@ -334,11 +361,23 @@ def latest_github(owner, repo):
             for t in data:
                 if t.get("name"):
                     cand.add(t["name"])
-    except Exception:
-        pass
+    except ApiError as e:
+        if e.code != 404:
+            raise
     stable = [c for c in cand if not is_prerelease(c)]
     pool = stable or list(cand)
     return max(pool, key=semver) if pool else None
+
+def fail_check(e):
+    print(f"check-updates: GitHub API request failed: {e}", file=sys.stderr)
+    if e.code == 401:
+        print("  The token was rejected: run `gh auth login` or set a valid",
+              "GITHUB_TOKEN/GH_TOKEN, then re-run.", file=sys.stderr)
+    else:
+        print("  Every package needs a successful request and the unauthenticated API",
+              "allows 60/hour: `gh auth login` (or GITHUB_TOKEN/GH_TOKEN), then re-run.",
+              file=sys.stderr)
+    sys.exit(2)
 
 d = yaml.safe_load(open(sys.argv[1]))
 rows = []
@@ -350,7 +389,10 @@ for name, p in sorted(d["packages"].items()):
     repo = p.get("repo", "")
     ver = str(p.get("version", ""))
     m = re.match(r"https://github\.com/([^/]+)/([^/]+)", repo)
-    latest = latest_github(m.group(1), m.group(2)) if m else None
+    try:
+        latest = latest_github(m.group(1), m.group(2)) if m else None
+    except ApiError as e:
+        fail_check(e)
     rows.append((name, ver, latest, str(p.get("hold") or "").strip()))
 
 print(f"{'package':35} {'packaged':>10} {'latest':>10}  status")

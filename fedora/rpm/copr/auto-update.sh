@@ -23,7 +23,9 @@
 #   - Only packages with `status: verified` in manifest.yaml are considered;
 #     the others are not part of the COPR. The plan prints every one of them
 #     with its packaged and latest version, so a run that changes nothing still
-#     shows each package was checked (`ok`, `HELD`, `SKIPPED`, `(unknown)`).
+#     shows each package was checked (`ok`, `HELD`, `SKIPPED`). A repo with no
+#     releases and no tags is listed as `(no releases or tags)`; a GitHub API
+#     failure aborts the run instead of being reported as "unknown".
 #     `(manual)` rows are the vendor-URL packages the updater cannot follow.
 #   - Runs `check-updates.sh --packages` and warns about new upstream package
 #     add/remove drift (unmapped or stale mappings). Rows accepted in
@@ -143,11 +145,25 @@ REBUILD_PLAN="$(mktemp)"
 CHANGED_OUT="$(mktemp)"
 trap 'rm -f "$PLAN" "$REBUILD_PLAN" "$CHANGED_OUT"' EXIT
 
+# Authenticate through the GitHub CLI when it is already logged in. The
+# unauthenticated API allows 60 requests/hour and a run needs one per upstream
+# repo (~28), so a run that exhausts the window ends with every later package
+# as "(unknown)" - which looks like the update check did nothing.
+GH_AUTH=""
+if [ -z "${GITHUB_TOKEN:-}${GH_TOKEN:-}" ] && command -v gh >/dev/null 2>&1; then
+  if _gh_token="$(gh auth token 2>/dev/null)" && [ -n "$_gh_token" ]; then
+    GH_TOKEN="$_gh_token"
+    export GH_TOKEN
+    GH_AUTH=" via gh"
+  fi
+fi
+
 if [ -n "${GITHUB_TOKEN:-}${GH_TOKEN:-}" ]; then
-  echo "== checking upstream for verified packages in $COPR (authenticated) =="
+  echo "== checking upstream for verified packages in $COPR (authenticated$GH_AUTH) =="
 else
   echo "== checking upstream for verified packages in $COPR =="
-  echo "   (tip: export GITHUB_TOKEN/GH_TOKEN to avoid the 60 req/hour API limit)"
+  echo "   (tip: authenticate with 'gh auth login' or export GITHUB_TOKEN/GH_TOKEN;"
+  echo "    the unauthenticated API allows only 60 requests/hour)"
 fi
 python3 - "$RPM_DIR" "$MANIFEST" "$PLAN" <<'PY'
 import json, os, re, sys, urllib.error, urllib.request, yaml
@@ -155,16 +171,29 @@ import json, os, re, sys, urllib.error, urllib.request, yaml
 rpm_dir, manifest_path, plan_path = sys.argv[1], sys.argv[2], sys.argv[3]
 UA = {"User-Agent": "omarchy-fedora-auto-update", "Accept": "application/vnd.github+json"}
 # Optional token raises the unauthenticated GitHub API limit from 60 to 5000
-# requests/hour (the script makes ~2 calls per upstream repo). Use a classic
-# token with no scopes, or set GH_TOKEN; `gh auth token` also works.
+# requests/hour (one call per upstream repo). This script exports one from
+# `gh auth token` when the environment has neither GITHUB_TOKEN nor GH_TOKEN;
+# without a token a rate-limited run stops instead of reporting unknown.
 _token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
 if _token:
     UA["Authorization"] = f"Bearer {_token}"
 
+class ApiError(Exception):
+    """A GitHub API call that could not be answered (HTTP status or transport)."""
+
+    def __init__(self, url, code, detail=""):
+        self.url, self.code, self.detail = url, code, detail
+        super().__init__(f"HTTP {code} from {url}" if code else f"{detail or 'no response'} ({url})")
+
 def gh_get(url):
     req = urllib.request.Request(url, headers=UA)
-    with urllib.request.urlopen(req, timeout=20) as r:
-        return json.load(r)
+    try:
+        with urllib.request.urlopen(req, timeout=20) as r:
+            return json.load(r)
+    except urllib.error.HTTPError as e:
+        raise ApiError(url, e.code) from e
+    except Exception as e:
+        raise ApiError(url, None, str(e)) from e
 
 def semver(v):
     v = str(v).lstrip("vV").strip().split("-")[0].split("+")[0]
@@ -185,22 +214,28 @@ def latest_github(owner, repo):
     # unrelated or prefixed tags (e.g. openai/codex also publishes `rusty-v8-*`),
     # which makes picking the max by semver meaningless and can select a bogus
     # version.
+    base = f"https://api.github.com/repos/{owner}/{repo}"
     try:
-        data = gh_get(f"https://api.github.com/repos/{owner}/{repo}/releases/latest")
+        data = gh_get(base + "/releases/latest")
         if isinstance(data, dict) and data.get("tag_name"):
             return data["tag_name"]
-    except Exception:
-        pass
+    except ApiError as e:
+        # 404: the repo has no published release, which is normal - not a
+        # failure. Anything else (403 rate limit, network) must not be read as
+        # "no newer version".
+        if e.code != 404:
+            raise
     # No published release: fall back to the newest tag.
     cand = set()
     try:
-        data = gh_get(f"https://api.github.com/repos/{owner}/{repo}/tags?per_page=50")
+        data = gh_get(base + "/tags?per_page=50")
         if isinstance(data, list):
             for t in data:
                 if t.get("name"):
                     cand.add(t["name"])
-    except Exception:
-        pass
+    except ApiError as e:
+        if e.code != 404:
+            raise
     stable = [c for c in cand if not is_prerelease(c)]
     pool = stable or list(cand)
     return max(pool, key=semver) if pool else None
@@ -291,15 +326,35 @@ blocked, unverified = [], []
 # One row per verified package for the checklist below, so a run that changes
 # nothing still shows every package was checked (and why any was skipped).
 rows = []
+
+def explain_api_failure(err):
+    print(f"error: GitHub API request failed: {err}", file=sys.stderr)
+    if err.code == 401:
+        print("       The token was rejected. Log in again (`gh auth login`) or set", file=sys.stderr)
+        print("       a valid GITHUB_TOKEN/GH_TOKEN.", file=sys.stderr)
+    elif err.code in (403, 429):
+        print("       Rate limited or forbidden. The unauthenticated API allows only", file=sys.stderr)
+        print("       60 requests/hour; authenticate with `gh auth login` or export", file=sys.stderr)
+        print("       GITHUB_TOKEN/GH_TOKEN.", file=sys.stderr)
+    else:
+        print("       Network or GitHub problem; re-run once it recovers.", file=sys.stderr)
+    print("       Continuing would report unchecked packages as unknown, so nothing", file=sys.stderr)
+    print("       was changed.", file=sys.stderr)
+
+api_error = None
 for repo, names in sorted(by_repo.items()):
     owner, rname = REPO_RE.match(repo).groups()
-    tag = latest_github(owner, rname)
+    try:
+        tag = latest_github(owner, rname)
+    except ApiError as e:
+        api_error = (repo, e)
+        break
     newver = norm(tag) if tag else None
     if not newver:
         unknown.append(repo)
         for n in names:
             sv = spec_version(n) or str(pkgs[n].get("version", ""))
-            rows.append((n, sv, None, "(unknown)"))
+            rows.append((n, sv, None, "(no releases or tags)"))
         continue
 
     cur = {}      # per-package current version, preferring the spec
@@ -334,6 +389,12 @@ for repo, names in sorted(by_repo.items()):
         else:
             ahead = semver(cur[n]) > semver(newver)
             rows.append((n, cur[n], tag, "ok (ahead of latest release)" if ahead else "ok"))
+
+if api_error:
+    repo, err = api_error
+    explain_api_failure(err)
+    print(f"error: could not check {repo}; nothing was bumped or submitted.", file=sys.stderr)
+    sys.exit(2)
 
 # Verified packages with no GitHub repo (a vendor download URL) cannot be
 # followed automatically, but they still belong in the checklist.
@@ -397,7 +458,7 @@ if drift:
 
 if unknown:
     print()
-    print("warning: could not determine latest upstream version for:")
+    print("warning: upstream publishes no GitHub release or tag to compare against:")
     for repo in unknown:
         print(f"  {repo}")
 
