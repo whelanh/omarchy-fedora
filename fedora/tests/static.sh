@@ -283,6 +283,20 @@ t "auto-update.sh skips held packages" python3 -c "
 s = open('fedora/rpm/copr/auto-update.sh').read()
 assert 'if n in held' in s, 'updater must skip hold: packages'
 "
+# A run with nothing to bump used to print only \"all verified packages current\",
+# which reads as if the checklist had been skipped. Every verified package now
+# gets a row (ok / BUMP / HELD / SKIPPED / (unknown) / (manual)), so it is
+# visible that omasnap, omawrite, ... were checked and why any was left alone.
+t "auto-update.sh plans every verified package, not just the bumps" python3 -c "
+s = open('fedora/rpm/copr/auto-update.sh').read()
+assert 'rows = []' in s and 'rows.append' in s, 'checklist rows missing'
+assert 'for name, oldver, tag, status in rows' in s, 'the plan table must iterate every row'
+assert '\"ok\"' in s, 'current packages need an ok row'
+assert '(manual)' in s, 'vendor-URL packages must appear in the checklist'
+assert '(unknown)' in s, 'unreachable repos must show up instead of vanishing'
+assert s.index('for name, oldver, tag, status in rows') < s.index('package(s) to bump'), \
+    'the table must print before the summary'
+"
 t "check-updates.sh marks held packages HELD" python3 -c "
 s = open('fedora/rpm/copr/check-updates.sh').read()
 assert 'HELD' in s and 'hold' in s, 'drift report must mark holds'

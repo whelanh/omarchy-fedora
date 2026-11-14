@@ -21,7 +21,10 @@
 #
 # Notes:
 #   - Only packages with `status: verified` in manifest.yaml are considered;
-#     the others are not part of the COPR.
+#     the others are not part of the COPR. The plan prints every one of them
+#     with its packaged and latest version, so a run that changes nothing still
+#     shows each package was checked (`ok`, `HELD`, `SKIPPED`, `(unknown)`).
+#     `(manual)` rows are the vendor-URL packages the updater cannot follow.
 #   - Runs `check-updates.sh --packages` and warns about new upstream package
 #     add/remove drift (unmapped or stale mappings). Rows accepted in
 #     fedora/mappings/package-audit-baseline.conf are suppressed, so only new
@@ -285,12 +288,18 @@ for name, p in sorted(pkgs.items()):
 
 plan, unknown, drift = [], [], []
 blocked, unverified = [], []
+# One row per verified package for the checklist below, so a run that changes
+# nothing still shows every package was checked (and why any was skipped).
+rows = []
 for repo, names in sorted(by_repo.items()):
     owner, rname = REPO_RE.match(repo).groups()
     tag = latest_github(owner, rname)
     newver = norm(tag) if tag else None
     if not newver:
         unknown.append(repo)
+        for n in names:
+            sv = spec_version(n) or str(pkgs[n].get("version", ""))
+            rows.append((n, sv, None, "(unknown)"))
         continue
 
     cur = {}      # per-package current version, preferring the spec
@@ -308,6 +317,7 @@ for repo, names in sorted(by_repo.items()):
     # skipped: their blocker is a dependency, not a version bump.
     for n in names:
         if n in held:
+            rows.append((n, cur[n], tag, f"HELD ({held[n]})"))
             continue
         if semver(cur[n]) < semver(newver):
             # Never bump to a release whose files are not all published: the
@@ -317,21 +327,43 @@ for repo, names in sorted(by_repo.items()):
             unverified.extend((n, url, code) for url, code in unverifiable)
             if missing:
                 blocked.append((n, cur[n], newver, missing))
+                rows.append((n, cur[n], tag, "SKIPPED (source 404)"))
                 continue
             plan.append((n, newver, cur[n], tag))
+            rows.append((n, cur[n], tag, f"BUMP -> {newver}-1"))
+        else:
+            ahead = semver(cur[n]) > semver(newver)
+            rows.append((n, cur[n], tag, "ok (ahead of latest release)" if ahead else "ok"))
+
+# Verified packages with no GitHub repo (a vendor download URL) cannot be
+# followed automatically, but they still belong in the checklist.
+for n, p in sorted(pkgs.items()):
+    if p.get("status") == "verified" and not REPO_RE.match(p.get("repo", "") or ""):
+        rows.append((n, spec_version(n) or str(p.get("version", "")), None,
+                     "(manual)"))
 
 plan.sort(key=lambda r: r[0])
 with open(plan_path, "w") as f:
     for name, newver, oldver, tag in plan:
         f.write(f"{name}\t{newver}\t{oldver}\t{tag}\n")
 
+rows.sort(key=lambda r: r[0])
+print(f"{'package':35} {'packaged':>10} {'latest':>10}  status")
+print("-" * 72)
+for name, oldver, tag, status in rows:
+    print(f"{name:35} {oldver:>10} {str(tag or '?'):>10}  {status}")
+
+current = sum(1 for r in rows if r[3].startswith("ok"))
+print()
 if plan:
-    print(f"{'package':35} {'packaged':>10} {'latest':>10}  action")
-    print("-" * 72)
-    for name, newver, oldver, tag in plan:
-        print(f"{name:35} {oldver:>10} {newver:>10}  BUMP -> {newver}-1")
+    print(f"{len(plan)} of {len(rows)} package(s) to bump")
+elif held or blocked or unknown:
+    print(f"nothing to bump ({len(held) + len(blocked) + len(unknown)} package(s) need review, below)")
+elif current == len(rows):
+    print(f"all {len(rows)} package(s) current")
 else:
-    print("all verified packages current")
+    manual = len(rows) - current
+    print(f"all {current} tracked package(s) current ({manual} manual)")
 
 if held:
     print()

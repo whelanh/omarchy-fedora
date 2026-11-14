@@ -236,7 +236,12 @@ bash fedora/rpm/copr/auto-update.sh --yes --no-watch
 `status: verified` packages, bumps packages that share an upstream repo
 (`owe` + `owe-lockfeed`) together to the same version, reads the current
 version from the spec (so a stale manifest can't hide a bump), and writes all
-edits only after every edit has succeeded. Before bumping it HEAD-checks the
+edits only after every edit has succeeded. Every run prints the whole
+checklist — each verified package with its packaged and latest version and an
+`ok`/`BUMP`/`HELD`/`SKIPPED`/`(unknown)` status — so a run with nothing to bump
+still shows that every package was checked. `(manual)` marks the vendor-URL
+packages (e.g. `openai-codex-desktop`) the updater cannot follow. Before
+bumping it HEAD-checks the
 spec's `Source:` URLs at the new version and skips the package when one 404s
 (upstream sometimes publishes a tag before its platform builds — voxtype
 v1.2.0 shipped macOS-only because its Linux workflow failed — and bumping
