@@ -137,6 +137,10 @@ google-noto-color-emoji-fonts
 google-noto-sans-cjk-fonts
 google-noto-sans-fonts
 jetbrains-mono-fonts
+# Console fonts for setup (Arch: terminus-font). Fedora splits the Arch
+# package; -console ships the PSF files console-font.sh reads (desktop OTB
+# fonts live in terminus-fonts, which nothing here uses).
+terminus-fonts-console
 
 # development
 lua

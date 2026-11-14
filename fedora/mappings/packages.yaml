@@ -467,6 +467,18 @@ packages:
     package: google-noto-color-emoji-fonts
     source: substitute
     note: Fedora emoji font package name
+  terminus-font:
+    package: terminus-fonts-console
+    source: fedora
+    note: >
+      Arch ships the console PSF fonts and the desktop OTB fonts in one
+      package; Fedora splits them. terminus-fonts has the OTB/fontconfig side,
+      terminus-fonts-console the PSF files. Upstream only needs the console
+      side: install/provisioning/console-font.sh loads ter-v16b.psf.gz /
+      ter-v32b.psf.gz for the setup form. Fedora's console font directory is
+      /usr/lib/kbd/consolefonts, not the /usr/share/kbd/consolefonts that
+      script hardcodes, and the port never runs it (its first-run is
+      graphical), so no path shim is installed.
   ttf-jetbrains-mono-nerd-basic:
     package: jetbrains-mono-fonts
     source: substitute
