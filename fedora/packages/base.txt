@@ -22,6 +22,10 @@ chromium
 # added cmake to omarchy-base.packages (migrations/1794396478.sh).
 cmake
 curl
+# crun and podman run omarchy-local-ai's models rootless. Upstream put them in
+# omarchy-base.packages (0c6dc2038) so setting up the first model needs no
+# install prompt.
+crun
 cups
 cups-filters
 cups-pk-helper
@@ -71,6 +75,9 @@ nss-mdns
 pamixer
 plocate
 plymouth
+# Runs omarchy-local-ai's models rootless; upstream put it in
+# omarchy-base.packages (0c6dc2038), paired with crun above.
+podman
 # Stands in for upstream's omarchy-power-profiles-daemon fork, whose extra
 # drivers are ARM-only (cppc_cpufreq, RTX Spark/N1x, Snapdragon X); this port
 # is x86_64-only. See fedora/mappings/packages.yaml.

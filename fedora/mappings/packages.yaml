@@ -118,7 +118,7 @@ packages:
     source: copr
     repository: whelanh/omarchy
     rpm: fedora/rpm/omarchy-local-ai/omarchy-local-ai.spec
-    note: Local model engine (Python) plus its curated recipe catalog; noarch, no compile step. Omarchy's omarchy-agent-local exposes it as `omarchy agent local`; the models themselves run in rootless podman, installed on demand.
+    note: Local model engine (Python) plus its curated recipe catalog; noarch, no compile step. Omarchy's omarchy-agent-local exposes it as `omarchy agent local`; the models themselves run in rootless podman (podman + crun are base packages, upstream 0c6dc2038).
   omarchy-screensaver:
     package: omarchy-screensaver
     source: copr
@@ -203,6 +203,7 @@ packages:
   chromium:              { package: chromium, source: fedora }
   clang:                 { package: clang, source: fedora }
   cmake:                 { package: cmake, source: fedora, note: upstream added it to omarchy-base.packages because omarchy-app now builds with CMake (upstream/migrations/1794396478.sh) }
+  crun:                  { package: crun, source: fedora, note: OCI runtime for the rootless podman containers that run local models; upstream put it in base so the first model needs no install prompt (0c6dc2038) }
   cups:                  { package: cups, source: fedora }
   cups-filters:          { package: cups-filters, source: fedora }
   cups-pk-helper:        { package: cups-pk-helper, source: fedora }
@@ -337,6 +338,7 @@ packages:
   pinta:                 { package: com.github.PintaProject.Pinta, source: flatpak, note: not in Fedora official; Flathub app }
   plocate:               { package: plocate, source: fedora }
   plymouth:              { package: plymouth, source: fedora }
+  podman:                { package: podman, source: fedora, note: runs omarchy-local-ai's models rootless; upstream put it in base so the first model needs no install prompt (0c6dc2038) }
   # Upstream replaced stock power-profiles-daemon with its own fork
   # (omarchy-power-profiles-daemon, pkgrel 3): stock PPD registers no
   # cppc_cpufreq driver, so profiles are placeholders on ARM laptops, and the
@@ -754,3 +756,18 @@ packages:
       AUR-only copy of a board-2.bin record for Qualcomm 17cb:1107/1112 Wi-Fi
       cards. No Fedora package, and upstream's fix script only runs on that
       hardware.
+  nvidia-container-toolkit:
+    package: null
+    source: unavailable
+    note: >
+      Not in Fedora or RPM Fusion; NVIDIA ships it from its own repository
+      (nvidia-container-toolkit on developer.download.nvidia.com). Upstream
+      adds it on an NVIDIA machine only, for the CDI spec that hands the GPU to
+      the rootless podman containers running local models; without it the
+      models fall back to CPU.
+  hp-omnibook-3-audio:
+    package: null
+    source: unavailable
+    note: >
+      AUR-only speaker quirk for the HP OmniBook 3. No Fedora package; the
+      upstream script only applies on that laptop's codec.

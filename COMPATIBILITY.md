@@ -23,15 +23,15 @@ human-readable summary. Classifications:
 for each classification. Static tests verify every upstream base package is
 mapped.
 
-## Summary counts (from packages.yaml, 249 entries)
+## Summary counts (from packages.yaml, 256 entries)
 
 | Classification | Count |
 |---|---|
-| fedora (official) | 123 |
+| fedora (official) | 127 |
 | substitute | 38 |
 | copr | 15 + 26 first-party |
 | external (mise) | 1 |
-| unavailable | 23 |
+| unavailable | 26 |
 | drop (Arch-only) | 14 |
 | rpmfusion | 7 |
 | flatpak | 2 |
@@ -288,6 +288,19 @@ Caveats:
    keeps the Omarchy look) is available via `install.sh --with-session-chooser`
    for converted machines where locking the greeter to Omarchy-only is
    undesirable; see `fedora/sddm-omarchy-plus/README.md`.
+7. **Local models: podman is base, the NVIDIA toolkit is not packaged** —
+   `omarchy-local-ai` runs its models in rootless podman containers. Upstream
+   made `podman` and `crun` base packages (`0c6dc2038`) so setting up the first
+   model installs nothing; both map to Fedora's official packages and are in
+   `fedora/packages/base.txt`, so `omarchy update` backfills them on existing
+   machines. `nvidia-container-toolkit` — added to `omarchy-other.packages` for
+   NVIDIA machines, because it writes the CDI spec that hands the GPU to those
+   containers — is **unavailable**: neither Fedora nor RPM Fusion packages it and
+   NVIDIA ships it only from its own repository. Upstream's on-demand fallback in
+   `bin/omarchy-agent-local` runs `pkexec /usr/bin/pacman -S`, a path that does
+   not exist here; with podman/crun in base the only thing it could still ask for
+   is that toolkit, so an NVIDIA machine runs local models on CPU until the user
+   installs it from NVIDIA's repo.
 
 ## Requirement: no security bypass
 

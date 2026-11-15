@@ -61,15 +61,15 @@ while IFS= read -r pkg; do
 done < upstream/install/omarchy-base.packages
 
 echo "== Mapping consistency: fedora/substitute base packages are installed =="
-# A base package classified `fedora`/`substitute` must resolve to a Fedora
+# A base package classified 'fedora'/'substitute' must resolve to a Fedora
 # package name that actually appears in an install manifest (base/desktop/
 # applications). Otherwise it would silently never be installed - either the
-# mapping points at a nonexistent package (e.g. `dua` instead of `dua-cli`) or
+# mapping points at a nonexistent package (e.g. 'dua' instead of 'dua-cli') or
 # the manifest is missing the entry. Offline proxy for "in the enabled repos".
 # Retired packages are the exception: they must NOT be installed (see the
 # retired-packages tests), so skip them here. The same goes for packages we
 # deliberately stop installing while keeping the mapping for existing machines
-# (`kept_but_not_installed`, e.g. xsetroot).
+# ('kept_but_not_installed', e.g. xsetroot).
 t "fedora/substitute base targets are in the install manifests" python3 -c "
 import glob, yaml
 installed = set()
@@ -86,8 +86,8 @@ for line in open('fedora/mappings/retired-packages.conf'):
 packages = yaml.safe_load(open('fedora/mappings/packages.yaml'))['packages']
 # Fedora targets we intentionally no longer install, but keep mapped (and keep
 # on existing machines) because they are a manual fallback:
-#   xsetroot - upstream dropped it with startup-cursor.lua; `xsetroot
-#   -cursor_name left_ptr` is the workaround for X11/XWayland apps that lose
+#   xsetroot - upstream dropped it with startup-cursor.lua; 'xsetroot
+#   -cursor_name left_ptr' is the workaround for X11/XWayland apps that lose
 #   the cursor (e.g. scid Community).
 kept_but_not_installed = {'xsetroot'}
 missing = []
@@ -149,6 +149,20 @@ t "shim translates a Fedora name mismatch" bash -c '
 t "shim passes through unmapped names" bash -c '
   . fedora/scripts/lib/pkg.sh
   [[ "$(_omarchy_pkg_resolve tailscale)" == "fedora|tailscale||||" ]]
+'
+# Upstream's bin/omarchy-agent-local installs its container packages on demand
+# behind a hardcoded 'pkexec /usr/bin/pacman', which does not exist here. The
+# NVIDIA toolkit cannot be installed from Fedora, so it must not be counted as
+# missing: otherwise the panel's setup on an NVIDIA machine would report
+# "Couldn't install podman crun nvidia-container-toolkit" (and prompt for a
+# password) even with podman and crun already installed.
+t "omarchy-pkg-missing ignores packages we cannot install" bash -c '
+  . fedora/scripts/lib/pkg.sh
+  ! omarchy_pkg_missing nvidia-container-toolkit
+'
+t "omarchy-pkg-missing still reports an absent installable package" bash -c '
+  . fedora/scripts/lib/pkg.sh
+  omarchy_pkg_missing omarchy-no-such-package-for-tests
 '
 
 echo "== Retired packages =="
@@ -245,7 +259,7 @@ t "copr/submit-builds.sh bash -n" bash -n fedora/rpm/copr/submit-builds.sh
 t "copr/check-updates.sh bash -n" bash -n fedora/rpm/copr/check-updates.sh
 t "copr/delete-retired.sh bash -n" bash -n fedora/rpm/copr/delete-retired.sh
 # list-packages JSON is an array of objects; the presence check must compare the
-# "name" field. A bare `name in list` compares against the dicts and is never
+# "name" field. A bare 'name in list' compares against the dicts and is never
 # true, so every delete is silently skipped as "already absent".
 t "copr/delete-retired.sh checks the package name field" python3 -c "
 s = open('fedora/rpm/copr/delete-retired.sh').read()
@@ -259,7 +273,17 @@ names = [l.split('#')[0].strip() for l in open('fedora/rpm/copr/retired-packages
 assert 'elsewhen' in names, 'elsewhen must be listed for COPR deletion'
 assert 'openai-codex-bin' in names, 'openai-codex-bin must be listed for COPR deletion'
 assert 'tensaku' in names, 'tensaku must be listed for COPR deletion'
-assert 'folio' in names, 'the old `folio` COPR package must be deleted (renamed to omarchy-folio)'
+assert 'folio' in names, 'the old folio COPR package must be deleted (renamed to omarchy-folio)'
+"
+# A backtick inside a double-quoted 'python3 -c "..."' body is a shell command
+# substitution, not text: bash runs a program named after the word. That made
+# the check above execute /usr/bin/folio (installed from our own COPR) and hang
+# the whole suite. Comment lines inside those bodies count too, so this file
+# uses apostrophes instead of backticks everywhere; keep it that way.
+t "static.sh contains no shell backticks" python3 -c "
+bt = chr(96)
+bad = [i for i, line in enumerate(open('fedora/tests/static.sh'), 1) if bt in line]
+assert not bad, 'a backtick runs as a command (even in a comment inside a quoted body): %s' % bad
 "
 # auto-update.sh can prune those packages from the COPR as part of its run.
 t "auto-update.sh supports --prune-retired" python3 -c "
@@ -267,7 +291,7 @@ s = open('fedora/rpm/copr/auto-update.sh').read()
 assert '--prune-retired' in s, 'flag missing'
 assert 'delete-retired.sh' in s, 'prune must call delete-retired.sh'
 "
-# A package can be pinned at its packaged version with `hold:` while upstream's
+# A package can be pinned at its packaged version with 'hold:' while upstream's
 # new release needs a dependency we cannot get yet (titlebars 0.3.0 needs
 # Hyprland 0.57 headers; nett00n/hyprland still ships 0.56.2). Both the updater
 # and the drift report must honour it, otherwise every run re-bumps the package
@@ -553,7 +577,7 @@ t "folio and plain are first-party and default-installed" python3 -c "
 import subprocess, yaml
 pkgs = yaml.safe_load(open('fedora/mappings/packages.yaml'))['packages']
 # 'folio' is the upstream/Arch name; the RPM is omarchy-folio because Fedora's
-# own `folio` is an unrelated note-taking app (see the spec header).
+# own 'folio' is an unrelated note-taking app (see the spec header).
 for arch, rpm in (('folio', 'omarchy-folio'), ('plain', 'plain')):
     entry = pkgs[arch]
     assert entry.get('source') == 'copr', entry
@@ -608,8 +632,8 @@ assert 'nautilus-python' in mig and 'sushi' in mig, 'must prune the Nautilus fam
 # available records the migration as done and never rewrites its mimeapps.
 assert 'exit 75' in mig, 'must defer (EX_TEMPFAIL, no marker) until folio is installed'
 # The marker is named after the file, so a corrected migration must be re-dated
-# or machines that recorded the *broken* run (Fedora's `folio` satisfied the old
-# `rpm -q folio` guard) never run the fix.
+# or machines that recorded the *broken* run (Fedora's 'folio' satisfied the old
+# 'rpm -q folio' guard) never run the fix.
 assert migs[0].split('/')[-1].split('-')[0] > '1794412800', \
     'must be re-dated past the broken run for machines that already marked it done'
 "
@@ -624,7 +648,7 @@ assert 'xdg-mime default folio.desktop inode/directory' in inst, \
 "
 # Upstream 00147cf6d (#18667, 2026-11-12) changed the *default* dock pins without
 # a migration, so installs that copied the old list into ~/.config keep it. The
-# port's `cp -a -n` seeding freezes it at install time, which is why a machine
+# port's 'cp -a -n' seeding freezes it at install time, which is why a machine
 # installed before that commit pins foot/X/YouTube and never hype/monologue.
 t "dock pins migration hands a legacy default back to upstream's defaults" python3 -c "
 import glob
@@ -764,10 +788,10 @@ install = s.split('%install', 1)[1].split('%files', 1)[0]
 assert 'pkgbuild/' not in install, 'folio 0.4.0 moved its desktop entry and icon to share/'
 assert 'share/folio.svg' in install and 'share/folio.desktop' in install
 "
-# Fedora ships its own unrelated `folio` (Toolstack's note-taking app, 26.x).
-# An RPM named `folio` loses dnf's version comparison and silently installs the
+# Fedora ships its own unrelated 'folio' (Toolstack's note-taking app, 26.x).
+# An RPM named 'folio' loses dnf's version comparison and silently installs the
 # wrong app, so the package name carries the omarchy- prefix while the files keep
-# upstream's names (bin/omarchy-launch-files runs `folio`; mimeapps points at
+# upstream's names (bin/omarchy-launch-files runs 'folio'; mimeapps points at
 # folio.desktop). Obsoletes must be version-bounded or we would hijack it.
 t "the file manager RPM is omarchy-folio, never the Fedora-owned name folio" python3 -c "
 s = open('fedora/rpm/omarchy-folio/omarchy-folio.spec').read()
@@ -788,7 +812,7 @@ assert 'rename the RPM' in s, 'must fail loudly instead of publishing a shadowin
 "
 
 echo "== Installer SELinux + update-window hygiene =="
-# `cp -a` carries the checkout's user_home_t label onto system paths, which
+# 'cp -a' carries the checkout's user_home_t label onto system paths, which
 # confines readers like sddm (xdm_t) and udevd (udev_t) out. install.sh must
 # relabel what it copies, and the tree copy must skip unchanged files so a
 # no-op update does not make Hyprland reload (and read a file mid-write).
@@ -884,8 +908,8 @@ assert 'snapshot check failed' in src, 'must filter the now-explained raw warnin
 "
 
 echo "== Installer's grub-btrfs guard works without root =="
-# `omarchy update` runs install.sh as the desktop user, escalating per command,
-# so the old guard (`[ ! -e /boot/grub2/grub.cfg ]`) hit EACCES on /boot/grub2
+# 'omarchy update' runs install.sh as the desktop user, escalating per command,
+# so the old guard ('[ ! -e /boot/grub2/grub.cfg ]') hit EACCES on /boot/grub2
 # (mode 0700) and reported "no GRUB configuration found" on machines that boot
 # GRUB fine. The guard must probe paths any user can stat.
 t "grub-btrfs guard does not test root-only GRUB configs alone" python3 -c "
@@ -900,8 +924,8 @@ assert 'no GRUB configuration found' not in src, 'message must describe the real
 
 echo "== Installer takes over the display manager (GDM / PLM bases) =="
 # On Fedora Workstation GDM owns display-manager.service, and on Fedora 44+
-# KDE Plasma Login Manager (plasmalogin.service) owns it, so `systemctl enable
-# sddm` fails and the Omarchy greeter never appears. install.sh must disable the
+# KDE Plasma Login Manager (plasmalogin.service) owns it, so 'systemctl enable
+# sddm' fails and the Omarchy greeter never appears. install.sh must disable the
 # other DMs first and force-enable SDDM.
 t "install.sh disables competing DMs before enabling SDDM" python3 -c "
 src = open('fedora/scripts/install.sh').read()
@@ -977,7 +1001,7 @@ assert 'enable-session-chooser.sh' in src, 'README must document the migration'
 "
 
 echo "== Userspace update: squashed subtree + opt-in live pull =="
-# upstream/ is a --squash subtree, so a plain `git subtree pull` fails with
+# upstream/ is a --squash subtree, so a plain 'git subtree pull' fails with
 # "refusing to merge unrelated histories"; it also needs the separate
 # git-subtree package. update.sh must use --squash, gate the live pull behind
 # OMARCHY_FEDORA_UPDATE_UPSTREAM=1, and check for git-subtree.
@@ -989,7 +1013,7 @@ assert 'OMARCHY_FEDORA_UPDATE_UPSTREAM:-0' in src, 'live pull must be opt-in'
 "
 
 echo "== Update upgrades mise-managed tools (matches upstream) =="
-# Upstream's omarchy-update-mise runs on every `omarchy update`, overriding
+# Upstream's omarchy-update-mise runs on every 'omarchy update', overriding
 # mise's release-age cooldown (MISE_MINIMUM_RELEASE_AGE=0) so tools advance.
 # The Fedora updater must do the same, as the target user (mise toolchains are
 # per-$HOME), and best-effort so a failed tool build cannot block the update.

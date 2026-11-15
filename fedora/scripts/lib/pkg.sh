@@ -434,9 +434,16 @@ omarchy_pkg_repo_enabled() {
 # philosophy as the omarchy-update shim).
 
 # omarchy-pkg-missing: 0 (true) if ANY named package is missing, 1 if all present.
+# A name mapped `unavailable` can never be installed here, so it is not counted
+# as missing: otherwise a caller that installs its list on demand (upstream's
+# bin/omarchy-agent-local adds nvidia-container-toolkit on an NVIDIA machine and
+# then shells out to pacman) would retry an impossible install and fail. Paired
+# with omarchy_pkg_add's warn-and-skip, the feature degrades to what we have.
 omarchy_pkg_missing() {
-  local pkg
+  local pkg src pkgs repo cmd desktop fb
   for pkg in "$@"; do
+    IFS='|' read -r src pkgs repo cmd desktop fb < <(_omarchy_pkg_resolve "$pkg")
+    [ "$src" = unavailable ] && continue
     omarchy_pkg_is_installed "$pkg" || return 0
   done
   return 1
