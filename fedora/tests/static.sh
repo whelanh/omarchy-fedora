@@ -248,6 +248,9 @@ t "base manifest skips an entry replaced by an installed package" bash -c '
   . fedora/scripts/lib/deps.sh
   [ "$(_omarchy_manifest_replaced_by ffmpeg-free)" = ffmpeg ]
   [ -z "$(_omarchy_manifest_replaced_by bash)" ]
+  # Pretend the replacement is installed: the test must not depend on what
+  # this machine (or the CI container) happens to have.
+  rpm() { return 0; }
   f="$(mktemp)"
   printf "%s\n" ffmpeg-free bash > "$f"
   out="$(omarchy_pkg_install() { echo "install:$*"; }; omarchy_fedora_install_list "$f" 2>&1)"
