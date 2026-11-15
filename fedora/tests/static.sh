@@ -1085,11 +1085,18 @@ def safe(name):
     return name
 icons = {safe(os.path.splitext(os.path.basename(p))[0])
          for p in glob.glob('upstream/applications/icons/*')}
-# Launchers may also use themed icons: omarchy-theme-set-icons renders
-# default/themed/icons/<name>.svg.tpl into the user's icon theme at runtime
-# (omarchy-terminal, omarchy-browser, ...), so a template covers the name too.
-themed = {os.path.splitext(os.path.splitext(os.path.basename(p))[0])[0]
-          for p in glob.glob('upstream/default/themed/icons/*.svg.tpl')}
+# Launchers may also use themed icons: an icon set under upstream/icons/<set>/
+# is drawn into the user's icon theme at runtime (omarchy-theme-set-icons), so a
+# template there covers the name too. Older trees kept them in
+# default/themed/icons/<name>.svg.tpl; accept both while upstream moves.
+def icon_name(path):
+    base = os.path.basename(path)
+    for ext in ('.svg.tpl', '.svg', '.png'):
+        if base.endswith(ext):
+            return base[:-len(ext)]
+    return os.path.splitext(base)[0]
+themed = {icon_name(p) for p in glob.glob('upstream/default/themed/icons/*.svg.tpl')}
+themed |= {icon_name(p) for p in glob.glob('upstream/icons/*/*.svg.tpl')}
 # foot and mpv are real programs whose icons come from their own packages.
 # text-editor is a themed icon name (Adwaita/Yaru legacy), used by
 # omarchy-launch-editor.desktop, not an Omarchy asset.
