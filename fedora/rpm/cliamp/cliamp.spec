@@ -5,7 +5,7 @@
 # Arch PKGBUILD's package layout. No Go toolchain needed.
 Name:           cliamp
 Version:        2.4.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A retro terminal music player inspired by Winamp 2.x
 
 License:        MIT
@@ -16,7 +16,9 @@ Source1:        %{url}/releases/download/v%{version}/cliamp-linux-amd64
 BuildArch:      x86_64
 
 Requires:       alsa-lib
-Requires:       ffmpeg-free
+# Either FFmpeg build provides the binary: RPM Fusion's full ffmpeg Conflicts
+# with Fedora's ffmpeg-free, so require the file, not one of the packages.
+Requires:       /usr/bin/ffmpeg
 Requires:       yt-dlp
 
 %description
@@ -41,6 +43,11 @@ install -Dm644 LICENSE %{buildroot}%{_datadir}/licenses/%{name}/LICENSE
 %{_datadir}/pixmaps/cliamp.png
 
 %changelog
+* Sun Nov 15 2026 whelanh <brickhousedevelopers@gmail.com> - 2.4.1-2
+- Require /usr/bin/ffmpeg instead of the ffmpeg-free package: RPM Fusion's
+  full ffmpeg provides the file and Conflicts with ffmpeg-free, so the hard
+  package dependency made cliamp uninstallable on machines that have it
+
 * Thu Nov 12 2026 whelanh <brickhousedevelopers@gmail.com> - 2.4.1-1
 - Automatic update to upstream v2.4.1
 

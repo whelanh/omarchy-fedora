@@ -56,6 +56,19 @@ Arch's `nvidia-*-dkms` + `nvidia-utils` map to Fedora's `akmod-nvidia` +
 `xorg-x11-drv-nvidia` from RPM Fusion nonfree. Fedora uses `akmods`, not
 `kernel-modules-hook`.
 
+### FFmpeg: free build by default, either build satisfies the apps
+Upstream's `ffmpeg` maps to Fedora's `ffmpeg-free` (`source: substitute`), and
+the base manifest installs it. RPM Fusion's full `ffmpeg` **Conflicts** with
+`ffmpeg-free` rather than obsoleting it, so a machine that already replaced the
+free build (hardware encode, mpv, ...) used to fail the whole backfill on
+`ffmpeg-free`, and the first-party RPMs that declared `Requires: ffmpeg-free`
+could not be installed at all. Both fixes are now in place: the six apps that
+shell out to FFmpeg (cliamp, hype, monologue, omacut, owe, superwhisper-bin)
+require `/usr/bin/ffmpeg` instead of the package, and
+`omarchy_fedora_install_list` skips a manifest entry when its conflicting
+replacement is installed. The free-vs-full choice stays the user's; the port
+never forces either.
+
 ### Boot / kernel
 Arch's custom kernels (`linux-ptl`, `linux-t2`) and `linux-headers` have no
 direct analog: Fedora uses the stock `kernel` and `kernel-devel`. Limine and

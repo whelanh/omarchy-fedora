@@ -8,7 +8,7 @@
 
 Name:           hype
 Version:        0.7.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Simple Markdown presentations with a visual slide editor
 
 License:        MIT
@@ -32,7 +32,9 @@ Requires:       qt6-qtimageformats
 Requires:       qt6-qtsvg
 Requires:       libwebp
 Requires:       source-highlight
-Requires:       ffmpeg-free
+# Either FFmpeg build provides the binary: RPM Fusion's full ffmpeg Conflicts
+# with Fedora's ffmpeg-free, so require the file, not one of the packages.
+Requires:       /usr/bin/ffmpeg
 Requires:       hicolor-icon-theme
 Requires:       xdg-desktop-portal
 
@@ -62,6 +64,11 @@ install -Dm644 README.md %{buildroot}%{_datadir}/doc/%{name}/README.md
 %{_datadir}/doc/%{name}/README.md
 
 %changelog
+* Sun Nov 15 2026 whelanh <brickhousedevelopers@gmail.com> - 0.7.1-2
+- Require /usr/bin/ffmpeg instead of the ffmpeg-free package: RPM Fusion's
+  full ffmpeg provides the file and Conflicts with ffmpeg-free, so the hard
+  package dependency made hype uninstallable on machines that have it
+
 * Thu Nov 12 2026 whelanh <brickhousedevelopers@gmail.com> - 0.7.1-1
 - Automatic update to upstream v0.7.1
 

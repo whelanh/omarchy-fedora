@@ -4,7 +4,7 @@
 # Arch `owe` package (daemon + CLI + renderer + hooks), not the qml-plugin.
 Name:           owe
 Version:        0.2.15
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        High-performance wallpaper engine for Omarchy (mp4, gif, stills)
 
 # Upstream ships no LICENSE file; the project is MIT (meson.build `license`).
@@ -26,7 +26,9 @@ BuildRequires:  systemd-devel
 BuildRequires:  python3
 
 Requires:       mpv
-Requires:       ffmpeg-free
+# Either FFmpeg build provides the binary: RPM Fusion's full ffmpeg Conflicts
+# with Fedora's ffmpeg-free, so require the file, not one of the packages.
+Requires:       /usr/bin/ffmpeg
 Requires:       socat
 
 %description
@@ -63,6 +65,11 @@ install -Dm644 config/config.toml %{buildroot}%{_docdir}/%{name}/config.toml.exa
 %{_docdir}/%{name}/config.toml.example
 
 %changelog
+* Sun Nov 15 2026 whelanh <brickhousedevelopers@gmail.com> - 0.2.15-2
+- Require /usr/bin/ffmpeg instead of the ffmpeg-free package: RPM Fusion's
+  full ffmpeg provides the file and Conflicts with ffmpeg-free, so the hard
+  package dependency made owe uninstallable on machines that have it
+
 * Tue Nov 10 2026 whelanh <brickhousedevelopers@gmail.com> - 0.2.15-1
 - Automatic update to upstream v0.2.15
 

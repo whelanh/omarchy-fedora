@@ -221,6 +221,42 @@ print(len(seen), 'baseline entries')
 "
 
 echo "== First-party RPM scaffold: manifest + spec + build helper =="
+# RPM Fusion's full ffmpeg *Conflicts* with Fedora's ffmpeg-free (no obsoletes),
+# so a package that Requires ffmpeg-free is uninstallable on a machine that
+# already replaced it - which is exactly what 'omarchy update' hit. Both builds
+# provide /usr/bin/ffmpeg, so require the file and let either satisfy it.
+t "first-party RPMs accept either FFmpeg build" python3 -c "
+import glob, re
+specs = sorted(glob.glob('fedora/rpm/*/*.spec'))
+bad, checked = [], 0
+for path in specs:
+    s = open(path).read()
+    if re.search(r'(?m)^Requires:\s+ffmpeg-free\s*$', s):
+        bad.append(path)
+    if '/usr/bin/ffmpeg' in s:
+        checked += 1
+        assert re.search(r'(?m)^Requires:\s+/usr/bin/ffmpeg\s*$', s), path
+        if re.search(r'(?m)^BuildRequires:.*ffmpeg-free-devel', s):
+            pass  # build-time only: COPR builds plain Fedora, where that exists
+assert not bad, 'hard package dependency on ffmpeg-free: %r' % bad
+assert checked == 6, ('expected the six ffmpeg shell-out packages', checked)
+"
+# A base-manifest entry whose equivalent is installed must not be forced: dnf
+# reports a hard conflict and the whole backfill fails (see the ffmpeg case
+# above). omarchy_fedora_install_list skips those instead.
+t "base manifest skips an entry replaced by an installed package" bash -c '
+  . fedora/scripts/lib/deps.sh
+  [ "$(_omarchy_manifest_replaced_by ffmpeg-free)" = ffmpeg ]
+  [ -z "$(_omarchy_manifest_replaced_by bash)" ]
+  f="$(mktemp)"
+  printf "%s\n" ffmpeg-free bash > "$f"
+  out="$(omarchy_pkg_install() { echo "install:$*"; }; omarchy_fedora_install_list "$f" 2>&1)"
+  rm -f "$f"
+  [[ "$out" == *"install:bash"* ]]
+  [[ "$out" != *"install:ffmpeg-free"* ]]
+  [[ "$out" == *"already provided by installed"* ]]
+'
+
 t "fedora/rpm/manifest.yaml parses" python3 -c "
 import glob, os, yaml
 d = yaml.safe_load(open('fedora/rpm/manifest.yaml'))

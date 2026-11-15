@@ -8,7 +8,7 @@
 
 Name:           monologue
 Version:        0.4.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Simple, theme-synced webcam recorder for Omarchy
 
 License:        MIT
@@ -29,7 +29,10 @@ Requires:       qt6-qtbase
 Requires:       qt6-qtdeclarative
 Requires:       qt6-qtmultimedia
 Requires:       pulseaudio-libs
-Requires:       ffmpeg-free
+# Either FFmpeg build provides the binaries: RPM Fusion's full ffmpeg Conflicts
+# with Fedora's ffmpeg-free, so require the files, not one of the packages.
+Requires:       /usr/bin/ffmpeg
+Requires:       /usr/bin/ffprobe
 Requires:       hicolor-icon-theme
 Requires:       xdg-desktop-portal
 
@@ -57,6 +60,12 @@ install -Dm644 pkgbuild/monologue.desktop %{buildroot}%{_datadir}/applications/m
 %{_datadir}/applications/monologue.desktop
 
 %changelog
+* Sun Nov 15 2026 whelanh <brickhousedevelopers@gmail.com> - 0.4.0-3
+- Require /usr/bin/ffmpeg and /usr/bin/ffprobe instead of the ffmpeg-free
+  package: RPM Fusion's full ffmpeg provides the files and Conflicts with
+  ffmpeg-free, so the hard package dependency made monologue uninstallable on
+  machines that have it
+
 * Fri Nov 13 2026 whelanh <brickhousedevelopers@gmail.com> - 0.4.0-2
 - Add upstream v0.4.0's libturbojpeg dependency (the editor's thumbnails
   need it; the build failed without turbojpeg-devel)

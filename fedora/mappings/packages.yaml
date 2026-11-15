@@ -237,7 +237,7 @@ packages:
   ffmpeg:
     package: ffmpeg-free
     source: substitute
-    note: Fedora's official FFmpeg (ffmpeg-free); the full/lawful build is RPM Fusion `ffmpeg`
+    note: Fedora's official FFmpeg (ffmpeg-free); the full/lawful build is RPM Fusion `ffmpeg`, which Conflicts with ffmpeg-free. Either provides /usr/bin/ffmpeg, which is what the first-party RPMs require, and the base manifest skips ffmpeg-free when the full build is installed.
   ffmpegthumbnailer:     { package: ffmpegthumbnailer, source: fedora }
   fontconfig:            { package: fontconfig, source: fedora }
   foot:                  { package: foot, source: fedora }

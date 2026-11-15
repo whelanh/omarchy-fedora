@@ -11,7 +11,7 @@
 
 Name:           superwhisper-bin
 Version:        1.3.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Local and cloud voice dictation with Superwhisper
 
 License:        LicenseRef-proprietary AND MIT
@@ -48,7 +48,9 @@ Requires:       at-spi2-core
 Requires:       pipewire-pulseaudio
 Requires:       libnotify
 Requires:       wl-clipboard
-Requires:       ffmpeg-free
+# Either FFmpeg build provides the binary: RPM Fusion's full ffmpeg Conflicts
+# with Fedora's ffmpeg-free, so require the file, not one of the packages.
+Requires:       /usr/bin/ffmpeg
 Requires:       vulkan-loader
 Requires:       librsvg2
 Requires:       fontconfig
@@ -134,6 +136,12 @@ sed 's|@LIBRARY@|/opt/superwhisper/lib/fcitx5/libsuperwhisper-fcitx5|' \
 /opt/superwhisper
 
 %changelog
+* Sun Nov 15 2026 whelanh <brickhousedevelopers@gmail.com> - 1.3.1-2
+- Require /usr/bin/ffmpeg instead of the ffmpeg-free package: RPM Fusion's
+  full ffmpeg provides the file and Conflicts with ffmpeg-free, so the hard
+  package dependency made superwhisper-bin uninstallable on machines that
+  have it
+
 * Thu Nov 12 2026 whelanh <brickhousedevelopers@gmail.com> - 1.3.1-1
 - Automatic update to upstream v1.3.1
 

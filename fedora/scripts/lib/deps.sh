@@ -226,6 +226,19 @@ omarchy_fedora_prune_retired() {
   return $rc
 }
 
+# Some manifest entries have an equivalent package that *Conflicts* with the
+# Fedora build instead of obsoleting it, so asking dnf for the manifest name
+# fails the whole transaction on a machine that already chose the other. RPM
+# Fusion's full FFmpeg (`ffmpeg`) is the case: it Conflicts with `ffmpeg-free`,
+# and either one provides /usr/bin/ffmpeg. When the replacement is installed the
+# entry is already satisfied - skip it instead of failing the backfill (the
+# -free vs full choice is the user's; never force it either way).
+_omarchy_manifest_replaced_by() {
+  case "${1:-}" in
+    ffmpeg-free) printf 'ffmpeg\n' ;;
+  esac
+}
+
 # Install a category list file (fedora/packages/<name>.txt). Skips comments and
 # any package Omarchy has retired.
 omarchy_fedora_install_list() {
@@ -236,12 +249,17 @@ omarchy_fedora_install_list() {
     echo "omarchy: package list not found: $list" >&2
     return 2
   fi
-  local pkgs=() line x
+  local pkgs=() line x repl
   while IFS= read -r line; do
     line="${line%%#*}"          # strip comments
     line="${line//[[:space:]]/}" # strip whitespace
     [ -n "$line" ] || continue
     omarchy_fedora_is_retired "$line" && continue
+    repl="$(_omarchy_manifest_replaced_by "$line")"
+    if [ -n "$repl" ] && rpm -q "$repl" >/dev/null 2>&1; then
+      echo "omarchy: '$line' already provided by installed '$repl'"
+      continue
+    fi
     pkgs+=("$line")
   done < "$list"
   for x in "${extra[@]}"; do

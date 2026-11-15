@@ -41,7 +41,10 @@ eza
 fakeroot
 fastfetch
 fd-find
-# Fedora's official FFmpeg build (upstream base package `ffmpeg`)
+# Fedora's official FFmpeg build (upstream base package `ffmpeg`).
+# Skipped on a machine that has RPM Fusion's full `ffmpeg` instead: that build
+# Conflicts with ffmpeg-free and either one provides /usr/bin/ffmpeg (see
+# _omarchy_manifest_replaced_by in fedora/scripts/lib/deps.sh).
 ffmpeg-free
 ffmpegthumbnailer
 flatpak
