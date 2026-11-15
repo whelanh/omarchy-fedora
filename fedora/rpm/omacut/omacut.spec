@@ -5,7 +5,7 @@
 
 Name:           omacut
 Version:        0.8.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Dead-simple video length trimmer built with Qt Quick and ffmpeg
 
 License:        MIT
@@ -35,7 +35,13 @@ Omanent is a dead-simple video length trimmer built with Qt Quick and ffmpeg.
 %autosetup -n %{name}-%{version}
 
 %build
-./bin/build
+# Build the app target, not upstream's test binary: v0.8.3's tests pass a
+# QPointF to QDragEnterEvent, whose constructor takes QPoint in Qt 6.11
+# (Fedora 45), so upstream's ./bin/build fails on the test target alone while
+# the app itself compiles. The package ships the app; upstream's CI runs the
+# tests.
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build --target omacut -j"$(nproc)"
 
 %install
 install -Dm755 build/omacut %{buildroot}%{_bindir}/omacut
@@ -50,6 +56,11 @@ install -Dm644 pkgbuild/omacut.desktop %{buildroot}%{_datadir}/applications/omac
 %{_datadir}/applications/omacut.desktop
 
 %changelog
+* Sun Nov 15 2026 whelanh <brickhousedevelopers@gmail.com> - 0.8.3-3
+- Build the app target instead of upstream's ./bin/build: v0.8.3's tests pass
+  a QPointF to QDragEnterEvent, which takes QPoint in Qt 6.11 (Fedora 45), so
+  the test binary no longer compiles while the app does
+
 * Sun Nov 15 2026 whelanh <brickhousedevelopers@gmail.com> - 0.8.3-2
 - Require /usr/bin/ffmpeg and /usr/bin/ffprobe instead of the ffmpeg-free
   package: RPM Fusion's full ffmpeg provides the files and Conflicts with
