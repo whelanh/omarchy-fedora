@@ -313,10 +313,10 @@ omarchy_fedora_install_applications() {
   omarchy_fedora_install_list "$PACKAGES_DIR/applications.txt" || return 1
 }
 
-# Install the 25 default first-party Omarchy packages from the whelanh/omarchy
+# Install the 26 default first-party Omarchy packages from the whelanh/omarchy
 # COPR (aether, cliamp, disktree-bin, gliff, herdr, hype,
 # hyprland-preview-share-picker, monologue, omacalc, omacut, omapresent,
-# omarchy-folio, omarchy-hyprland-titlebars, omarchy-local-ai,
+# omaview, omarchy-folio, omarchy-hyprland-titlebars, omarchy-local-ai,
 # omarchy-screensaver, omawrite, omasnap, owe, owe-lockfeed, plain, qtengine,
 # signed, superwhisper-bin, try, ttfx).
 # omarchy-emacs, openai-codex-desktop and voxtype-bin are published in the same

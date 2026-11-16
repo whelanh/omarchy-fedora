@@ -6,7 +6,7 @@ in Fedora official/COPR repos. They map to `source: copr` entries in
 `fedora/mappings/packages.yaml` and are distributed via the
 `whelanh/omarchy` COPR.
 
-> **Status: 28 VERIFIED, 1 RETIRED, 0 BLOCKED.** Every `verified` package builds
+> **Status: 29 VERIFIED, 1 RETIRED, 0 BLOCKED.** Every `verified` package builds
 > cleanly in the
 > Fedora Rawhide container (`manifest.yaml` status `verified`), driven by
 > `build-rpm-in-ci.sh` — the same path the CI `rpm-build` job runs. `retired`
@@ -66,6 +66,7 @@ FEDORA=1 bash fedora/rpm/build-in-container.sh omasnap
 | omarchy-local-ai | omacom/omarchy-local-ai | noarch-repack (Python + TOML catalog) | MIT | verified |
 | omarchy-screensaver | omacom/omarchy-screensaver | cargo (vendored) | MIT | verified |
 | omasnap | tobi/omasnap | cmake (Qt6, source) | MIT | verified |
+| omaview | omacom/omaview | Qt6 / CMake | MIT | verified |
 | openai-codex-desktop | chatgpt.com/codex | Debian .deb repack | LicenseRef-proprietary | verified |
 | signed | omacom/signed | Qt6 / CMake | MIT | verified |
 | owe | omacom/owe | meson (C) | MIT | verified |

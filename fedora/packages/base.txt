@@ -59,7 +59,6 @@ gvfs-mtp
 gvfs-nfs
 gvfs-smb
 ImageMagick
-imv
 inotify-tools
 inxi
 jq
@@ -70,8 +69,12 @@ libsecret
 libyaml
 man-db
 mariadb-connector-c
+# Upstream dropped mpv from omarchy-base.packages when Omaview replaced it
+# (9599f7661), but keeps it installed: Omarchy's wallpaper engine, owe, plays
+# video wallpapers through it. owe requires mpv, and the port keeps the entry
+# explicit so the runtime dependency is installed even if the first-party set
+# is skipped. Its packaged launcher stays hidden (launcher.hides).
 mpv
-mpv-mpris
 mise
 NetworkManager
 nss-mdns

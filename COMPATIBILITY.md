@@ -23,13 +23,13 @@ human-readable summary. Classifications:
 for each classification. Static tests verify every upstream base package is
 mapped.
 
-## Summary counts (from packages.yaml, 256 entries)
+## Summary counts (from packages.yaml, 257 entries)
 
 | Classification | Count |
 |---|---|
 | fedora (official) | 127 |
 | substitute | 38 |
-| copr | 15 + 26 first-party |
+| copr | 15 + 27 first-party |
 | external (mise) | 1 |
 | unavailable | 26 |
 | drop (Arch-only) | 14 |
@@ -62,9 +62,9 @@ the base manifest installs it. RPM Fusion's full `ffmpeg` **Conflicts** with
 `ffmpeg-free` rather than obsoleting it, so a machine that already replaced the
 free build (hardware encode, mpv, ...) used to fail the whole backfill on
 `ffmpeg-free`, and the first-party RPMs that declared `Requires: ffmpeg-free`
-could not be installed at all. Both fixes are now in place: the six apps that
-shell out to FFmpeg (cliamp, hype, monologue, omacut, owe, superwhisper-bin)
-require `/usr/bin/ffmpeg` instead of the package, and
+could not be installed at all. Both fixes are now in place: the seven apps that
+shell out to FFmpeg (cliamp, hype, monologue, omacut, omaview, owe,
+superwhisper-bin) require `/usr/bin/ffmpeg` instead of the package, and
 `omarchy_fedora_install_list` skips a manifest entry when its conflicting
 replacement is installed. The free-vs-full choice stays the user's; the port
 never forces either.
@@ -117,16 +117,16 @@ definition, as Google ships no `.repo`), swap `chromium` for
 only for machines without Chrome.
 
 ### First-party Omarchy binaries (FIRST_PARTY, COPR `whelanh/omarchy`)
-28 Omarchy packages (`aether`, `cliamp`, `disktree-bin`, `gliff`,
+29 Omarchy packages (`aether`, `cliamp`, `disktree-bin`, `gliff`,
 `herdr`, `hype`, `hyprland-preview-share-picker`, `monologue`, `omacalc`,
-`omacut`, `omapresent`, `omarchy-emacs`, `omarchy-folio`,
+`omacut`, `omapresent`, `omaview`, `omarchy-emacs`, `omarchy-folio`,
 `omarchy-hyprland-titlebars`, `omarchy-local-ai`, `omarchy-screensaver`,
 `omawrite`, `omasnap`,
 `openai-codex-desktop`, `owe`, `owe-lockfeed`, `plain`, `qtengine`, `signed`,
 `superwhisper-bin`, `tobi-try → try`, `ttfx`, `voxtype-bin`) are
 source-built or repacked as Fedora RPMs. Specs live in `fedora/rpm/` (one SPEC
 per package) with a `manifest.yaml` (repo, build system, license, status) and
-publish tooling in `fedora/rpm/copr/`. 25 of them are installed by the default
+publish tooling in `fedora/rpm/copr/`. 26 of them are installed by the default
 first-party set; `omarchy-emacs`, `openai-codex-desktop` and `voxtype-bin` are
 published for on-demand install from Omarchy's Install menu. Three former
 packages are now **retired**: `elsewhen` (`status: retired`; upstream moved it
@@ -145,13 +145,13 @@ default agents) are **not** RPMs — upstream installs them through mise at user
 setup (`install/user/mise.sh` → `omarchy-mise-install`), and the Fedora layer
 does the same (`fedora/scripts/lib/mise.sh`).
 
-**Status — 28 verified, 1 retired, 0 blocked.** Every verified package builds
+**Status — 29 verified, 1 retired, 0 blocked.** Every verified package builds
 cleanly in a Fedora Rawhide container and is published from the
 `whelanh/omarchy` COPR. The default installer enables that COPR and installs
-the 25-package default set (disable with `install.sh --no-firstparty`); the
+the 26-package default set (disable with `install.sh --no-firstparty`); the
 three on-demand packages are installed from Omarchy's Install menu.
 
-All 28 are now published: `omarchy-folio` (formerly `folio`, renamed because
+All 29 are now published: `omarchy-folio` (formerly `folio`, renamed because
 Fedora owns that name) and `plain` landed in the COPR. The machinery that kept
 installs working during the gap stays, because a future publish can lag a
 release; while a first-party RPM is unpublished the port degrades instead of
@@ -169,6 +169,25 @@ breaking:
   one-shot marker, and retries on the next update (see
   `fedora/migrations/README.md`).
 
+### Omaview replaces imv and mpv (upstream 9599f7661)
+Upstream made **Omaview** its picture viewer and media player, replacing `imv`
+and `mpv` in `omarchy-base.packages`. It is packaged first-party (`omaview`,
+Qt6/CMake, built from source) and is in the default set. `imv` and `mpv-mpris`
+are retired: they are no longer installed and `omarchy update` prunes them,
+with `retired-replacements.conf` keeping `imv` until `omaview` is actually
+installed. `mpv` itself stays installed as a dependency of `owe`, which plays
+video wallpapers through it (its packaged launcher stays hidden via
+`launcher.hides`).
+
+On Arch the associations come from the packaged
+`/usr/share/applications/mimeapps.list`; on Fedora that path belongs to
+`shared-mime-info`. The port therefore fills in the user's associations for
+Omaview's MIME types only where no handler is set (fresh installs and updates),
+and the `*-omaview-replaces-imv.sh` migration repoints entries that still name
+`imv.desktop`/`mpv.desktop` and removes Omarchy's old launcher copies when they
+are unmodified. `kimageformats` (HEIC, AVIF, JPEG XL) maps to a
+`Recommends: kf6-kimageformats`, matching upstream's optdepends.
+
 | Package | Version | Notes |
 |---------|---------|-------|
 | aether | v4.32.0 | Go/Wails, repacked release binary |
@@ -180,6 +199,7 @@ breaking:
 | monologue | v0.4.0 | Qt6/CMake webcam recorder + libpulse/turbojpeg |
 | omacalc | v0.4.2 | Qt6/CMake |
 | omacut | v0.8.3 | Qt6/CMake + ffmpeg |
+| omaview | v0.1.0 | Qt6/CMake picture viewer + media player (replaces imv/mpv) |
 | omawrite | v0.7.5 | Qt6/CMake |
 | omasnap | v1.26.2 | built from source (supersedes tensaku) |
 | owe | v0.2.15 | meson/C wallpaper engine (mpv + ffmpeg-free) |
@@ -209,8 +229,8 @@ session — no package manager. The installer wires them onto PATH by symlinking
 Caveats:
 - `omarchy plugin enable/disable` talk to the running shell via
   `omarchy-shell shell enablePlugin`, so Quickshell must be running.
-- The 28 first-party binary packages are built and published from the
-  `whelanh/omarchy` COPR; the default installer installs the 25-package default
+- The 29 first-party binary packages are built and published from the
+  `whelanh/omarchy` COPR; the default installer installs the 26-package default
   set (`--no-firstparty` to skip) and `omarchy-emacs`, `openai-codex-desktop`
   and `voxtype-bin` install on demand from the menu. All are `verified` in
   `fedora/rpm/manifest.yaml`.
@@ -237,7 +257,7 @@ Caveats:
 
 ## Known incompatibilities / open work
 
-1. **First-party RPM packaging (done)** — 25 Omarchy binaries built + published
+1. **First-party RPM packaging (done)** — 26 Omarchy binaries built + published
    from the `whelanh/omarchy` COPR (`fedora/rpm/`, see `fedora/rpm/copr/`) plus
    one retired spec kept for migrations. Installed by the default installer. CI
    re-verifies the specs on push.

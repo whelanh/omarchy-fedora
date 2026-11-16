@@ -131,6 +131,12 @@ packages:
     repository: whelanh/omarchy
     rpm: fedora/rpm/omasnap/omasnap.spec
     note: Screenshot/annotation editor; repack of the prebuilt Arch release (AUR omasnap-bin), supersedes tensaku.
+  omaview:
+    package: omaview
+    source: copr
+    repository: whelanh/omarchy
+    rpm: fedora/rpm/omaview/omaview.spec
+    note: Omarchy's picture viewer and media player; Qt6/CMake, replaces imv and mpv (upstream 9599f7661). kimageformats is a Recommends for HEIC/AVIF/JPEG XL.
   owe:
     package: owe
     source: copr
@@ -273,7 +279,7 @@ packages:
     package: ImageMagick
     source: substitute
     note: same tool; Fedora package name capitalization
-  imv:                   { package: imv, source: fedora }
+  imv:                   { package: imv, source: fedora, note: RETIRED — upstream replaced it with omaview (9599f7661) }
   inetutils:
     package: null
     source: unavailable
@@ -319,8 +325,8 @@ packages:
       (omarchy-default-agent / omarchy-install-dev-env) but is NOT in Fedora
       official. Shipped via the upstream mise RPM repo (mise.jdx.dev/rpm), see
       fedora/mappings/repositories.yaml. binary `mise`; Fedora has no -bin split.
-  mpv:                   { package: mpv, source: fedora }
-  mpv-mpris:             { package: mpv-mpris, source: fedora }
+  mpv:                   { package: mpv, source: fedora, note: no longer a base package upstream (9599f7661); the port keeps it installed because owe plays video wallpapers through it. Its packaged launcher stays hidden via launcher.hides. }
+  mpv-mpris:             { package: mpv-mpris, source: fedora, note: RETIRED — upstream dropped it with mpv (9599f7661); omaview has MPRIS built in }
   nautilus:              { package: nautilus, source: fedora, note: RETIRED — upstream replaced it with folio (upstream/migrations/1794330979.sh drops it) }
   nautilus-python:       { package: nautilus-python, source: fedora, note: RETIRED — Nautilus extension support; dropped with nautilus }
   networkmanager:
@@ -746,6 +752,13 @@ packages:
       AUR-only driver package for the ARM Microsoft Surface Laptop 8 (panel,
       keyboard and USB4 router firmware). Hardware-gated to an ARM device, which
       this x86_64-only port does not support.
+  microsoft-surface-snapdragon-addresses:
+    package: null
+    source: unavailable
+    note: >
+      Surface Laptop 7 (Snapdragon) support package (upstream c42138375): gives
+      Wi-Fi and Bluetooth their firmware addresses. It is ARM hardware plus a
+      distro-specific package, so this x86_64-only port does not install it.
   linux-t2:              { package: null, source: unavailable, note: Apple T2 kernel }
   linux-t2-headers:      { package: null, source: unavailable, note: Apple T2 kernel headers }
   t2fanrd:               { package: null, source: unavailable, note: Apple T2 fan daemon }

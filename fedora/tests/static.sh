@@ -239,7 +239,7 @@ for path in specs:
         if re.search(r'(?m)^BuildRequires:.*ffmpeg-free-devel', s):
             pass  # build-time only: COPR builds plain Fedora, where that exists
 assert not bad, 'hard package dependency on ffmpeg-free: %r' % bad
-assert checked == 6, ('expected the six ffmpeg shell-out packages', checked)
+assert checked == 7, ('expected the seven ffmpeg shell-out packages', checked)
 "
 # A base-manifest entry whose equivalent is installed must not be forced: dnf
 # reports a hard conflict and the whole backfill fails (see the ffmpeg case
@@ -684,6 +684,63 @@ assert 'xdg-mime default folio.desktop inode/directory' in mig, \
 inst = open('fedora/scripts/install.sh').read()
 assert 'xdg-mime default folio.desktop inode/directory' in inst, \
     'fresh installs must get the association without waiting for the migration'
+"
+echo "== Omaview replaces imv and mpv (upstream 9599f7661) =="
+# Upstream made Omaview the picture viewer and media player, replacing imv and
+# mpv in omarchy-base.packages. It is first-party (no Fedora package), so the
+# COPR has to carry it or the nightly sync's mapped: omaview check fails.
+t "omaview is first-party and default-installed" python3 -c "
+import subprocess, yaml
+pkgs = yaml.safe_load(open('fedora/mappings/packages.yaml'))['packages']
+entry = pkgs['omaview']
+assert entry.get('source') == 'copr', entry
+assert entry.get('repository') == 'whelanh/omarchy', entry
+assert entry.get('package') == 'omaview', entry
+assert entry.get('rpm') == 'fedora/rpm/omaview/omaview.spec', entry
+resolved = subprocess.check_output(
+    ['python3', 'fedora/scripts/lib/resolve.py', '--copr', 'whelanh/omarchy'],
+    text=True).split()
+assert 'omaview' in resolved, 'omaview must be in the default first-party set'
+manifest = yaml.safe_load(open('fedora/rpm/manifest.yaml'))['packages']['omaview']
+assert manifest['status'] == 'verified', manifest
+assert manifest['version'] == '0.1.0', manifest
+"
+t "imv and mpv-mpris retired; mpv stays for owe" python3 -c "
+import glob, re
+retired = [l.split('#')[0].strip() for l in open('fedora/mappings/retired-packages.conf')]
+for p in ('imv', 'mpv-mpris'):
+    assert p in retired, p + ' must be retired (upstream replaced it with omaview)'
+assert 'mpv' not in retired, 'mpv stays: owe plays video wallpapers through it'
+lists = [l.split('#')[0].strip() for p in glob.glob('fedora/packages/*.txt') for l in open(p)]
+for p in ('imv', 'mpv-mpris'):
+    assert p not in lists, p + ' must not be in an install manifest'
+assert 'mpv' in lists, 'mpv stays installed: owe plays video wallpapers through it'
+pairs = [l.split() for l in open('fedora/mappings/retired-replacements.conf')
+         if l.split('#')[0].strip()]
+assert ['imv', 'omaview'] in pairs, 'imv must wait for omaview before it is pruned'
+owe = open('fedora/rpm/owe/owe.spec').read()
+assert re.search(r'(?m)^Requires:\s+mpv\s*$', owe), 'owe must keep Requires: mpv'
+baseline = [l.split('#')[0].strip() for l in open('fedora/mappings/package-audit-baseline.conf')]
+assert 'mpv' in baseline, 'mpv is a stale mapping now: upstream dropped it from base'
+"
+t "omaview migration repoints per-user state as the user" python3 -c "
+import glob
+migs = glob.glob('fedora/migrations/*-omaview-replaces-imv.sh')
+assert len(migs) == 1, migs
+mig = open(migs[0]).read()
+for needle in ('imv.desktop', 'mpv.desktop', 'omaview.desktop', 'sha256sum',
+               'runuser', 'xdg-mime'):
+    assert needle in mig, 'migration must handle ' + needle
+assert 'exit 75' in mig, 'must defer (EX_TEMPFAIL, no marker) until omaview is installed'
+install = open('fedora/scripts/install.sh').read()
+assert 'xdg-mime default omaview.desktop' in install, \
+    'fresh installs must get the associations without waiting for the migration'
+"
+t "Snapdragon Surface addresses are unavailable on x86_64" python3 -c "
+import yaml
+entry = yaml.safe_load(open('fedora/mappings/packages.yaml'))['packages']['microsoft-surface-snapdragon-addresses']
+assert entry.get('source') == 'unavailable', entry
+assert entry.get('package') is None, entry
 "
 # Upstream 00147cf6d (#18667, 2026-11-12) changed the *default* dock pins without
 # a migration, so installs that copied the old list into ~/.config keep it. The

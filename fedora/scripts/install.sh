@@ -1396,6 +1396,25 @@ configure_user() {
     fi
   fi
 
+  # Omaview is Omarchy's picture viewer and media player (upstream 9599f7661,
+  # replacing imv and mpv). Upstream gets the associations from
+  # default/applications/mimeapps.list installed to
+  # /usr/share/applications/mimeapps.list, which on Fedora belongs to
+  # shared-mime-info, so fill in the user's own associations instead. Only MIME
+  # types with no handler are set: a viewer the user picked is left alone.
+  # Existing machines are covered by fedora/migrations/*-omaview-replaces-imv.sh
+  # (which also repoints associations that still name imv/mpv).
+  if [ -f /usr/share/applications/omaview.desktop ] && command -v xdg-mime >/dev/null 2>&1; then
+    local mime
+    while IFS= read -r mime; do
+      [ -n "$mime" ] || continue
+      if [ -z "$($as_user env HOME="$home" xdg-mime query default "$mime" 2>/dev/null || true)" ]; then
+        $as_user env HOME="$home" xdg-mime default omaview.desktop "$mime" || true
+      fi
+    done < <(sed -n 's/^MimeType=//p' /usr/share/applications/omaview.desktop | tr ';' '\n')
+    log "  made Omaview the default handler for unset picture/video/audio types"
+  fi
+
   # uwsm runs /etc/xdg/autostart entries for the Omarchy session through
   # systemd-xdg-autostart-generator. Most KDE Plasma entries are guarded with
   # OnlyShowIn=KDE or X-systemd-skip, but org.kde.xwaylandvideobridge is not:
