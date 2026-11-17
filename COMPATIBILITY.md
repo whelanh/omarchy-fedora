@@ -205,19 +205,19 @@ opts out.
 | cards | v0.1.0 | Qt6/CMake Klondike solitaire |
 | checkmate | v0.1.2 | Qt6/CMake + Qt Quick 3D chess |
 | cliamp | v2.4.1 | Go/CGO, repacked release binary |
-| omarchy-folio | v0.4.0 | Qt6/CMake file manager (Files); replaces Nautilus |
+| omarchy-folio | v0.5.0 | Qt6/CMake file manager (Files); replaces Nautilus, and its Open/Save dialogs |
 | herdr | v0.9.5 | Rust, repacked release binary (herdrdev/herdr) |
 | hype | v0.7.1 | Qt6/CMake Markdown presentation editor |
 | hyprland-preview-share-picker | v0.3.1 | Rust/GTK4, source-built |
 | monologue | v0.4.0 | Qt6/CMake webcam recorder + libpulse/turbojpeg |
 | omacalc | v0.4.2 | Qt6/CMake |
 | omacut | v0.8.3 | Qt6/CMake + ffmpeg |
-| omaview | v0.1.0 | Qt6/CMake picture viewer + media player (replaces imv/mpv) |
+| omaview | v0.1.1 | Qt6/CMake picture viewer + media player (replaces imv/mpv) |
 | omawrite | v0.7.5 | Qt6/CMake |
 | omasnap | v1.26.2 | built from source (supersedes tensaku) |
 | owe | v0.2.15 | meson/C wallpaper engine (mpv + ffmpeg-free) |
 | owe-lockfeed | v0.2.15 | Qt6 QML lock-screen feed module |
-| plain | v0.3.3 | Qt6/CMake text editor for config files |
+| plain | v0.4.1 | Qt6/CMake text editor for config files |
 | qtengine | v0.2.4 | Qt6 platform theme (replaces `gtk3`); AUR-only, first-party |
 | try (tobi-try) | v1.10.1 | Ruby gem |
 | ttfx | v0.5.1 | pure Rust/cargo |

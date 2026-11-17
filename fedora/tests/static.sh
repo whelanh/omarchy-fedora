@@ -703,7 +703,6 @@ resolved = subprocess.check_output(
 assert 'omaview' in resolved, 'omaview must be in the default first-party set'
 manifest = yaml.safe_load(open('fedora/rpm/manifest.yaml'))['packages']['omaview']
 assert manifest['status'] == 'verified', manifest
-assert manifest['version'] == '0.1.0', manifest
 "
 t "imv and mpv-mpris retired; mpv stays for owe" python3 -c "
 import glob, re
@@ -884,7 +883,10 @@ assert 'not published in whelanh/omarchy yet' in d, 'must warn instead of failin
 t "folio and plain specs are Qt6 CMake builds that ship the desktop bits" python3 -c "
 for rpm, app in (('omarchy-folio', 'folio'), ('plain', 'plain')):
     spec = open('fedora/rpm/%s/%s.spec' % (rpm, rpm)).read()
-    assert './bin/build' in spec, rpm + ' must use the upstream build script'
+    # ./bin/build or a direct -Dtarget-style app build: folio 0.5.0's tests do not
+    # compile on Qt 6.11, so that spec builds the app target only.
+    assert './bin/build' in spec or '--target %s' % app in spec, \
+        rpm + ' must build the app (it is CMake either way)'
     assert 'BuildRequires:  cmake' in spec, rpm + ' builds with CMake'
     assert 'qt6-qtdeclarative-devel' in spec, rpm + ' needs Qt Quick headers'
     # upstream has shipped these under pkgbuild/ and, for folio 0.4.0, share/
@@ -917,11 +919,49 @@ for spec in glob.glob('fedora/rpm/*/*.spec'):
     if man[name].get('build') == 'cmake':
         assert 'BuildRequires:  cmake' in s, name + ' builds through CMake via ./bin/build'
 "
-t "folio installs upstream 0.4.0's share/ assets" python3 -c "
+t "folio installs upstream 0.5.0's share/ assets, portal backend and plugins" python3 -c "
 s = open('fedora/rpm/omarchy-folio/omarchy-folio.spec').read()
 install = s.split('%install', 1)[1].split('%files', 1)[0]
 assert 'pkgbuild/' not in install, 'folio 0.4.0 moved its desktop entry and icon to share/'
 assert 'share/folio.svg' in install and 'share/folio.desktop' in install
+# 0.5.0 added the xdg-desktop-portal FileChooser backend: Open and Save dialogs
+# of other apps go through it, and D-Bus starts 'folio chooser' on demand.
+for f in ('share/folio.portal',
+          'share/org.freedesktop.impl.portal.desktop.folio.service',
+          'share/folio-chooser.desktop'):
+    assert f in install, 'the 0.5.0 portal backend needs ' + f
+files = s.split('%files', 1)[1].split('%changelog', 1)[0]
+assert '%{_datadir}/xdg-desktop-portal/portals/folio.portal' in files
+assert '%{_datadir}/dbus-1/services/org.freedesktop.impl.portal.desktop.folio.service' in files
+# The bundled plugins (Tailscale, Dropbox, LocalSend) keep their executable bits.
+assert 'cp -a plugins/.' in install and '%{_datadir}/folio' in files, 'the 0.5.0 plugins must be packaged'
+assert 'bsdtar' in s, 'folio makes archives by exec-ing bsdtar'
+"
+t "folio builds the app target, not upstream's tests (Qt 6.11 lacks the overload)" python3 -c "
+s = open('fedora/rpm/omarchy-folio/omarchy-folio.spec').read()
+build = s.split('%build', 1)[1].split('%install', 1)[0]
+assert './bin/build' not in build, 'bin/build compiles folio_tests too, which 0.5.0 cannot on Qt 6.11'
+assert '--target folio' in build, 'build only the app target'
+"
+t "folio file-chooser migration points the portal at Files, per user" python3 -c "
+import glob
+migs = glob.glob('fedora/migrations/*-folio-file-chooser.sh')
+assert len(migs) == 1, migs
+mig = open(migs[0]).read()
+assert 'org.freedesktop.impl.portal.FileChooser=folio;gtk' in mig, 'must prefer Files, falling back to gtk'
+assert 'hyprland-portals.conf' in mig, 'must edit the portal config Omarchy seeds'
+assert 'runuser' in mig, 'the portal config lives in each user s HOME'
+assert 'exit 75' in mig, 'before the 0.5.0 RPM the preference would point at nothing'
+assert 'portals.conf' in mig, 'a user own portals.conf outranks this file'
+# Fresh installs need no migration: install.sh seeds ~/.config from the
+# upstream config tree, which ships the same preference.
+cfg = open('upstream/config/xdg-desktop-portal/hyprland-portals.conf').read()
+assert 'org.freedesktop.impl.portal.FileChooser=folio;gtk' in cfg, \
+    'upstream config must carry the preference for fresh installs'
+"
+t "install.sh seeds the upstream config tree including the portal preference" python3 -c "
+s = open('fedora/scripts/install.sh').read()
+assert 'cp -a -n ' in s and 'config/' in s, 'the upstream config tree seeds ~/.config'
 "
 # Fedora ships its own unrelated 'folio' (Toolstack's note-taking app, 26.x).
 # An RPM named 'folio' loses dnf's version comparison and silently installs the

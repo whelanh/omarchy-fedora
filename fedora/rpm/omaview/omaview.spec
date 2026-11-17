@@ -16,7 +16,7 @@
 %global debug_package %{nil}
 
 Name:           omaview
-Version:        0.1.0
+Version:        0.1.1
 Release:        1%{?dist}
 Summary:        Omarchy's picture viewer and media player
 
@@ -92,6 +92,9 @@ install -Dm644 README.md %{buildroot}%{_datadir}/doc/%{name}/README.md
 %{_datadir}/doc/%{name}/README.md
 
 %changelog
+* Tue Nov 17 2026 whelanh <brickhousedevelopers@gmail.com> - 0.1.1-1
+- Automatic update to upstream v0.1.1
+
 * Mon Nov 16 2026 whelanh <brickhousedevelopers@gmail.com> - 0.1.0-1
 - Initial Fedora package (v0.1.0): Omarchy's picture viewer and media player,
   which replaces imv and mpv in omarchy-base.packages

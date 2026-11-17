@@ -14,8 +14,8 @@
 %global debug_package %{nil}
 
 Name:           plain
-Version:        0.3.3
-Release:        2%{?dist}
+Version:        0.4.1
+Release:        1%{?dist}
 Summary:        Omarchy's text editor for config files
 
 License:        MIT
@@ -60,6 +60,9 @@ install -Dm644 pkgbuild/plain.desktop \
 %{_datadir}/applications/plain.desktop
 
 %changelog
+* Tue Nov 17 2026 whelanh <brickhousedevelopers@gmail.com> - 0.4.1-1
+- Automatic update to upstream v0.4.1
+
 * Fri Nov 13 2026 whelanh <brickhousedevelopers@gmail.com> - 0.3.3-2
 - Declare CMake explicitly (bin/build drives CMake, not qmake6)
 
