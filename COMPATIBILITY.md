@@ -23,13 +23,13 @@ human-readable summary. Classifications:
 for each classification. Static tests verify every upstream base package is
 mapped.
 
-## Summary counts (from packages.yaml, 257 entries)
+## Summary counts (from packages.yaml, 259 entries)
 
 | Classification | Count |
 |---|---|
 | fedora (official) | 127 |
 | substitute | 38 |
-| copr | 15 + 27 first-party |
+| copr | 15 + 29 first-party |
 | external (mise) | 1 |
 | unavailable | 26 |
 | drop (Arch-only) | 14 |
@@ -145,13 +145,13 @@ default agents) are **not** RPMs — upstream installs them through mise at user
 setup (`install/user/mise.sh` → `omarchy-mise-install`), and the Fedora layer
 does the same (`fedora/scripts/lib/mise.sh`).
 
-**Status — 29 verified, 1 retired, 0 blocked.** Every verified package builds
+**Status — 31 verified, 1 retired, 0 blocked.** Every verified package builds
 cleanly in a Fedora Rawhide container and is published from the
 `whelanh/omarchy` COPR. The default installer enables that COPR and installs
-the 26-package default set (disable with `install.sh --no-firstparty`); the
+the 28-package default set (disable with `install.sh --no-firstparty`); the
 three on-demand packages are installed from Omarchy's Install menu.
 
-All 29 are now published: `omarchy-folio` (formerly `folio`, renamed because
+All 31 are now published: `omarchy-folio` (formerly `folio`, renamed because
 Fedora owns that name) and `plain` landed in the COPR. The machinery that kept
 installs working during the gap stays, because a future publish can lag a
 release; while a first-party RPM is unpublished the port degrades instead of
@@ -188,9 +188,22 @@ and the `*-omaview-replaces-imv.sh` migration repoints entries that still name
 are unmodified. `kimageformats` (HEIC, AVIF, JPEG XL) maps to a
 `Recommends: kf6-kimageformats`, matching upstream's optdepends.
 
+### Cards and Checkmate join the base install (upstream fad23cf81, 3489996a2)
+Upstream added two of its own games to `omarchy-base.packages`: **Cards**
+(Klondike solitaire) and **Checkmate** (3D chess, listed as Chess in the
+launcher), with migrations that install them on existing machines unless the
+user removed Omarchy's preinstalls. Neither exists in Fedora or any COPR, so
+both are packaged first-party (`cards`, `checkmate`; Qt6/CMake, the latter on
+Qt Quick 3D) and belong to the default set. The preinstalls opt-out is Arch's
+`omarchy-remove-preinstalls` bookkeeping, which the port does not carry: the
+games install like the rest of the base list, and `dnf remove` is how a user
+opts out.
+
 | Package | Version | Notes |
 |---------|---------|-------|
 | aether | v4.32.0 | Go/Wails, repacked release binary |
+| cards | v0.1.0 | Qt6/CMake Klondike solitaire |
+| checkmate | v0.1.2 | Qt6/CMake + Qt Quick 3D chess |
 | cliamp | v2.4.1 | Go/CGO, repacked release binary |
 | omarchy-folio | v0.4.0 | Qt6/CMake file manager (Files); replaces Nautilus |
 | herdr | v0.9.5 | Rust, repacked release binary (herdrdev/herdr) |
@@ -229,8 +242,8 @@ session — no package manager. The installer wires them onto PATH by symlinking
 Caveats:
 - `omarchy plugin enable/disable` talk to the running shell via
   `omarchy-shell shell enablePlugin`, so Quickshell must be running.
-- The 29 first-party binary packages are built and published from the
-  `whelanh/omarchy` COPR; the default installer installs the 26-package default
+- The 31 first-party binary packages are built and published from the
+  `whelanh/omarchy` COPR; the default installer installs the 28-package default
   set (`--no-firstparty` to skip) and `omarchy-emacs`, `openai-codex-desktop`
   and `voxtype-bin` install on demand from the menu. All are `verified` in
   `fedora/rpm/manifest.yaml`.

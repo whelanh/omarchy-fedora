@@ -313,8 +313,8 @@ omarchy_fedora_install_applications() {
   omarchy_fedora_install_list "$PACKAGES_DIR/applications.txt" || return 1
 }
 
-# Install the 26 default first-party Omarchy packages from the whelanh/omarchy
-# COPR (aether, cliamp, disktree-bin, gliff, herdr, hype,
+# Install the 28 default first-party Omarchy packages from the whelanh/omarchy
+# COPR (aether, cards, checkmate, cliamp, disktree-bin, gliff, herdr, hype,
 # hyprland-preview-share-picker, monologue, omacalc, omacut, omapresent,
 # omaview, omarchy-folio, omarchy-hyprland-titlebars, omarchy-local-ai,
 # omarchy-screensaver, omawrite, omasnap, owe, owe-lockfeed, plain, qtengine,

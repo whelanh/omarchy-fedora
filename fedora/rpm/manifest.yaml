@@ -29,6 +29,26 @@ packages:
     status: verified
     version: 4.32.0
     note: Repack of aether-linux-amd64; desktop + aether:// url-handler + icons. Container-built OK.
+  cards:
+    repo: https://github.com/omacom/cards
+    language: cpp
+    build: cmake
+    binary: cards
+    license: MIT
+    deps: [hicolor-icon-theme, qt6-qtbase, qt6-qtdeclarative, qt6-qtsvg, qt6-qtwayland]
+    status: verified
+    version: 0.1.0
+    note: Omarchy's Klondike solitaire, added to omarchy-base.packages (fad23cf81) and installed on existing machines by upstream migration 1794839103.sh; Qt6/CMake, cards drawn with QtQuick.Shapes. Container-built OK.
+  checkmate:
+    repo: https://github.com/omacom/checkmate
+    language: cpp
+    build: cmake
+    binary: checkmate
+    license: MIT
+    deps: [hicolor-icon-theme, qt6-qtbase, qt6-qtdeclarative, qt6-qtquick3d, qt6-qtsvg, qt6-qtwayland]
+    status: verified
+    version: 0.1.2
+    note: Omarchy's 3D chess game, added to omarchy-base.packages (3489996a2) and installed on existing machines by an upstream migration; Qt6/CMake with Qt Quick 3D. Needs xvfb-run at configure time (upstream looks it up with REQUIRED before any target). Container-built OK.
   cliamp:
     repo: https://github.com/bjarneo/cliamp
     language: go

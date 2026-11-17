@@ -29,6 +29,18 @@ packages:
     repository: whelanh/omarchy
     rpm: fedora/rpm/aether/aether.spec
     note: Desktop theming (wallpaper colour); Go/Wails, repacked as prebuilt release binary.
+  cards:
+    package: cards
+    source: copr
+    repository: whelanh/omarchy
+    rpm: fedora/rpm/cards/cards.spec
+    note: Omarchy's Klondike solitaire; Qt6/CMake. Added to omarchy-base.packages (upstream fad23cf81) and installed on existing machines by a migration, so it is part of the default first-party set.
+  checkmate:
+    package: checkmate
+    source: copr
+    repository: whelanh/omarchy
+    rpm: fedora/rpm/checkmate/checkmate.spec
+    note: Omarchy's 3D chess game; Qt6/CMake with Qt Quick 3D. Added to omarchy-base.packages (upstream 3489996a2) and installed on existing machines by a migration, so it is part of the default first-party set.
   cliamp:
     package: cliamp
     source: copr

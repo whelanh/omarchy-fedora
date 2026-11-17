@@ -742,6 +742,45 @@ entry = yaml.safe_load(open('fedora/mappings/packages.yaml'))['packages']['micro
 assert entry.get('source') == 'unavailable', entry
 assert entry.get('package') is None, entry
 "
+echo "== Cards and Checkmate join the base install (upstream fad23cf81, 3489996a2) =="
+# Upstream added its own Klondike solitaire and 3D chess to
+# omarchy-base.packages, with migrations that install them on existing machines
+# unless the user removed Omarchy's preinstalls. Neither is in Fedora or a COPR,
+# so both are first-party and part of the default set - otherwise the nightly
+# sync's 'mapped: cards'/'mapped: checkmate' checks fail.
+t "cards and checkmate are first-party and default-installed" python3 -c "
+import subprocess, yaml
+pkgs = yaml.safe_load(open('fedora/mappings/packages.yaml'))['packages']
+for name, version in (('cards', '0.1.0'), ('checkmate', '0.1.2')):
+    entry = pkgs[name]
+    assert entry.get('source') == 'copr', entry
+    assert entry.get('repository') == 'whelanh/omarchy', entry
+    assert entry.get('package') == name, entry
+    assert entry.get('rpm') == 'fedora/rpm/%s/%s.spec' % (name, name), entry
+    manifest = yaml.safe_load(open('fedora/rpm/manifest.yaml'))['packages'][name]
+    assert manifest['status'] == 'verified', manifest
+    assert manifest['version'] == version, manifest
+resolved = subprocess.check_output(
+    ['python3', 'fedora/scripts/lib/resolve.py', '--copr', 'whelanh/omarchy'],
+    text=True).split()
+for rpm in ('cards', 'checkmate'):
+    assert rpm in resolved, rpm + ' must be in the default first-party set'
+"
+t "cards and checkmate build the game target, not upstream's test binaries" python3 -c "
+cards = open('fedora/rpm/cards/cards.spec').read()
+checkmate = open('fedora/rpm/checkmate/checkmate.spec').read()
+for s in (cards, checkmate):
+    assert '--target %{name}' in s, 'the tests are upstream CI: build only the app target'
+    assert '%{_datadir}/applications/' in s, 'the launcher must be packaged'
+    assert '%{_datadir}/icons/hicolor/scalable/apps/' in s, 'the icon must be packaged'
+    assert '/usr/bin/ffmpeg' not in s, 'neither game shells out to ffmpeg'
+# The board and pieces are Qt Quick 3D; the window icon needs Qt's SVG engine.
+assert 'BuildRequires:  qt6-qtquick3d-devel' in checkmate, 'checkmate needs Qt Quick 3D'
+assert 'Requires:       qt6-qtquick3d' in checkmate, 'the 3D board needs Qt Quick 3D at run time'
+assert 'BuildRequires:  xorg-x11-server-Xvfb' in checkmate, \
+    \"upstream's CMakeLists looks for xvfb-run with REQUIRED at configure time\"
+assert 'Requires:       qt6-qtsvg' in cards, 'the window icon goes through Qt SVG'
+"
 # Upstream 00147cf6d (#18667, 2026-11-12) changed the *default* dock pins without
 # a migration, so installs that copied the old list into ~/.config keep it. The
 # port's 'cp -a -n' seeding freezes it at install time, which is why a machine

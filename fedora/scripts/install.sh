@@ -182,11 +182,11 @@ install_repos() {
   # gpu-screen-recorder is part of the desktop; enable its COPR.
   omarchy_fedora_enable_optional_coprs brycensranch/gpu-screen-recorder-git \
     || die "failed to enable gpu-screen-recorder COPR"
-  # First-party Omarchy packages (aether, cliamp, disktree-bin, gliff,
-  # herdr, hype, hyprland-preview-share-picker, monologue, omacalc, omacut,
-  # omapresent, omarchy-hyprland-titlebars, omarchy-local-ai,
-  # omarchy-screensaver, omawrite, omasnap, owe, owe-lockfeed, signed,
-  # superwhisper-bin, try, ttfx) live in the whelanh/omarchy COPR (see
+  # First-party Omarchy packages (aether, cards, checkmate, cliamp,
+  # disktree-bin, gliff, herdr, hype, hyprland-preview-share-picker, monologue,
+  # omacalc, omacut, omapresent, omaview, omarchy-hyprland-titlebars,
+  # omarchy-local-ai, omarchy-screensaver, omawrite, omasnap, owe, owe-lockfeed,
+  # signed, superwhisper-bin, try, ttfx) live in the whelanh/omarchy COPR (see
   # fedora/rpm/copr/README.md) and are installed by default. omarchy-emacs,
   # openai-codex-desktop and voxtype-bin are published there too, but installed
   # on demand from Omarchy's Install menu. The retired elsewhen, openai-codex-bin
@@ -546,12 +546,12 @@ install_omarchy_tree() {
     sudo chown -R root:root "$dest"
   fi
   log "Omarchy tree installed to $dest"
-  log "NOTE: the 25 first-party packages (aether, cliamp, disktree-bin," \
-       "gliff, herdr, hype, hyprland-preview-share-picker, monologue, omacalc," \
-       "omacut, omapresent, omarchy-folio, omarchy-hyprland-titlebars," \
-       "omarchy-local-ai, omarchy-screensaver, omasnap, omawrite, owe," \
-       "owe-lockfeed, plain," \
-       "qtengine, signed, superwhisper-bin, try, ttfx) are packaged" \
+  log "NOTE: the 28 first-party packages (aether, cards, checkmate, cliamp," \
+       "disktree-bin, gliff, herdr, hype, hyprland-preview-share-picker," \
+       "monologue, omacalc, omacut, omapresent, omaview, omarchy-folio," \
+       "omarchy-hyprland-titlebars, omarchy-local-ai, omarchy-screensaver," \
+       "omawrite, omasnap, owe, owe-lockfeed, plain, qtengine, signed," \
+       "superwhisper-bin, try, ttfx) are packaged" \
        "under fedora/rpm and installed from the whelanh/omarchy COPR (see" \
        "fedora/rpm/copr/README.md). omarchy-emacs, openai-codex-desktop and" \
        "voxtype-bin are also published there for on-demand install from the" \

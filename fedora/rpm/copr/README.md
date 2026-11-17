@@ -1,12 +1,12 @@
 # whelanh/omarchy COPR publishing
 
-This directory holds the tooling that publishes the 29 first-party Omarchy
+This directory holds the tooling that publishes the 31 first-party Omarchy
 RPMs (specs in `fedora/rpm/<pkg>/`) to the **`whelanh/omarchy`** COPR, so a
 stock Fedora install gets them with a plain `dnf install` — no local builds.
 
-## The 29 packages
+## The 31 packages
 
-aether, cliamp, disktree-bin, gliff, herdr, hype,
+aether, cards, checkmate, cliamp, disktree-bin, gliff, herdr, hype,
 hyprland-preview-share-picker, monologue, omacalc, omacut, omapresent, omaview,
 omarchy-emacs, omarchy-hyprland-titlebars, omarchy-local-ai,
 omarchy-screensaver, omawrite, omasnap, openai-codex-desktop, owe,
@@ -123,7 +123,7 @@ already does by default; `--no-firstparty` skips it):
 
 ```sh
 sudo dnf copr enable whelanh/omarchy
-sudo dnf install aether cliamp disktree-bin gliff herdr hype \
+sudo dnf install aether cards checkmate cliamp disktree-bin gliff herdr hype \
                  hyprland-preview-share-picker monologue omacalc omacut \
                  omapresent omaview omarchy-hyprland-titlebars omarchy-local-ai \
                  omarchy-screensaver omawrite omasnap owe owe-lockfeed \
