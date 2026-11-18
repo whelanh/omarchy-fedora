@@ -16,6 +16,7 @@ BuildRequires:  cmake
 BuildRequires:  gcc-c++
 BuildRequires:  make
 BuildRequires:  qt6-qtbase-devel
+BuildRequires:  qt6-qtbase-private-devel
 BuildRequires:  qt6-qtdeclarative-devel
 Requires:       qt6-qtbase
 Requires:       qt6-qtdeclarative
@@ -49,6 +50,7 @@ install -Dm644 pkgbuild/omawrite.desktop %{buildroot}%{_datadir}/applications/om
 %changelog
 * Wed Nov 18 2026 whelanh <brickhousedevelopers@gmail.com> - 0.7.6-1
 - Automatic update to upstream v0.7.6
+- Add qt6-qtbase-private-devel BuildRequires (0.7.6 links Qt6GuiPrivate)
 
 * Thu Nov 12 2026 whelanh <brickhousedevelopers@gmail.com> - 0.7.5-1
 - Automatic update to upstream v0.7.5
