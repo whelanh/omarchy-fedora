@@ -14,7 +14,7 @@
 %global debug_package %{nil}
 
 Name:           checkmate
-Version:        0.1.2
+Version:        0.1.3
 Release:        1%{?dist}
 Summary:        Native 3D chess for one or two players
 
@@ -72,6 +72,9 @@ install -Dm644 README.md %{buildroot}%{_datadir}/doc/%{name}/README.md
 %{_datadir}/doc/%{name}/README.md
 
 %changelog
+* Wed Nov 18 2026 whelanh <brickhousedevelopers@gmail.com> - 0.1.3-1
+- Automatic update to upstream v0.1.3
+
 * Tue Nov 17 2026 whelanh <brickhousedevelopers@gmail.com> - 0.1.2-1
 - Initial Fedora package (v0.1.2): Omarchy's 3D chess game, installed by
   default from omarchy-base.packages

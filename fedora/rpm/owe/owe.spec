@@ -3,8 +3,8 @@
 # Source-built from the same tag archive as owe-lockfeed; this SPEC mirrors the
 # Arch `owe` package (daemon + CLI + renderer + hooks), not the qml-plugin.
 Name:           owe
-Version:        0.2.15
-Release:        2%{?dist}
+Version:        0.2.16
+Release:        1%{?dist}
 Summary:        High-performance wallpaper engine for Omarchy (mp4, gif, stills)
 
 # Upstream ships no LICENSE file; the project is MIT (meson.build `license`).
@@ -65,6 +65,9 @@ install -Dm644 config/config.toml %{buildroot}%{_docdir}/%{name}/config.toml.exa
 %{_docdir}/%{name}/config.toml.example
 
 %changelog
+* Wed Nov 18 2026 whelanh <brickhousedevelopers@gmail.com> - 0.2.16-1
+- Automatic update to upstream v0.2.16
+
 * Sun Nov 15 2026 whelanh <brickhousedevelopers@gmail.com> - 0.2.15-2
 - Require /usr/bin/ffmpeg instead of the ffmpeg-free package: RPM Fusion's
   full ffmpeg provides the file and Conflicts with ffmpeg-free, so the hard
