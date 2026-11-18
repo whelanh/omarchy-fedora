@@ -12,7 +12,7 @@
 
 Name:           omarchy-hyprland-titlebars
 Version:        0.4.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Titlebars for Omarchy's floating workspace mode
 
 License:        BSD-3-Clause AND MIT
@@ -62,6 +62,9 @@ install -Dm644 LICENSE.MIT %{buildroot}%{_datadir}/licenses/%{name}/LICENSE.MIT
 %{_prefix}/lib/omarchy-hyprland-titlebars/titlebars.so
 
 %changelog
+* Wed Nov 18 2026 whelanh <brickhousedevelopers@gmail.com> - 0.4.0-3
+- Automatic rebuild against hyprland 0.57.2-3 (2026-11-18): native plugin ABI follows its COPR build dependency
+
 * Wed Nov 18 2026 whelanh <brickhousedevelopers@gmail.com> - 0.4.0-2
 - Automatic rebuild against hyprland 0.57.2-2 (2026-11-17): native plugin ABI follows its COPR build dependency
 
