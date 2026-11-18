@@ -241,7 +241,7 @@ packages:
     license: MIT
     deps: [qt6-base, qt6-declarative, qt6-quickcontrols2, xdg-desktop-portal]
     status: verified
-    version: 0.7.5
+    version: 0.7.6
     note: Built in Fedora Rawhide container (v0.5.0); Qt6 markdown editor.
   omasnap:
     repo: https://github.com/tobi/omasnap
@@ -271,7 +271,7 @@ packages:
     license: LicenseRef-proprietary
     deps: [gtk3, mesa-libEGL, mesa-libgbm, nss, xdg-utils]
     status: verified
-    version: 26.1007.21434
+    version: 26.1111.71025
     # OpenAI ships no GitHub release for the desktop app, so the version is
     # tracked from the omacom/omarchy-pkgs PKGBUILD's pkgver= (same value the
     # Arch package builds from). Deliberately Omarchy's published version, even

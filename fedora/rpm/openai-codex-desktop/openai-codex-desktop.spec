@@ -16,7 +16,7 @@
 %global __requires_exclude_from ^/usr/lib/chatgpt/.*$
 
 Name:           openai-codex-desktop
-Version:        26.1007.21434
+Version:        26.1111.71025
 Release:        1%{?dist}
 Summary:        Official ChatGPT desktop app with Codex
 
@@ -111,5 +111,8 @@ fi
 %{_datadir}/swcatalog/xml/com.openai.chatgpt.xml
 
 %changelog
+* Wed Nov 18 2026 whelanh <brickhousedevelopers@gmail.com> - 26.1111.71025-1
+- Automatic update to upstream v26.1111.71025
+
 * Tue Oct 13 2026 whelanh <brickhousedevelopers@gmail.com> - 26.1007.21434-1
 - Initial Fedora package: repack of OpenAI's ChatGPT desktop release
