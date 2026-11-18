@@ -31,6 +31,36 @@ This has been sucessfully deployed in Fedora Rawhide, Fedora 44 and Fedora 45.  
 
 - Fedora Rawhide, 44 or 45 **x86_64** (starting with Fedora Sway spin recommended, although KDE is also a good starting point)
 
+## Rawhide vs. stable releases
+
+The project builds for **Rawhide**, **Fedora 44**, and **Fedora 45**. For a daily
+driver, prefer a **stable** release (45, then 44).
+
+**Rawhide is the rolling development branch.** Its libraries (Qt, aquamarine,
+Lua, …) churn almost daily, while the Omarchy packages are built in COPRs that
+rebuild on their own schedule. During a library transition — Qt 6.11 → 6.12, an
+aquamarine soname bump, a Lua update — the COPR builds can fall out of sync: one
+COPR rebuilds against the new library before another has, and `dnf` reports a
+dependency conflict like:
+
+```
+Problem: package omarchy-folio … requires libQt6Quick.so.6(Qt_6.12_PRIVATE_API) …
+  - cannot install both qt6-qtdeclarative-6.12.0 … and qt6-qtdeclarative-6.11.2 …
+```
+
+These are **not bugs in the port** — they are Rawhide churn catching the COPRs
+mid-rebuild. They clear on their own once every COPR has rebuilt against the same
+library version (usually within a few days). In the meantime a specific package
+can be held back with `dnf upgrade --exclude=<stale-package>`, and `omarchy
+update` is deliberately best-effort so a transient conflict never blocks the
+userspace sync.
+
+On a **stable** release the libraries are frozen, so the COPR builds stay
+consistent and this class of conflict does not occur. The trade-off is a package
+set a few weeks behind Rawhide and a 6-monthly upgrade cadence (45 → 46 when it
+branches), which the nightly upstream sync, the Fedora migrations, and `omarchy
+update` handle.
+
 ## Layout
 
 ```
