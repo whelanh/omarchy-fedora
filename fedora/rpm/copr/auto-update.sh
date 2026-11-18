@@ -240,6 +240,25 @@ def latest_github(owner, repo):
     pool = stable or list(cand)
     return max(pool, key=semver) if pool else None
 
+def latest_pkgbuild(pkg):
+    # Vendor packages with no GitHub release (openai-codex-desktop) are tracked
+    # against Omarchy's own PKGBUILD: read `pkgver=` from omacom/omarchy-pkgs,
+    # the value the Arch package is built from. Deliberately Omarchy's published
+    # version, which may lag the vendor's channel - matching upstream is the point.
+    url = f"https://raw.githubusercontent.com/omacom/omarchy-pkgs/master/pkgbuilds/{pkg}/PKGBUILD"
+    req = urllib.request.Request(url, headers={"User-Agent": UA["User-Agent"]})
+    try:
+        with urllib.request.urlopen(req, timeout=20) as r:
+            text = r.read().decode("utf-8", "replace")
+    except urllib.error.HTTPError as e:
+        raise ApiError(url, e.code) from e
+    except Exception as e:
+        raise ApiError(url, None, str(e)) from e
+    m = re.search(r"(?m)^pkgver=(\S+)", text)
+    if not m:
+        raise ApiError(url, None, f"no pkgver= in {url}")
+    return m.group(1)
+
 def norm(tag):
     m = re.search(r"\d+(?:\.\d+)*", str(tag))
     return m.group(0) if m else None
@@ -327,6 +346,27 @@ blocked, unverified = [], []
 # nothing still shows every package was checked (and why any was skipped).
 rows = []
 
+def consider(name, cur_ver, newver, tag):
+    """Bump decision shared by the GitHub and omarchy_pkg paths."""
+    if name in held:
+        rows.append((name, cur_ver, tag, f"HELD ({held[name]})"))
+        return
+    if semver(cur_ver) < semver(newver):
+        # Never bump to a release whose files are not all published: the
+        # SRPM build is the first thing that would notice, and by then the
+        # spec is already bumped (auto-update writes before submitting).
+        missing, unverifiable = missing_sources(name, newver)
+        unverified.extend((name, url, code) for url, code in unverifiable)
+        if missing:
+            blocked.append((name, cur_ver, newver, missing))
+            rows.append((name, cur_ver, tag, "SKIPPED (source 404)"))
+            return
+        plan.append((name, newver, cur_ver, tag))
+        rows.append((name, cur_ver, tag, f"BUMP -> {newver}-1"))
+    else:
+        ahead = semver(cur_ver) > semver(newver)
+        rows.append((name, cur_ver, tag, "ok (ahead of latest release)" if ahead else "ok"))
+
 def explain_api_failure(err):
     print(f"error: GitHub API request failed: {err}", file=sys.stderr)
     if err.code == 401:
@@ -371,24 +411,24 @@ for repo, names in sorted(by_repo.items()):
     # while never downgrading a member that is somehow ahead. Held members are
     # skipped: their blocker is a dependency, not a version bump.
     for n in names:
-        if n in held:
-            rows.append((n, cur[n], tag, f"HELD ({held[n]})"))
-            continue
-        if semver(cur[n]) < semver(newver):
-            # Never bump to a release whose files are not all published: the
-            # SRPM build is the first thing that would notice, and by then the
-            # spec is already bumped (auto-update writes before submitting).
-            missing, unverifiable = missing_sources(n, newver)
-            unverified.extend((n, url, code) for url, code in unverifiable)
-            if missing:
-                blocked.append((n, cur[n], newver, missing))
-                rows.append((n, cur[n], tag, "SKIPPED (source 404)"))
-                continue
-            plan.append((n, newver, cur[n], tag))
-            rows.append((n, cur[n], tag, f"BUMP -> {newver}-1"))
-        else:
-            ahead = semver(cur[n]) > semver(newver)
-            rows.append((n, cur[n], tag, "ok (ahead of latest release)" if ahead else "ok"))
+        consider(n, cur[n], newver, tag)
+
+# Vendor packages whose app version Omarchy tracks in its own PKGBUILD
+# (omacom/omarchy-pkgs), not a GitHub release. Read the pkgver= line exactly as
+# the Arch package does - Omarchy's published version, even when it lags the
+# vendor's channel. Same bump/held/404-guard path as GitHub packages.
+for name, pkg in sorted((n, str(p["omarchy_pkg"]).strip())
+                        for n, p in pkgs.items()
+                        if p.get("status") == "verified" and p.get("omarchy_pkg")):
+    try:
+        newver = latest_pkgbuild(pkg)
+    except ApiError as e:
+        api_error = (name, e)
+        break
+    cur = spec_version(name) or str(pkgs[name].get("version", ""))
+    if cur and str(pkgs[name].get("version", "")) != cur:
+        drift.append((name, str(pkgs[name].get("version", "")), cur))
+    consider(name, cur, newver, newver)
 
 if api_error:
     repo, err = api_error
@@ -396,10 +436,13 @@ if api_error:
     print(f"error: could not check {repo}; nothing was bumped or submitted.", file=sys.stderr)
     sys.exit(2)
 
-# Verified packages with no GitHub repo (a vendor download URL) cannot be
-# followed automatically, but they still belong in the checklist.
+# Verified packages with no GitHub repo and no omarchy_pkg (a vendor download
+# URL we cannot follow) cannot be tracked automatically, but still belong in
+# the checklist.
 for n, p in sorted(pkgs.items()):
-    if p.get("status") == "verified" and not REPO_RE.match(p.get("repo", "") or ""):
+    if (p.get("status") == "verified"
+            and not REPO_RE.match(p.get("repo", "") or "")
+            and not p.get("omarchy_pkg")):
         rows.append((n, spec_version(n) or str(p.get("version", "")), None,
                      "(manual)"))
 

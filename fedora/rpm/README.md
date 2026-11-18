@@ -20,7 +20,10 @@ in Fedora official/COPR repos. They map to `source: copr` entries in
   A package can also carry `hold: "<reason>"` when upstream's newer release
   needs a dependency this repo cannot provide yet; `copr/auto-update.sh` skips
   held packages and `copr/check-updates.sh` reports them as `HELD` instead of
-  `OUTDATED`.
+  `OUTDATED`. A package with no GitHub release can carry
+  `omarchy_pkg: <name>`; its version is then read from the `pkgver=` of the
+  `omacom/omarchy-pkgs` PKGBUILD at `pkgbuilds/<name>/PKGBUILD` (used by
+  `openai-codex-desktop`, whose vendor ships no GitHub release).
 - `build-rpm.sh <pkg>` — builds one package with `rpmbuild` (optionally via
   `mock`).
 - `build-rpm-in-ci.sh [pkg...]` — builds all `verified` packages (or the

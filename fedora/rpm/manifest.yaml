@@ -272,6 +272,11 @@ packages:
     deps: [gtk3, mesa-libEGL, mesa-libgbm, nss, xdg-utils]
     status: verified
     version: 26.1007.21434
+    # OpenAI ships no GitHub release for the desktop app, so the version is
+    # tracked from the omacom/omarchy-pkgs PKGBUILD's pkgver= (same value the
+    # Arch package builds from). Deliberately Omarchy's published version, even
+    # when it lags the vendor's own channel.
+    omarchy_pkg: openai-codex-desktop
     note: Official ChatGPT desktop app (Electron) repacked from OpenAI's Debian release; replaces the Debian entry with Omarchy's flags-aware launcher and Provides chatgpt/codex-desktop. Installed on demand from SUPER+SPACE Install > AI > ChatGPT Desktop. Not in omarchy-base.packages. Container-built OK.
   owe:
     repo: https://github.com/omacom/owe

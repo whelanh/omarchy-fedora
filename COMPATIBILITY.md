@@ -201,11 +201,11 @@ opts out.
 
 | Package | Version | Notes |
 |---------|---------|-------|
-| aether | v4.32.0 | Go/Wails, repacked release binary |
+| aether | v4.33.0 | Go/Wails, repacked release binary |
 | cards | v0.1.0 | Qt6/CMake Klondike solitaire |
-| checkmate | v0.1.2 | Qt6/CMake + Qt Quick 3D chess |
+| checkmate | v0.1.3 | Qt6/CMake + Qt Quick 3D chess |
 | cliamp | v2.4.1 | Go/CGO, repacked release binary |
-| omarchy-folio | v0.5.0 | Qt6/CMake file manager (Files); replaces Nautilus, and its Open/Save dialogs |
+| omarchy-folio | v0.6.1 | Qt6/CMake file manager (Files); replaces Nautilus, and its Open/Save dialogs |
 | herdr | v0.9.5 | Rust, repacked release binary (herdrdev/herdr) |
 | hype | v0.7.1 | Qt6/CMake Markdown presentation editor |
 | hyprland-preview-share-picker | v0.3.1 | Rust/GTK4, source-built |
@@ -215,8 +215,8 @@ opts out.
 | omaview | v0.1.1 | Qt6/CMake picture viewer + media player (replaces imv/mpv) |
 | omawrite | v0.7.5 | Qt6/CMake |
 | omasnap | v1.26.2 | built from source (supersedes tensaku) |
-| owe | v0.2.15 | meson/C wallpaper engine (mpv + ffmpeg-free) |
-| owe-lockfeed | v0.2.15 | Qt6 QML lock-screen feed module |
+| owe | v0.2.16 | meson/C wallpaper engine (mpv + ffmpeg-free) |
+| owe-lockfeed | v0.2.16 | Qt6 QML lock-screen feed module |
 | plain | v0.4.1 | Qt6/CMake text editor for config files |
 | qtengine | v0.2.4 | Qt6 platform theme (replaces `gtk3`); AUR-only, first-party |
 | try (tobi-try) | v1.10.1 | Ruby gem |

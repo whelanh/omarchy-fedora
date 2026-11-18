@@ -240,7 +240,11 @@ edits only after every edit has succeeded. Every run prints the whole
 checklist — each verified package with its packaged and latest version and an
 `ok`/`BUMP`/`HELD`/`SKIPPED`/`(unknown)` status — so a run with nothing to bump
 still shows that every package was checked. `(manual)` marks the vendor-URL
-packages (e.g. `openai-codex-desktop`) the updater cannot follow. Before
+packages with no GitHub release and no `omarchy_pkg:` entry that the updater
+cannot follow; a package with `omarchy_pkg: <name>` is instead tracked by
+reading `pkgver=` from the `omacom/omarchy-pkgs` PKGBUILD (e.g.
+`openai-codex-desktop`, whose version deliberately follows Omarchy's published
+value). Before
 bumping it HEAD-checks the
 spec's `Source:` URLs at the new version and skips the package when one 404s
 (upstream sometimes publishes a tag before its platform builds — voxtype

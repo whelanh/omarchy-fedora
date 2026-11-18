@@ -368,6 +368,24 @@ def latest_github(owner, repo):
     pool = stable or list(cand)
     return max(pool, key=semver) if pool else None
 
+def latest_pkgbuild(pkg):
+    # Vendor packages with no GitHub release (openai-codex-desktop) are tracked
+    # against Omarchy's own PKGBUILD: read `pkgver=` from omacom/omarchy-pkgs.
+    # Must agree with auto-update.sh, which is what acts on this report.
+    url = f"https://raw.githubusercontent.com/omacom/omarchy-pkgs/master/pkgbuilds/{pkg}/PKGBUILD"
+    req = urllib.request.Request(url, headers={"User-Agent": UA["User-Agent"]})
+    try:
+        with urllib.request.urlopen(req, timeout=20) as r:
+            text = r.read().decode("utf-8", "replace")
+    except urllib.error.HTTPError as e:
+        raise ApiError(url, e.code) from e
+    except Exception as e:
+        raise ApiError(url, None, str(e)) from e
+    m = re.search(r"(?m)^pkgver=(\S+)", text)
+    if not m:
+        raise ApiError(url, None, f"no pkgver= in {url}")
+    return m.group(1)
+
 def fail_check(e):
     print(f"check-updates: GitHub API request failed: {e}", file=sys.stderr)
     if e.code == 401:
@@ -390,7 +408,12 @@ for name, p in sorted(d["packages"].items()):
     ver = str(p.get("version", ""))
     m = re.match(r"https://github\.com/([^/]+)/([^/]+)", repo)
     try:
-        latest = latest_github(m.group(1), m.group(2)) if m else None
+        if m:
+            latest = latest_github(m.group(1), m.group(2))
+        elif p.get("omarchy_pkg"):
+            latest = latest_pkgbuild(str(p["omarchy_pkg"]))
+        else:
+            latest = None
     except ApiError as e:
         fail_check(e)
     rows.append((name, ver, latest, str(p.get("hold") or "").strip()))

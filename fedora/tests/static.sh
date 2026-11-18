@@ -344,7 +344,19 @@ for n, p in d.items():
 "
 t "auto-update.sh skips held packages" python3 -c "
 s = open('fedora/rpm/copr/auto-update.sh').read()
-assert 'if n in held' in s, 'updater must skip hold: packages'
+assert 'if name in held' in s, 'updater must skip hold: packages'
+"
+# Vendor packages with no GitHub release (openai-codex-desktop) are tracked via
+# 'omarchy_pkg:', reading pkgver= from omacom/omarchy-pkgs. Guard the mechanism
+# so a future edit can't silently drop them back to (manual)/(unknown).
+t "omarchy_pkg packages track the omacom/omarchy-pkgs pkgver" python3 -c "
+import yaml
+man = yaml.safe_load(open('fedora/rpm/manifest.yaml'))['packages']
+assert man['openai-codex-desktop'].get('omarchy_pkg') == 'openai-codex-desktop', 'omarchy_pkg missing'
+s = open('fedora/rpm/copr/auto-update.sh').read()
+assert 'def latest_pkgbuild' in s and 'pkgver=' in s, 'auto-update.sh must read pkgver='
+c = open('fedora/rpm/copr/check-updates.sh').read()
+assert 'latest_pkgbuild' in c and 'omarchy_pkg' in c, 'check-updates.sh must track omarchy_pkg'
 "
 # A run with nothing to bump used to print only \"all verified packages current\",
 # which reads as if the checklist had been skipped. Every verified package now
@@ -750,7 +762,7 @@ echo "== Cards and Checkmate join the base install (upstream fad23cf81, 3489996a
 t "cards and checkmate are first-party and default-installed" python3 -c "
 import subprocess, yaml
 pkgs = yaml.safe_load(open('fedora/mappings/packages.yaml'))['packages']
-for name, version in (('cards', '0.1.0'), ('checkmate', '0.1.2')):
+for name, version in (('cards', '0.1.0'), ('checkmate', '0.1.3')):
     entry = pkgs[name]
     assert entry.get('source') == 'copr', entry
     assert entry.get('repository') == 'whelanh/omarchy', entry
