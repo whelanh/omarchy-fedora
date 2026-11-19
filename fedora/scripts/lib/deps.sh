@@ -341,8 +341,14 @@ omarchy_fedora_install_firstparty() {
   # the run: dnf would refuse the request and the user would get nothing.
   # Install what the enabled repo offers now; the next `omarchy update` (or the
   # first-party backfill) picks up the rest.
+  #
+  # Run through _omarchy_dnf (sudo) with --refresh so it reads the *root*
+  # metadata cache -- the same one omarchy_pkg_update refreshed and the one the
+  # install below will use. A plain non-sudo `dnf repoquery` reads the user's
+  # own cache, which lags and made freshly-published packages look "not
+  # published yet".
   local available
-  available="$(dnf -q repoquery --available --qf '%{name}\n' "${firstparty[@]}" 2>/dev/null | sort -u || true)"
+  available="$(_omarchy_dnf --refresh -q repoquery --available --qf '%{name}\n' "${firstparty[@]}" 2>/dev/null | sort -u || true)"
   # Nothing came back (repos disabled, metadata unavailable): let dnf try the
   # whole set rather than silently skipping every first-party package.
   if [ -z "$available" ]; then
