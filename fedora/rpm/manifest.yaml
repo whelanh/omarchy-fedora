@@ -281,7 +281,7 @@ packages:
     license: LicenseRef-proprietary
     deps: [gtk3, mesa-libEGL, mesa-libgbm, nss, xdg-utils]
     status: verified
-    version: 26.1111.71025
+    version: 26.1111.71704
     # OpenAI ships no GitHub release for the desktop app, so the version is
     # tracked from the omacom/omarchy-pkgs PKGBUILD's pkgver= (same value the
     # Arch package builds from). Deliberately Omarchy's published version, even
@@ -366,7 +366,7 @@ packages:
     license: MIT
     deps: [python3, systemd]
     status: verified
-    version: 0.6.5
+    version: 0.6.9
     note: Local model engine and its curated recipe catalog, installed as one tree under /usr/share/omarchy-local-ai with /usr/bin/omarchy-local-ai symlinked into it (the engine reads the catalog beside itself). %check runs upstream's `validate .` offline. The containers that run models use podman + crun, which are base packages since upstream 0c6dc2038.
   omarchy-screensaver:
     repo: https://github.com/omacom/omarchy-screensaver
