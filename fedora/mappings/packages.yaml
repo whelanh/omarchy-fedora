@@ -59,6 +59,12 @@ packages:
     repository: whelanh/omarchy
     rpm: fedora/rpm/elsewhen/elsewhen.spec
     note: RETIRED upstream (moved in-tree as omarchy.elsewhen, upstream/migrations/1790528634.sh drops the package). Kept for reference; listed in retired-packages.conf so fresh installs skip it and updates prune it. See fedora/migrations/*-elsewhen-retire.sh for the shell.json rename/dedup.
+  fantasi:
+    package: fantasi
+    source: copr
+    repository: whelanh/omarchy
+    rpm: fedora/rpm/fantasi/fantasi.spec
+    note: Omarchy's local image model app; Qt6/CMake. Added to omarchy-base.packages (installed by default), so it is part of the default first-party set.
   gliff:
     package: gliff
     source: copr
@@ -137,6 +143,12 @@ packages:
     repository: whelanh/omarchy
     rpm: fedora/rpm/omarchy-screensaver/omarchy-screensaver.spec
     note: Native Wayland screensaver overlay (layer-shell + ttfx effects); Rust, crates vendored. Installed off PATH at /usr/lib/omarchy-screensaver/omarchy-screensaver, which omarchy-launch-screensaver execs.
+  omarchy-themes-intros:
+    package: omarchy-themes-intros
+    source: copr
+    repository: whelanh/omarchy
+    rpm: fedora/rpm/omarchy-themes-intros/omarchy-themes-intros.spec
+    note: Theme background intro videos; noarch data package (mp4 files). Added to omarchy-base.packages (installed by default); pinned to a commit and versioned by date.
   omasnap:
     package: omasnap
     source: copr
@@ -260,6 +272,7 @@ packages:
   fontconfig:            { package: fontconfig, source: fedora }
   foot:                  { package: foot, source: fedora }
   fzf:                   { package: fzf, source: fedora }
+  ghostscript:           { package: ghostscript, source: fedora }
   git:                   { package: git, source: fedora }
   gnome-disk-utility:    { package: gnome-disk-utility, source: fedora }
   gnome-keyring:         { package: gnome-keyring, source: fedora }

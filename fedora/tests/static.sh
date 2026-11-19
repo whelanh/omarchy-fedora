@@ -239,7 +239,7 @@ for path in specs:
         if re.search(r'(?m)^BuildRequires:.*ffmpeg-free-devel', s):
             pass  # build-time only: COPR builds plain Fedora, where that exists
 assert not bad, 'hard package dependency on ffmpeg-free: %r' % bad
-assert checked == 7, ('expected the seven ffmpeg shell-out packages', checked)
+assert checked == 8, ('expected the eight ffmpeg shell-out packages', checked)
 "
 # A base-manifest entry whose equivalent is installed must not be forced: dnf
 # reports a hard conflict and the whole backfill fails (see the ffmpeg case

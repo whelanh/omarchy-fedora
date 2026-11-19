@@ -144,6 +144,7 @@ repositories:
       - aether
       - cliamp
       - disktree-bin
+      - fantasi
       - gliff
       - herdr
       - hype
@@ -157,6 +158,7 @@ repositories:
       - omarchy-hyprland-titlebars
       - omarchy-local-ai
       - omarchy-screensaver
+      - omarchy-themes-intros
       - omasnap
       - omawrite
       - openai-codex-desktop

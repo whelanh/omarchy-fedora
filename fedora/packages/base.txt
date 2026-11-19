@@ -51,6 +51,7 @@ flatpak
 fontconfig
 foot
 fzf
+ghostscript
 git
 gnome-keyring
 grim
