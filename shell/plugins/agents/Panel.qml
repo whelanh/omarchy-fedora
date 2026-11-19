@@ -89,9 +89,25 @@ Panel {
     root.close()
   }
 
+  // What a local model makes, in a word.
+  function kindLabel(model) {
+    return model.kind === "image" ? Commons.I18n.t("agents.kindImage")
+      : model.kind === "video" ? Commons.I18n.t("agents.kindVideo")
+      : model.kind === "music" ? Commons.I18n.t("agents.kindMusic")
+      : Commons.I18n.t("agents.kindText")
+  }
+
+  // Image, video and music models are made with in Fantasi rather than an agent.
+  function makesInFantasi(model) {
+    return ["image", "video", "music"].indexOf(model.kind) >= 0
+  }
+
   function runLocalAction(model, action) {
     if (action === "launch") {
-      Util.execArgv(["omarchy-agent", "--local-model", modelId(model)])
+      // An image or video model makes pictures or clips in Fantasi rather than running an agent.
+      // An open Fantasi takes the model and comes to the front, so this always opens.
+      if (makesInFantasi(model)) Util.execArgv(["uwsm-app", "--", "fantasi", "open", "--model", modelId(model)])
+      else Util.execArgv(["omarchy-agent", "--local-model", modelId(model)])
       root.close()
     } else if (action === "toggle") {
       var running = model.unit === "active" || model.unit === "activating"
@@ -312,9 +328,11 @@ Panel {
         }
       }
       if (starterShown) {
-        var tiles = []
-        for (var j = 0; j < starterPrompts.length; j++) tiles.push({ kind: "starter", index: j })
-        rows.push(tiles)
+        for (var j = 0; j < starterPrompts.length; j += starterColumns) {
+          var tiles = []
+          for (var k = j; k < Math.min(j + starterColumns, starterPrompts.length); k++) tiles.push({ kind: "starter", index: k })
+          rows.push(tiles)
+        }
       }
     }
     return rows
@@ -810,8 +828,11 @@ Panel {
   readonly property var starterPrompts: [
     { glyph: "󰏘", label: Commons.I18n.t("agents.theme"), kind: "theme" },
     { glyph: "󰐱", label: Commons.I18n.t("agents.plugin"), kind: "plugin" },
-    { glyph: "󰣆", label: Commons.I18n.t("agents.app"), kind: "app" }
+    { glyph: "󰣆", label: Commons.I18n.t("agents.app"), kind: "app" },
+    { glyph: "󰊴", label: Commons.I18n.t("agents.game"), kind: "game" }
   ]
+  // Two across, so a label in a long language still fits its tile.
+  readonly property int starterColumns: 2
 
   // The local model a starter opens on, picked as omarchy-agent --prefer-local
   // picks it: the last one started when it's running, any other running one
@@ -1756,9 +1777,10 @@ Panel {
               fontFamily: root.fontFamily
             }
 
-            Row {
-              id: tileRow
+            Grid {
+              id: tileGrid
               width: parent.width
+              columns: root.starterColumns
               spacing: Style.space(10)
 
               Repeater {
@@ -1769,7 +1791,7 @@ Panel {
                   required property int index
                   hasCursor: root.hasKey("starter", index)
                   onHovered: root.pointAt("starter", index)
-                  width: (tileRow.width - tileRow.spacing * 2) / 3
+                  width: (tileGrid.width - tileGrid.spacing * (tileGrid.columns - 1)) / tileGrid.columns
                   glyph: modelData.glyph
                   title: modelData.label
                   onClicked: function(modifiers) { root.startPrompt(modelData.kind, modifiers) }
@@ -2304,8 +2326,11 @@ Panel {
         anchors.baseline: sectionName.baseline
         visible: !section.multi && text !== ""
         textFormat: Text.PlainText
-        // A network model names its host where a plan would be.
-        text: section.remote ? section.model.host : section.model || section.offer ? "" : root.planLabel(section.provider)
+        // A local model says what it makes where a plan would be, and a
+        // network one its host as well.
+        text: section.offer && section.offer.link ? ""
+          : section.model || section.offer ? [root.kindLabel(section.model || section.offer)].concat(section.remote ? [section.model.host] : []).join(" · ")
+          : root.planLabel(section.provider)
         color: root.dim
         font.family: root.fontFamily
         font.pixelSize: Style.font.caption
@@ -2418,10 +2443,11 @@ Panel {
         anchors.right: parent.right
         anchors.verticalCenter: parent.verticalCenter
         readonly property bool download: !!section.offer
+        readonly property bool image: !!section.model && root.makesInFantasi(section.model)
         visible: download || (section.model ? section.running && (!section.remote || (section.paired && !section.offline)) : root.harnessFor(section.provider) !== "")
-        iconText: download ? (section.offer.link ? "󰌘" : "󰇚") : "󰞷"
+        iconText: download ? (section.offer.link ? "󰌘" : "󰇚") : image ? "󰋩" : "󰞷"
         tooltipText: download ? (section.offer.link ? Commons.I18n.t("agents.linkSetUp") : Commons.I18n.t("agents.localDownload"))
-          : section.model ? Commons.I18n.t("agents.localLaunch") : Commons.I18n.t("agents.launchHarness").arg(section.provider ? section.provider.providerName : "")
+          : image ? Commons.I18n.t("agents.openFantasi") : section.model ? Commons.I18n.t("agents.localLaunch") : Commons.I18n.t("agents.launchHarness").arg(section.provider ? section.provider.providerName : "")
         foreground: root.foreground
         fontFamily: root.fontFamily
         hasCursor: root.hasKey(download ? "localDownload" : section.model ? "modelLaunch" : "providerLaunch", section.providerIndex)
