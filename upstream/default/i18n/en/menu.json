@@ -702,7 +702,7 @@
   "setup.security.passwordless-sudo": {
     "label": "Passwordless Sudo"
   },
-  "setup.config.git": {
+  "setup.git": {
     "label": "Git"
   },
   "setup.config.hyprland": {
@@ -714,11 +714,8 @@
   "setup.config.xcompose": {
     "label": "XCompose"
   },
-  "setup.direct-boot": {
-    "label": "Direct Boot"
-  },
-  "setup.reset": {
-    "label": "Reset Computer"
+  "remove.factory-reset": {
+    "label": "Factory Reset"
   },
   "install.package": {
     "label": "Package"
@@ -1343,5 +1340,8 @@
   },
   "agent.make.app": {
     "label": "Make an app"
+  },
+  "agent.make.game": {
+    "label": "Make a game"
   }
 }
