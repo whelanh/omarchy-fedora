@@ -198,6 +198,24 @@ assertDeepEqual(localActions({ host: 'away', recipe: 'm', unit: 'inactive', pair
 // A model paired from the panel that is still starting on its host has no
 // terminal yet: the cursor waits for one rather than giving up.
 const modelId = new Function(panel.match(/function modelId\([^]*?\n  \}/)[0] + '\nreturn modelId')()
+// An image model's launch opens Fantasi on it, here or on a paired host; a text model's starts an agent.
+const makesInFantasi = new Function(panel.match(/function makesInFantasi\([^]*?\n  \}/)[0] + '\nreturn makesInFantasi')()
+const runLocalAction = new Function('Util', 'modelId', 'root', 'makesInFantasi', panel.match(/function runLocalAction\([^]*?\n  \}/)[0] + '\nreturn runLocalAction')
+const launched = []
+const launch = runLocalAction({ execArgv: argv => launched.push(argv), shellQuote: value => `'${value}'` }, modelId, { close() {} }, makesInFantasi)
+launch({ recipe: 'pic', kind: 'image', unit: 'active' }, 'launch')
+launch({ host: 'box', recipe: 'pic', kind: 'image', unit: 'active', paired: true, offline: '' }, 'launch')
+launch({ recipe: 'clip', kind: 'video', unit: 'active' }, 'launch')
+launch({ recipe: 'song', kind: 'music', unit: 'active' }, 'launch')
+launch({ recipe: 'm', unit: 'active' }, 'launch')
+assertDeepEqual(launched, [
+  ['uwsm-app', '--', 'fantasi', 'open', '--model', 'pic'],
+  ['uwsm-app', '--', 'fantasi', 'open', '--model', 'box/pic'],
+  ['uwsm-app', '--', 'fantasi', 'open', '--model', 'clip'],
+  ['uwsm-app', '--', 'fantasi', 'open', '--model', 'song'],
+  ['omarchy-agent', '--local-model', 'm']
+], 'an image, video or music model opens Fantasi on itself, a paired host\'s too, and a text model starts an agent')
+assertDeepEqual(localActions({ host: 'box', recipe: 'pic', kind: 'image', unit: 'active', paired: true, offline: '' }), ['disconnect', 'launch'], 'a paired host\'s image model can be opened in Fantasi')
 const landing = { landAfterPair: 'box/m', usage: { pairingId: '', pairFailures: {}, canShare: false }, root: { opened: true }, providers: [], localActions, modelId, pointed: null }
 landing.pointAt = (kind, index) => { landing.pointed = [kind, index] }
 const landOnPaired = new Function('scope', 'with (scope) { ' + panel.match(/function landOnPaired\([^]*?\n  \}/)[0] + '\nreturn landOnPaired }')(landing)
