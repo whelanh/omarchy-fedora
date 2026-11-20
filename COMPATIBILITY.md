@@ -188,22 +188,28 @@ and the `*-omaview-replaces-imv.sh` migration repoints entries that still name
 are unmodified. `kimageformats` (HEIC, AVIF, JPEG XL) maps to a
 `Recommends: kf6-kimageformats`, matching upstream's optdepends.
 
-### Cards and Checkmate join the base install (upstream fad23cf81, 3489996a2)
-Upstream added two of its own games to `omarchy-base.packages`: **Cards**
-(Klondike solitaire) and **Checkmate** (3D chess, listed as Chess in the
-launcher), with migrations that install them on existing machines unless the
-user removed Omarchy's preinstalls. Neither exists in Fedora or any COPR, so
-both are packaged first-party (`cards`, `checkmate`; Qt6/CMake, the latter on
-Qt Quick 3D) and belong to the default set. The preinstalls opt-out is Arch's
-`omarchy-remove-preinstalls` bookkeeping, which the port does not carry: the
-games install like the rest of the base list, and `dnf remove` is how a user
-opts out.
+### Cards and Checkmate moved into Game Vibes (upstream 64c0b627c)
+Upstream briefly added two of its own games to `omarchy-base.packages`: **Cards**
+(Klondike solitaire, fad23cf81) and **Checkmate** (3D chess, 3489996a2), with
+migrations that installed them on existing machines. Two days later 64c0b627c
+("Add a Game starter that makes three.js games for the launcher", #16308)
+replaced both desktop apps with single-file web pages in **Game Vibes**
+(`default/games/vibes/{cards,checkmate}`, opened from the launcher entry `Game
+Vibes` through `omarchy-games-vibes-launch`) and deleted those two lines from
+the base list, so nothing installs the Qt apps by default any more.
+
+The port still builds and publishes `cards` and `checkmate` (upstream keeps
+their PKGBUILDs too), but marks them `default: false` in
+`fedora/mappings/packages.yaml`, which keeps them out of the first-party
+backfill; a machine that already has them keeps them, exactly as on Arch. The
+Game Vibes games need no Fedora packaging: they ship in the vendored upstream
+tree and open as `file://` web apps.
 
 | Package | Version | Notes |
 |---------|---------|-------|
 | aether | v4.33.0 | Go/Wails, repacked release binary |
-| cards | v0.1.0 | Qt6/CMake Klondike solitaire |
-| checkmate | v0.1.3 | Qt6/CMake + Qt Quick 3D chess |
+| cards | v0.1.0 | Qt6/CMake solitaire; Game Vibes ships a web version, so no longer a default |
+| checkmate | v0.1.3 | Qt6/CMake + Qt Quick 3D chess; Game Vibes ships a web version, so no longer a default |
 | cliamp | v2.4.1 | Go/CGO, repacked release binary |
 | fantasi | v0.1.2 | Qt6/CMake local image model app |
 | omarchy-folio | v0.6.1 | Qt6/CMake file manager (Files); replaces Nautilus, and its Open/Save dialogs |

@@ -182,13 +182,16 @@ install_repos() {
   # gpu-screen-recorder is part of the desktop; enable its COPR.
   omarchy_fedora_enable_optional_coprs brycensranch/gpu-screen-recorder-git \
     || die "failed to enable gpu-screen-recorder COPR"
-  # First-party Omarchy packages (aether, cards, checkmate, cliamp,
-  # disktree-bin, gliff, herdr, hype, hyprland-preview-share-picker, monologue,
-  # omacalc, omacut, omapresent, omaview, omarchy-hyprland-titlebars,
-  # omarchy-local-ai, omarchy-screensaver, omawrite, omasnap, owe, owe-lockfeed,
+  # First-party Omarchy packages (aether, cliamp, disktree-bin, fantasi, gliff,
+  # herdr, hype, hyprland-preview-share-picker, monologue, omacalc, omacut,
+  # omapresent, omaview, omarchy-folio, omarchy-hyprland-titlebars,
+  # omarchy-local-ai, omarchy-screensaver, omarchy-themes-intros,
+  # omarchy-themes-loops, omawrite, omasnap, owe, owe-lockfeed, plain, qtengine,
   # signed, superwhisper-bin, try, ttfx) live in the whelanh/omarchy COPR (see
-  # fedora/rpm/copr/README.md) and are installed by default. omarchy-emacs,
-  # openai-codex-desktop and voxtype-bin are published there too, but installed
+  # fedora/rpm/copr/README.md) and are installed by default. cards and checkmate
+  # are published there but marked `default: false` (upstream replaced them with
+  # games inside Game Vibes), and omarchy-emacs, openai-codex-desktop and
+  # voxtype-bin are published there too, but installed
   # on demand from Omarchy's Install menu. The retired elsewhen, openai-codex-bin
   # and tensaku RPMs are excluded via retired-packages.conf (upstream moved
   # Elsewhen in-tree, the Codex CLI to mise, and screenshots to omasnap).
@@ -546,14 +549,17 @@ install_omarchy_tree() {
     sudo chown -R root:root "$dest"
   fi
   log "Omarchy tree installed to $dest"
-  log "NOTE: the 28 first-party packages (aether, cards, checkmate, cliamp," \
-       "disktree-bin, gliff, herdr, hype, hyprland-preview-share-picker," \
+  log "NOTE: the 29 first-party packages (aether, cliamp, disktree-bin," \
+       "fantasi, gliff, herdr, hype, hyprland-preview-share-picker," \
        "monologue, omacalc, omacut, omapresent, omaview, omarchy-folio," \
        "omarchy-hyprland-titlebars, omarchy-local-ai, omarchy-screensaver," \
+       "omarchy-themes-intros, omarchy-themes-loops," \
        "omawrite, omasnap, owe, owe-lockfeed, plain, qtengine, signed," \
        "superwhisper-bin, try, ttfx) are packaged" \
        "under fedora/rpm and installed from the whelanh/omarchy COPR (see" \
-       "fedora/rpm/copr/README.md). omarchy-emacs, openai-codex-desktop and" \
+       "fedora/rpm/copr/README.md). cards and checkmate are published there" \
+       "but no longer installed by default: upstream moved those games into" \
+       "Game Vibes as web pages (64c0b627c). omarchy-emacs, openai-codex-desktop and" \
        "voxtype-bin are also published there for on-demand install from the" \
        "menu. The retired elsewhen, openai-codex-bin and tensaku RPMs are no" \
        "longer installed (upstream moved Elsewhen in-tree, the Codex CLI to" \

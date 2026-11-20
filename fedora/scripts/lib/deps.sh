@@ -313,13 +313,17 @@ omarchy_fedora_install_applications() {
   omarchy_fedora_install_list "$PACKAGES_DIR/applications.txt" || return 1
 }
 
-# Install the 31 default first-party Omarchy packages from the whelanh/omarchy
-# COPR (aether, cards, checkmate, cliamp, disktree-bin, fantasi, gliff, herdr,
-# hype, hyprland-preview-share-picker, monologue, omacalc, omacut, omapresent,
+# Install the 29 default first-party Omarchy packages from the whelanh/omarchy
+# COPR (aether, cliamp, disktree-bin, fantasi, gliff, herdr, hype,
+# hyprland-preview-share-picker, monologue, omacalc, omacut, omapresent,
 # omaview, omarchy-folio, omarchy-hyprland-titlebars, omarchy-local-ai,
 # omarchy-screensaver, omarchy-themes-intros, omarchy-themes-loops, omawrite,
 # omasnap, owe, owe-lockfeed, plain, qtengine, signed, superwhisper-bin, try,
 # ttfx).
+# cards and checkmate are published there too but carry `default: false`: in
+# 64c0b627c upstream replaced those desktop apps with games inside Game Vibes
+# and dropped them from omarchy-base.packages, so they stay installable on
+# demand rather than backfilled.
 # omarchy-emacs, openai-codex-desktop and voxtype-bin are published in the same
 # COPR but installed on demand; elsewhen, openai-codex-bin and tensaku retired
 # upstream, pruned via retired-packages.conf.

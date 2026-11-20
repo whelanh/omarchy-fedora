@@ -27,7 +27,7 @@ COPR="whelanh/omarchy"
 DEFAULT_CHROOT="fedora-rawhide-x86_64"
 HYPRLAND_BASE="https://download.copr.fedorainfracloud.org/results/nett00n/hyprland"
 DESCRIPTION="Omarchy Quattro first-party packages (aether, cards, checkmate, cliamp, disktree-bin, fantasi, gliff, herdr, hype, hyprland-preview-share-picker, monologue, omacalc, omacut, omapresent, omaview, omarchy-emacs, omarchy-folio, omarchy-hyprland-titlebars, omarchy-local-ai, omarchy-screensaver, omarchy-themes-intros, omarchy-themes-loops, omawrite, omasnap, openai-codex-desktop, owe, owe-lockfeed, plain, qtengine, signed, superwhisper-bin, try, ttfx, voxtype-bin), source-built/repacked from fedora/rpm."
-INSTRUCTIONS="Enabling the repo: sudo dnf copr enable ${COPR}; then: sudo dnf install aether cards checkmate cliamp disktree-bin gliff herdr hype hyprland-preview-share-picker monologue omacalc omacut omapresent omaview omarchy-folio omarchy-hyprland-titlebars omarchy-local-ai omarchy-screensaver omawrite omasnap owe owe-lockfeed plain qtengine signed superwhisper-bin try ttfx"
+INSTRUCTIONS="Enabling the repo: sudo dnf copr enable ${COPR}; then: sudo dnf install aether cliamp disktree-bin fantasi gliff herdr hype hyprland-preview-share-picker monologue omacalc omacut omapresent omaview omarchy-folio omarchy-hyprland-titlebars omarchy-local-ai omarchy-screensaver omarchy-themes-intros omarchy-themes-loops omawrite omasnap owe owe-lockfeed plain qtengine signed superwhisper-bin try ttfx (cards, checkmate, omarchy-emacs, openai-codex-desktop and voxtype-bin are published here too, for on-demand install)"
 
 need() { command -v "$1" >/dev/null 2>&1 || { echo "missing required tool: $1" >&2; exit 1; }; }
 need copr-cli

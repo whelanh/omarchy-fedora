@@ -34,13 +34,15 @@ packages:
     source: copr
     repository: whelanh/omarchy
     rpm: fedora/rpm/cards/cards.spec
-    note: Omarchy's Klondike solitaire; Qt6/CMake. Added to omarchy-base.packages (upstream fad23cf81) and installed on existing machines by a migration, so it is part of the default first-party set.
+    default: false
+    note: Omarchy's Klondike solitaire; Qt6/CMake. Upstream removed it from omarchy-base.packages in 64c0b627c, which replaced the standalone app with a card game inside Game Vibes (default/games/vibes/cards). The RPM stays published for anyone who wants the desktop app, but it is no longer part of the default install.
   checkmate:
     package: checkmate
     source: copr
     repository: whelanh/omarchy
     rpm: fedora/rpm/checkmate/checkmate.spec
-    note: Omarchy's 3D chess game; Qt6/CMake with Qt Quick 3D. Added to omarchy-base.packages (upstream 3489996a2) and installed on existing machines by a migration, so it is part of the default first-party set.
+    default: false
+    note: Omarchy's 3D chess game; Qt6/CMake with Qt Quick 3D. Upstream removed it from omarchy-base.packages in 64c0b627c, which replaced the standalone app with a chess game inside Game Vibes (default/games/vibes/checkmate). The RPM stays published for anyone who wants the desktop app, but it is no longer part of the default install.
   cliamp:
     package: cliamp
     source: copr

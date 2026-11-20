@@ -101,17 +101,21 @@ systemctl reboot
 
 The installer is **idempotent** — running it again is safe.
 
-> Note: Omarchy's first-party binaries and plugins (aether, cards, checkmate,
-> cliamp, disktree-bin,
+> Note: Omarchy's first-party binaries and plugins (aether, cliamp,
+> disktree-bin, fantasi,
 > gliff, herdr, hype, hyprland-preview-share-picker, monologue,
 > omacalc, omacut, omapresent, omarchy-folio, omarchy-hyprland-titlebars,
-> omarchy-local-ai, omarchy-screensaver, omawrite, omasnap, owe, owe-lockfeed,
+> omarchy-local-ai, omarchy-screensaver, omarchy-themes-intros,
+> omarchy-themes-loops, omawrite, omasnap, owe, owe-lockfeed,
 > plain, qtengine, signed, superwhisper-bin, try, ttfx) are built as Fedora RPMs
 > and installed from the `whelanh/omarchy` COPR by the installer (see
-> `fedora/rpm/copr/README.md`). Pass `--no-firstparty` to skip. `omarchy-emacs`,
+> `fedora/rpm/copr/README.md`). Pass `--no-firstparty` to skip. `cards`,
+> `checkmate`, `omarchy-emacs`,
 > `openai-codex-desktop` and `voxtype-bin` are published there for on-demand
-> install from the menu. (The `elsewhen` world-clock plugin is retired: upstream
-> moved it in-tree as `omarchy.elsewhen`. The Codex CLI is retired from RPM:
+> install from the menu; upstream moved Cards and Checkmate into Game Vibes as
+> web pages, so the desktop apps are no longer installed by default. (The
+> `elsewhen` world-clock plugin is retired: upstream moved it in-tree as
+> `omarchy.elsewhen`. The Codex CLI is retired from RPM:
 > upstream installs it via mise. `tensaku` is retired: upstream replaced it with
 > `omasnap`.)
 
