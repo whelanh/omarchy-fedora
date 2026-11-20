@@ -471,6 +471,39 @@ assert entry.group(1) == ver + '-' + rel, (
 "
 done
 
+echo "== auto-update repairs a Release: that lags the changelog (spec_release.py) =="
+# The rule auto-update.sh applies before submitting: if the newest %changelog
+# entry names the same Version with a higher Release, the entry already
+# describes the work, so Release: is raised to match. Anything else is reported
+# rather than guessed. Exercised directly so the repair path is covered without
+# a network call or a real COPR submission.
+t "spec_release.py reconciles Release: with the newest changelog entry" python3 -c "
+import importlib.util, sys
+sys.dont_write_bytecode = True
+spec = importlib.util.spec_from_file_location('spec_release', 'fedora/rpm/copr/spec_release.py')
+m = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(m)
+base = ('Name: demo\\nVersion: 1.2.3\\nRelease: 1%{?dist}\\n%changelog\\n'
+        '* Fri Nov 20 2026 A B <a@b> - 1.2.3-2\\n- fix the packaging\\n')
+assert m.analyze(base)['state'] == 'repair', m.analyze(base)
+fixed, info = m.fix_text(base)
+assert 'Release: 2%{?dist}' in fixed, fixed
+assert m.analyze(fixed)['state'] == 'ok'
+assert m.analyze(base.replace('Release: 1', 'Release: 2'))['state'] == 'ok'
+stale = base.replace('Release: 1', 'Release: 3')
+assert m.analyze(stale)['state'] == 'stale', m.analyze(stale)
+try:
+    m.fix_text(stale)
+    raise SystemExit('a stale changelog must not be auto-repaired')
+except ValueError:
+    pass
+"
+t "auto-update.sh repairs and resubmits Release: lagging the changelog" bash -c '
+  grep -q "import spec_release" fedora/rpm/copr/auto-update.sh
+  grep -q "REPAIR_PLAN" fedora/rpm/copr/auto-update.sh
+  grep -q "spec_release.fix_text" fedora/rpm/copr/auto-update.sh
+'
+
 echo "== omarchy-screensaver binary path =="
 # Omarchy's bin/omarchy-launch-screensaver execs the literal path
 # /usr/lib/omarchy-screensaver/omarchy-screensaver. Arch has no libexec split, so

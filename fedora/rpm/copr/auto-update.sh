@@ -58,6 +58,14 @@
 #     release before publishing its platform builds — voxtype v1.2.0 shipped
 #     macOS-only because its Linux workflow failed — which would otherwise bump
 #     the spec and fail the SRPM build with nothing submitted.
+#   - A spec whose newest %changelog entry names the same Version with a higher
+#     Release: is repaired and submitted: Release: is raised to match, because
+#     that entry already describes the work. This is how a hand fix otherwise
+#     sits unshipped — omasnap 1.26.2 was rebuilt as -1 for a week while its
+#     newest entry said -2, since no version bump ever resubmitted it. Entries
+#     that cannot be reconciled that way (another version, a lower release) are
+#     reported for a human instead of guessed. The rule lives in
+#     spec_release.py, which the static suite exercises.
 #   - All file edits happen in memory and are only written once every edit has
 #     succeeded, so a failure never leaves a half-bumped tree.
 #   - The maintainer identity in new %changelog entries is taken from the
@@ -142,8 +150,9 @@ fi
 
 PLAN="$(mktemp)"
 REBUILD_PLAN="$(mktemp)"
+REPAIR_PLAN="$(mktemp)"
 CHANGED_OUT="$(mktemp)"
-trap 'rm -f "$PLAN" "$REBUILD_PLAN" "$CHANGED_OUT"' EXIT
+trap 'rm -f "$PLAN" "$REBUILD_PLAN" "$REPAIR_PLAN" "$CHANGED_OUT"' EXIT
 
 # Authenticate through the GitHub CLI when it is already logged in. The
 # unauthenticated API allows 60 requests/hour and a run needs one per upstream
@@ -165,10 +174,16 @@ else
   echo "   (tip: authenticate with 'gh auth login' or export GITHUB_TOKEN/GH_TOKEN;"
   echo "    the unauthenticated API allows only 60 requests/hour)"
 fi
-python3 - "$RPM_DIR" "$MANIFEST" "$PLAN" <<'PY'
+python3 - "$RPM_DIR" "$MANIFEST" "$PLAN" "$REPAIR_PLAN" <<'PY'
 import json, os, re, sys, urllib.error, urllib.request, yaml
 
-rpm_dir, manifest_path, plan_path = sys.argv[1], sys.argv[2], sys.argv[3]
+rpm_dir, manifest_path, plan_path, repair_path = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
+
+# The Release:/%changelog rule lives in spec_release.py so the static suite can
+# exercise it; this script only decides when to apply it.
+sys.dont_write_bytecode = True   # no __pycache__ beside the specs
+sys.path.insert(0, os.path.join(rpm_dir, "copr"))
+import spec_release
 UA = {"User-Agent": "omarchy-fedora-auto-update", "Accept": "application/vnd.github+json"}
 # Optional token raises the unauthenticated GitHub API limit from 60 to 5000
 # requests/hour (one call per upstream repo). This script exports one from
@@ -446,10 +461,36 @@ for n, p in sorted(pkgs.items()):
         rows.append((n, spec_version(n) or str(p.get("version", "")), None,
                      "(manual)"))
 
+# A spec builds Version-Release, and its newest %changelog entry must name the
+# same thing; otherwise a hand fix could write a "-2" entry and leave Release:
+# at 1, so every rebuild still produces -1 and the fix never ships (omasnap
+# 1.26.2 sat like that for a week). Raising Release: is safe and complete when
+# the entry already describes the work, so those specs are repaired and
+# submitted. Anything else (an entry for another version, or a lower release)
+# cannot be inferred, so it is only reported.
+repairs, stale_specs = [], []
+planned = {name for name, *_ in plan}
+for n, p in sorted(pkgs.items()):
+    if p.get("status") != "verified" or n in planned or n in held:
+        continue
+    try:
+        text = open(os.path.join(rpm_dir, n, n + ".spec")).read()
+        info = spec_release.analyze(text)
+    except (OSError, ValueError):
+        continue
+    if info["state"] == "repair":
+        repairs.append((n, info["version"], info["release"], info["top_release"]))
+    elif info["state"] == "stale":
+        stale_specs.append((n, "%s-%d" % (info["version"], info["release"]), info["top"]))
+
 plan.sort(key=lambda r: r[0])
 with open(plan_path, "w") as f:
     for name, newver, oldver, tag in plan:
         f.write(f"{name}\t{newver}\t{oldver}\t{tag}\n")
+
+with open(repair_path, "w") as f:
+    for name, version, oldrel, newrel in repairs:
+        f.write(f"{name}\t{version}\t{oldrel}\t{newrel}\n")
 
 rows.sort(key=lambda r: r[0])
 print(f"{'package':35} {'packaged':>10} {'latest':>10}  status")
@@ -492,6 +533,18 @@ if unverified:
     print("would fail the SRPM build):")
     for name, url, code in unverified:
         print(f"  {name}: HTTP {code or 'no response'} {url}")
+
+if repairs:
+    print()
+    print("Release: lags the newest %changelog entry (raising it and submitting):")
+    for name, version, oldrel, newrel in repairs:
+        print(f"  {name}: {version}-{oldrel} -> {version}-{newrel}")
+
+if stale_specs:
+    print()
+    print("warning: newest %changelog entry does not match Version-Release:")
+    for name, built, top in stale_specs:
+        print(f"  {name}: builds {built}, changelog says {top}")
 
 if drift:
     print()
@@ -591,13 +644,20 @@ if [ "$PRUNE_RETIRED" = 1 ]; then
   fi
 fi
 
-if [ ! -s "$PLAN" ] && [ ! -s "$REBUILD_PLAN" ]; then
+if [ ! -s "$PLAN" ] && [ ! -s "$REBUILD_PLAN" ] && [ ! -s "$REPAIR_PLAN" ]; then
   echo
   echo "Nothing to do."
   exit 0
 fi
 
 if [ "$DRY_RUN" = 1 ]; then
+  if [ -s "$REPAIR_PLAN" ]; then
+    echo
+    echo "would raise Release: (the newest %changelog entry already describes it):"
+    while IFS=$'\t' read -r name version oldrel newrel; do
+      printf '  %-34s %s-%s -> %s-%s\n' "$name" "$version" "$oldrel" "$version" "$newrel"
+    done <"$REPAIR_PLAN"
+  fi
   echo
   echo "(--dry-run: no files changed)"
   exit 0
@@ -612,10 +672,14 @@ if [ "$ASSUME_YES" != 1 ]; then
   esac
 fi
 
-if ! python3 - "$RPM_DIR" "$MANIFEST" "$PLAN" "$REBUILD_PLAN" "$MAINTAINER" >"$CHANGED_OUT" <<'PY'
+if ! python3 - "$RPM_DIR" "$MANIFEST" "$PLAN" "$REBUILD_PLAN" "$REPAIR_PLAN" "$MAINTAINER" >"$CHANGED_OUT" <<'PY'
 import datetime, os, re, sys
 
-rpm_dir, manifest_path, plan_path, rebuild_path, fallback_maintainer = sys.argv[1:6]
+rpm_dir, manifest_path, plan_path, rebuild_path, repair_path, fallback_maintainer = sys.argv[1:7]
+
+sys.dont_write_bytecode = True   # no __pycache__ beside the specs
+sys.path.insert(0, os.path.join(rpm_dir, "copr"))
+import spec_release
 
 plan = []
 for line in open(plan_path):
@@ -735,6 +799,31 @@ for name, trigger in rebuilds:
     writes[spec_path] = new_src
     changed.append(name)
     print(f"auto-update: {name} rebuilt ({version}-{newrel}) against {trigger}", file=sys.stderr)
+
+# Specs whose Release: lags the newest %changelog entry: the entry already
+# describes the work, so raising the release is the whole fix. A rebuild above
+# writes its own entry and release, so it wins over a repair.
+rebuilt = {name for name, _ in rebuilds}
+for line in open(repair_path):
+    line = line.rstrip("\n")
+    if not line:
+        continue
+    name, version, oldrel, newrel = (line.split("\t") + ["", "", "", ""])[:4]
+    if name in versioned or name in rebuilt:
+        continue
+    spec_path = os.path.join(rpm_dir, name, name + ".spec")
+    if not os.path.exists(spec_path):
+        continue
+    src = writes.get(spec_path, read(spec_path))
+    try:
+        new_src, info = spec_release.fix_text(src)
+    except ValueError as e:
+        print(f"auto-update: {name}: {e}", file=sys.stderr)
+        continue
+    writes[spec_path] = new_src
+    changed.append(name)
+    print(f"auto-update: {name} Release {info['release']} -> {info['top_release']} "
+          f"(the newest changelog entry already described it)", file=sys.stderr)
 
 if not changed and manifest_src == read(manifest_path):
     sys.exit(0)

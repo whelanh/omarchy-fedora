@@ -149,6 +149,10 @@ with web pages inside Game Vibes (64c0b627c): their specs are gone and
   package's spec, re-run `submit-builds.sh <pkg>`.
 - **Root-cause fix**: fix the spec in `fedora/rpm/`, container-verify with
   `fedora/rpm/build-rpm-in-ci.sh <pkg>`, then bump `Release:` and resubmit.
+  A fix that writes its `%changelog` entry but forgets `Release:` is caught by
+  `auto-update.sh`: it raises `Release:` to match the newest entry and resubmits
+  the package (`spec_release.py` holds the rule; the static suite asserts every
+  spec's newest entry names its `Version-Release`).
 - **Full refresh**: `bash fedora/rpm/copr/submit-builds.sh` after any spec,
   manifest, or mapping change. CI (`fedora-build.yml`) re-verifies the specs,
   then the COPR build is the release step.
