@@ -29,20 +29,6 @@ packages:
     repository: whelanh/omarchy
     rpm: fedora/rpm/aether/aether.spec
     note: Desktop theming (wallpaper colour); Go/Wails, repacked as prebuilt release binary.
-  cards:
-    package: cards
-    source: copr
-    repository: whelanh/omarchy
-    rpm: fedora/rpm/cards/cards.spec
-    default: false
-    note: Omarchy's Klondike solitaire; Qt6/CMake. Upstream removed it from omarchy-base.packages in 64c0b627c, which replaced the standalone app with a card game inside Game Vibes (default/games/vibes/cards). The RPM stays published for anyone who wants the desktop app, but it is no longer part of the default install.
-  checkmate:
-    package: checkmate
-    source: copr
-    repository: whelanh/omarchy
-    rpm: fedora/rpm/checkmate/checkmate.spec
-    default: false
-    note: Omarchy's 3D chess game; Qt6/CMake with Qt Quick 3D. Upstream removed it from omarchy-base.packages in 64c0b627c, which replaced the standalone app with a chess game inside Game Vibes (default/games/vibes/checkmate). The RPM stays published for anyone who wants the desktop app, but it is no longer part of the default install.
   cliamp:
     package: cliamp
     source: copr

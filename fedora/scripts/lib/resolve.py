@@ -53,8 +53,8 @@ def main():
     if "--copr" in args:
         copr = args[args.index("--copr") + 1]
         # `default: false` marks a package the COPR publishes but the port does
-        # not install by default (an app upstream moved to on-demand, such as
-        # the desktop Cards/Checkmate that Game Vibes replaced with web pages).
+        # not install by default (an app upstream moved to on-demand). Nothing
+        # uses it today; retired packages leave the mapping entirely instead.
         for name, entry in data.items():
             if entry.get("source") == "copr" \
                and entry.get("repository") == copr \

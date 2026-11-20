@@ -109,11 +109,11 @@ The installer is **idempotent** — running it again is safe.
 > omarchy-themes-loops, omawrite, omasnap, owe, owe-lockfeed,
 > plain, qtengine, signed, superwhisper-bin, try, ttfx) are built as Fedora RPMs
 > and installed from the `whelanh/omarchy` COPR by the installer (see
-> `fedora/rpm/copr/README.md`). Pass `--no-firstparty` to skip. `cards`,
-> `checkmate`, `omarchy-emacs`,
-> `openai-codex-desktop` and `voxtype-bin` are published there for on-demand
-> install from the menu; upstream moved Cards and Checkmate into Game Vibes as
-> web pages, so the desktop apps are no longer installed by default. (The
+> `fedora/rpm/copr/README.md`). Pass `--no-firstparty` to skip.
+> `omarchy-emacs`, `openai-codex-desktop` and `voxtype-bin` are published there
+> for on-demand install from the menu. (Cards and Checkmate are retired: upstream
+> replaced those desktop apps with web pages inside Game Vibes, so their RPMs are
+> no longer built and `omarchy update` removes them if present. The
 > `elsewhen` world-clock plugin is retired: upstream moved it in-tree as
 > `omarchy.elsewhen`. The Codex CLI is retired from RPM:
 > upstream installs it via mise. `tensaku` is retired: upstream replaced it with

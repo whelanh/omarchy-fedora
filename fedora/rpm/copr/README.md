@@ -1,12 +1,12 @@
 # whelanh/omarchy COPR publishing
 
-This directory holds the tooling that publishes the 34 first-party Omarchy
+This directory holds the tooling that publishes the 32 first-party Omarchy
 RPMs (specs in `fedora/rpm/<pkg>/`) to the **`whelanh/omarchy`** COPR, so a
 stock Fedora install gets them with a plain `dnf install` — no local builds.
 
-## The 34 packages
+## The 32 packages
 
-aether, cards, checkmate, cliamp, disktree-bin, fantasi, gliff, herdr, hype,
+aether, cliamp, disktree-bin, fantasi, gliff, herdr, hype,
 hyprland-preview-share-picker, monologue, omacalc, omacut, omapresent, omaview,
 omarchy-emacs, omarchy-hyprland-titlebars, omarchy-local-ai,
 omarchy-screensaver, omarchy-themes-intros, omarchy-themes-loops, omawrite,
@@ -19,17 +19,17 @@ via `fedora/rpm/build-rpm-in-ci.sh`. (`elsewhen` and `openai-codex-bin` are
 installs the Codex CLI through mise rather than pacman, so neither is built or
 published; their specs are kept only for the migrations that clean existing
 machines. `tensaku` is retired too: upstream replaced it with `omasnap`, so its
-spec and manifest entry are gone and `delete-retired.sh` drops the COPR copy.)
+spec and manifest entry are gone and `delete-retired.sh` drops the COPR copy.
+`cards` and `checkmate` are retired the same way: upstream replaced both desktop
+apps with web pages inside Game Vibes (64c0b627c), so their specs and manifest
+entries are gone and the COPR copies are pruned.)
 
 > `omapresent` is the successor to `hype`; upstream still lists `hype` in
 > `omarchy-base.packages`, so both are published for now.
 
-> `cards`, `checkmate`, `omarchy-emacs`, `voxtype-bin` and
-> `openai-codex-desktop`
+> `omarchy-emacs`, `voxtype-bin` and `openai-codex-desktop`
 > are published in the COPR but installed **on demand** (from the SUPER+SPACE
-> Install menu, or a plain `dnf install`), not by the default first-party set.
-> Upstream moved Cards and Checkmate into Game Vibes as web pages (64c0b627c),
-> so the port marks the desktop apps `default: false`.
+> Install menu), not by the default first-party set.
 
 ## Prereqs (run once, on the maintainer machine)
 
@@ -135,9 +135,9 @@ sudo dnf install aether cliamp disktree-bin fantasi gliff herdr hype \
                  plain qtengine signed superwhisper-bin try ttfx
 ```
 
-`cards` and `checkmate` are published here too, but upstream replaced those
-desktop apps with web pages inside Game Vibes (64c0b627c), so the port marks
-them `default: false` and they are installed on demand only.
+`cards` and `checkmate` were retired when upstream replaced those desktop apps
+with web pages inside Game Vibes (64c0b627c): their specs are gone and
+`delete-retired.sh` removes the COPR copies.
 
 `fedora/scripts/lib/deps.sh` exposes
 `omarchy_fedora_install_firstparty()` which resolves the exact set from

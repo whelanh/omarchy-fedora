@@ -320,10 +320,9 @@ omarchy_fedora_install_applications() {
 # omarchy-screensaver, omarchy-themes-intros, omarchy-themes-loops, omawrite,
 # omasnap, owe, owe-lockfeed, plain, qtengine, signed, superwhisper-bin, try,
 # ttfx).
-# cards and checkmate are published there too but carry `default: false`: in
-# 64c0b627c upstream replaced those desktop apps with games inside Game Vibes
-# and dropped them from omarchy-base.packages, so they stay installable on
-# demand rather than backfilled.
+# cards and checkmate are retired: in 64c0b627c upstream replaced those desktop
+# apps with games inside Game Vibes and dropped them from omarchy-base.packages,
+# so their RPMs are gone and retired-packages.conf prunes them.
 # omarchy-emacs, openai-codex-desktop and voxtype-bin are published in the same
 # COPR but installed on demand; elsewhen, openai-codex-bin and tensaku retired
 # upstream, pruned via retired-packages.conf.

@@ -189,8 +189,8 @@ install_repos() {
   # omarchy-themes-loops, omawrite, omasnap, owe, owe-lockfeed, plain, qtengine,
   # signed, superwhisper-bin, try, ttfx) live in the whelanh/omarchy COPR (see
   # fedora/rpm/copr/README.md) and are installed by default. cards and checkmate
-  # are published there but marked `default: false` (upstream replaced them with
-  # games inside Game Vibes), and omarchy-emacs, openai-codex-desktop and
+  # are retired (upstream replaced them with games inside Game Vibes, 64c0b627c),
+  # and omarchy-emacs, openai-codex-desktop and
   # voxtype-bin are published there too, but installed
   # on demand from Omarchy's Install menu. The retired elsewhen, openai-codex-bin
   # and tensaku RPMs are excluded via retired-packages.conf (upstream moved
@@ -557,9 +557,10 @@ install_omarchy_tree() {
        "omawrite, omasnap, owe, owe-lockfeed, plain, qtengine, signed," \
        "superwhisper-bin, try, ttfx) are packaged" \
        "under fedora/rpm and installed from the whelanh/omarchy COPR (see" \
-       "fedora/rpm/copr/README.md). cards and checkmate are published there" \
-       "but no longer installed by default: upstream moved those games into" \
-       "Game Vibes as web pages (64c0b627c). omarchy-emacs, openai-codex-desktop and" \
+       "fedora/rpm/copr/README.md). cards and checkmate are retired: upstream" \
+       "moved those games into Game Vibes as web pages (64c0b627c), so their" \
+       "RPMs are no longer built and omarchy update removes them if present." \
+       "omarchy-emacs, openai-codex-desktop and" \
        "voxtype-bin are also published there for on-demand install from the" \
        "menu. The retired elsewhen, openai-codex-bin and tensaku RPMs are no" \
        "longer installed (upstream moved Elsewhen in-tree, the Codex CLI to" \

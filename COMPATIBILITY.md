@@ -198,18 +198,17 @@ replaced both desktop apps with single-file web pages in **Game Vibes**
 Vibes` through `omarchy-games-vibes-launch`) and deleted those two lines from
 the base list, so nothing installs the Qt apps by default any more.
 
-The port still builds and publishes `cards` and `checkmate` (upstream keeps
-their PKGBUILDs too), but marks them `default: false` in
-`fedora/mappings/packages.yaml`, which keeps them out of the first-party
-backfill; a machine that already has them keeps them, exactly as on Arch. The
-Game Vibes games need no Fedora packaging: they ship in the vendored upstream
-tree and open as `file://` web apps.
+The port retired the RPMs with them: `fedora/rpm/cards` and
+`fedora/rpm/checkmate` are gone, along with their `packages.yaml` and
+`manifest.yaml` entries, and both are listed in the two `retired-packages.conf`
+files, so `omarchy update` prunes them from existing machines and
+`delete-retired.sh` deletes the published copies from the COPR. The Game Vibes
+games need no Fedora packaging: they ship in the vendored upstream tree and
+open as `file://` web apps.
 
 | Package | Version | Notes |
 |---------|---------|-------|
 | aether | v4.33.0 | Go/Wails, repacked release binary |
-| cards | v0.1.0 | Qt6/CMake solitaire; Game Vibes ships a web version, so no longer a default |
-| checkmate | v0.1.3 | Qt6/CMake + Qt Quick 3D chess; Game Vibes ships a web version, so no longer a default |
 | cliamp | v2.4.1 | Go/CGO, repacked release binary |
 | fantasi | v0.1.2 | Qt6/CMake local image model app |
 | omarchy-folio | v0.6.1 | Qt6/CMake file manager (Files); replaces Nautilus, and its Open/Save dialogs |

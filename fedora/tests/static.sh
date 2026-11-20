@@ -753,70 +753,40 @@ entry = yaml.safe_load(open('fedora/mappings/packages.yaml'))['packages']['micro
 assert entry.get('source') == 'unavailable', entry
 assert entry.get('package') is None, entry
 "
-echo "== Cards and Checkmate moved into Game Vibes (upstream 64c0b627c) =="
+echo "== Cards and Checkmate retired into Game Vibes (upstream 64c0b627c) =="
 # Upstream added its own Klondike solitaire and 3D chess to
 # omarchy-base.packages in fad23cf81/3489996a2, then replaced both desktop apps
 # with single-page games in Game Vibes (default/games/vibes/cards|checkmate) and
-# dropped them from the base list. They stay packaged first-party and published,
-# but default:false keeps them out of the backfill, and the browser versions
-# come from the vendored tree.
-t "cards and checkmate are packaged first-party but not default-installed" python3 -c "
+# dropped them from the base list. The port retired the RPMs with it: nothing
+# builds, updates or publishes them any more, and delete-retired.sh removes the
+# COPR copies. The browser versions ride in the vendored tree and need no
+# package.
+t "cards and checkmate are retired from the COPR" python3 -c "
 import subprocess, yaml
+from pathlib import Path
 pkgs = yaml.safe_load(open('fedora/mappings/packages.yaml'))['packages']
-for name, version in (('cards', '0.1.0'), ('checkmate', '0.1.3')):
-    entry = pkgs[name]
-    assert entry.get('source') == 'copr', entry
-    assert entry.get('repository') == 'whelanh/omarchy', entry
-    assert entry.get('package') == name, entry
-    assert entry.get('rpm') == 'fedora/rpm/%s/%s.spec' % (name, name), entry
-    assert entry.get('default') is False, name + ' must not be backfilled any more'
-    manifest = yaml.safe_load(open('fedora/rpm/manifest.yaml'))['packages'][name]
-    assert manifest['status'] == 'verified', manifest
-    assert manifest['version'] == version, manifest
+man = yaml.safe_load(open('fedora/rpm/manifest.yaml'))['packages']
+for name in ('cards', 'checkmate'):
+    assert name not in pkgs, name + ' must not be mapped any more'
+    assert name not in man, name + ' must not be in the manifest any more'
+    assert not Path('fedora/rpm', name).exists(), name + ' spec must be gone'
+    for conf in ('fedora/mappings/retired-packages.conf',
+                 'fedora/rpm/copr/retired-packages.conf'):
+        names = {l.split('#')[0].strip() for l in open(conf)}
+        assert name in names, '%s missing from %s' % (name, conf)
 resolved = subprocess.check_output(
     ['python3', 'fedora/scripts/lib/resolve.py', '--copr', 'whelanh/omarchy'],
     text=True).split()
 for rpm in ('cards', 'checkmate'):
-    assert rpm not in resolved, rpm + ' is on-demand now, not in the default set'
+    assert rpm not in resolved, rpm + ' must not be backfilled'
 "
 t "Game Vibes ships the cards and checkmate web pages" python3 -c "
 from pathlib import Path
 for game in ('cards', 'checkmate'):
     page = Path('upstream/default/games/vibes') / game / 'index.html'
     assert page.is_file(), page
-    assert 'Game Vibes' in Path('upstream/applications/Game Vibes.desktop').read_text()
 launcher = Path('upstream/applications/Game Vibes.desktop').read_text()
 assert 'Exec=omarchy-games-vibes-launch' in launcher, launcher
-"
-t "cards and checkmate build the game target, not upstream's test binaries" python3 -c "
-cards = open('fedora/rpm/cards/cards.spec').read()
-checkmate = open('fedora/rpm/checkmate/checkmate.spec').read()
-for s in (cards, checkmate):
-    assert '--target %{name}' in s, 'the tests are upstream CI: build only the app target'
-    assert '%{_datadir}/applications/' in s, 'the launcher must be packaged'
-    assert '%{_datadir}/icons/hicolor/scalable/apps/' in s, 'the icon must be packaged'
-    assert '/usr/bin/ffmpeg' not in s, 'neither game shells out to ffmpeg'
-# The board and pieces are Qt Quick 3D; the window icon needs Qt's SVG engine.
-assert 'BuildRequires:  qt6-qtquick3d-devel' in checkmate, 'checkmate needs Qt Quick 3D'
-assert 'Requires:       qt6-qtquick3d' in checkmate, 'the 3D board needs Qt Quick 3D at run time'
-assert 'BuildRequires:  xorg-x11-server-Xvfb' in checkmate, \
-    \"upstream's CMakeLists looks for xvfb-run with REQUIRED at configure time\"
-assert 'Requires:       qt6-qtsvg' in cards, 'the window icon goes through Qt SVG'
-"
-t "cards and checkmate build the game target, not upstream's test binaries" python3 -c "
-cards = open('fedora/rpm/cards/cards.spec').read()
-checkmate = open('fedora/rpm/checkmate/checkmate.spec').read()
-for s in (cards, checkmate):
-    assert '--target %{name}' in s, 'the tests are upstream CI: build only the app target'
-    assert '%{_datadir}/applications/' in s, 'the launcher must be packaged'
-    assert '%{_datadir}/icons/hicolor/scalable/apps/' in s, 'the icon must be packaged'
-    assert '/usr/bin/ffmpeg' not in s, 'neither game shells out to ffmpeg'
-# The board and pieces are Qt Quick 3D; the window icon needs Qt's SVG engine.
-assert 'BuildRequires:  qt6-qtquick3d-devel' in checkmate, 'checkmate needs Qt Quick 3D'
-assert 'Requires:       qt6-qtquick3d' in checkmate, 'the 3D board needs Qt Quick 3D at run time'
-assert 'BuildRequires:  xorg-x11-server-Xvfb' in checkmate, \
-    \"upstream's CMakeLists looks for xvfb-run with REQUIRED at configure time\"
-assert 'Requires:       qt6-qtsvg' in cards, 'the window icon goes through Qt SVG'
 "
 # Upstream 00147cf6d (#18667, 2026-11-12) changed the *default* dock pins without
 # a migration, so installs that copied the old list into ~/.config keep it. The
