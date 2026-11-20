@@ -159,6 +159,7 @@ repositories:
       - omarchy-local-ai
       - omarchy-screensaver
       - omarchy-themes-intros
+      - omarchy-themes-loops
       - omasnap
       - omawrite
       - openai-codex-desktop

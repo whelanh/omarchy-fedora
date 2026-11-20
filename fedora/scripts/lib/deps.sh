@@ -313,12 +313,13 @@ omarchy_fedora_install_applications() {
   omarchy_fedora_install_list "$PACKAGES_DIR/applications.txt" || return 1
 }
 
-# Install the 28 default first-party Omarchy packages from the whelanh/omarchy
-# COPR (aether, cards, checkmate, cliamp, disktree-bin, gliff, herdr, hype,
-# hyprland-preview-share-picker, monologue, omacalc, omacut, omapresent,
+# Install the 31 default first-party Omarchy packages from the whelanh/omarchy
+# COPR (aether, cards, checkmate, cliamp, disktree-bin, fantasi, gliff, herdr,
+# hype, hyprland-preview-share-picker, monologue, omacalc, omacut, omapresent,
 # omaview, omarchy-folio, omarchy-hyprland-titlebars, omarchy-local-ai,
-# omarchy-screensaver, omawrite, omasnap, owe, owe-lockfeed, plain, qtengine,
-# signed, superwhisper-bin, try, ttfx).
+# omarchy-screensaver, omarchy-themes-intros, omarchy-themes-loops, omawrite,
+# omasnap, owe, owe-lockfeed, plain, qtengine, signed, superwhisper-bin, try,
+# ttfx).
 # omarchy-emacs, openai-codex-desktop and voxtype-bin are published in the same
 # COPR but installed on demand; elsewhen, openai-codex-bin and tensaku retired
 # upstream, pruned via retired-packages.conf.

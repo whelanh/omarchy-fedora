@@ -4,19 +4,20 @@
 # The theme intro videos live in their own repository so omarchy (and each
 # omarchy-dev rebuild of a quattro tip) stay small. This noarch package just
 # installs the .mp4 files under /usr/share/omarchy/themes/<theme>/
-# backgrounds/intros/. Pinned to a commit and versioned by date, matching
-# upstream's PKGBUILD: bump both when an intro is added or changed.
+# backgrounds/intros/. Versioned by date and built from the release tag, the
+# same way the port builds omarchy-themes-loops: a version bump then always
+# brings the matching content, so auto-update cannot move the version without
+# moving the videos with it.
 %global debug_package %{nil}
-%global commit 3c8d7f0d0d292898069ae264bdb89e6bdfc355c3
 
 Name:           omarchy-themes-intros
-Version:        2026.11.18
+Version:        2026.11.19
 Release:        1%{?dist}
 Summary:        Background intro videos for the Omarchy themes
 
 License:        MIT
 URL:            https://github.com/omacom/omarchy-themes-intros
-Source0:        https://github.com/omacom/omarchy-themes-intros/archive/%{commit}.tar.gz
+Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz
 
 BuildArch:      noarch
 
@@ -26,7 +27,7 @@ the theme's background is selected; a theme without one switches straight to
 the still image.
 
 %prep
-%autosetup -n %{name}-%{commit}
+%autosetup -n %{name}-%{version}
 
 %install
 for intro in */*.mp4; do
@@ -37,8 +38,13 @@ done
 
 %files
 %license LICENSE
-%{_datadir}/omarchy/themes/
+%{_datadir}/omarchy/themes/*/backgrounds/intros/
 
 %changelog
+* Fri Nov 20 2026 whelanh <brickhousedevelopers@gmail.com> - 2026.11.19-1
+- Update to 2026.11.19: adds the Starship (Starbase) intro. Build from the
+  release tag instead of a pinned commit so the version and the videos can
+  never drift apart.
+
 * Thu Nov 19 2026 whelanh <brickhousedevelopers@gmail.com> - 2026.11.18-1
 - Initial Fedora package: theme intro videos, pinned to commit 3c8d7f0d0d

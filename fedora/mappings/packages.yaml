@@ -148,7 +148,13 @@ packages:
     source: copr
     repository: whelanh/omarchy
     rpm: fedora/rpm/omarchy-themes-intros/omarchy-themes-intros.spec
-    note: Theme background intro videos; noarch data package (mp4 files). Added to omarchy-base.packages (installed by default); pinned to a commit and versioned by date.
+    note: Theme background intro videos; noarch data package (mp4 files). Added to omarchy-base.packages (installed by default); versioned by date, built from the release tag.
+  omarchy-themes-loops:
+    package: omarchy-themes-loops
+    source: copr
+    repository: whelanh/omarchy
+    rpm: fedora/rpm/omarchy-themes-loops/omarchy-themes-loops.spec
+    note: Theme live background loops; noarch data package (mp4 files). Added to omarchy-base.packages (installed by default); versioned by date, built from the release tag. omarchy-theme-set copies a theme's packaged loops into the staged theme.
   omasnap:
     package: omasnap
     source: copr

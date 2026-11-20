@@ -386,5 +386,15 @@ packages:
     license: MIT
     deps: []
     status: verified
-    version: 2026.11.18
-    note: Background intro videos for the Omarchy themes, pinned to commit 3c8d7f0d0d. noarch data package (mp4 files under /usr/share/omarchy/themes/*/backgrounds/intros/). Container-built OK.
+    version: 2026.11.19
+    note: Background intro videos for the Omarchy themes, built from the release tag (versioned by date, so the tag always matches the content). noarch data package (mp4 files under /usr/share/omarchy/themes/*/backgrounds/intros/). Container-built OK.
+  omarchy-themes-loops:
+    repo: https://github.com/omacom/omarchy-themes-loops
+    language: null
+    build: noarch-data (mp4 theme background loops; no compile step)
+    binary: null
+    license: MIT
+    deps: []
+    status: verified
+    version: 2026.11.19
+    note: Live background loops for the Omarchy themes, built from the release tag (versioned by date). noarch data package (mp4 files under /usr/share/omarchy/themes/*/backgrounds/loops/); omarchy-theme-set copies them into the staged theme. Added to omarchy-base.packages (installed by default). Container-built OK.
