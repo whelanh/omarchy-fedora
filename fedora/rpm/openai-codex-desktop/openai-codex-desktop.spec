@@ -16,7 +16,7 @@
 %global __requires_exclude_from ^/usr/lib/chatgpt/.*$
 
 Name:           openai-codex-desktop
-Version:        26.1111.71704
+Version:        26.1117.31558
 Release:        1%{?dist}
 Summary:        Official ChatGPT desktop app with Codex
 
@@ -111,6 +111,9 @@ fi
 %{_datadir}/swcatalog/xml/com.openai.chatgpt.xml
 
 %changelog
+* Fri Nov 20 2026 whelanh <brickhousedevelopers@gmail.com> - 26.1117.31558-1
+- Automatic update to upstream v26.1117.31558
+
 * Thu Nov 19 2026 whelanh <brickhousedevelopers@gmail.com> - 26.1111.71704-1
 - Automatic update to upstream v26.1111.71704
 

@@ -7,7 +7,7 @@
 %global debug_package %{nil}
 
 Name:           fantasi
-Version:        0.1.2
+Version:        0.1.5
 Release:        1%{?dist}
 Summary:        Make and change images with Omarchy local image models
 
@@ -61,6 +61,9 @@ install -Dm644 share/%{name}.svg \
 %{_datadir}/icons/hicolor/scalable/apps/fantasi.svg
 
 %changelog
+* Fri Nov 20 2026 whelanh <brickhousedevelopers@gmail.com> - 0.1.5-1
+- Automatic update to upstream v0.1.5
+
 * Thu Nov 19 2026 whelanh <brickhousedevelopers@gmail.com> - 0.1.2-1
 - Initial Fedora package (v0.1.2): Omarchy's local image model app, installed
   by default from omarchy-base.packages
