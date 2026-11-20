@@ -452,6 +452,23 @@ m = re.search(r'^Version:\\s*(\\S+)', spec, re.M)
 man = yaml.safe_load(open('fedora/rpm/manifest.yaml'))['packages'][name].get('version')
 assert m and str(m.group(1)) == str(man), 'drift'
 "
+
+  # The newest %changelog entry has to name the release being built, otherwise
+  # a hand-edited Release: (or a changelog entry written without bumping it)
+  # ships an NEVRA and a changelog that disagree. omasnap 1.26.2 was packaged
+  # as -1 for a week while its top entry said -2: the fix never reached the
+  # COPR because the version had not moved and the release number was never
+  # raised, so the failed build was the only thing anyone saw.
+  t "spec changelog matches Version-Release: $pkg" python3 -c "
+import re
+spec = open('fedora/rpm/$pkg/$pkg.spec').read()
+ver = re.search(r'(?m)^Version:\\s*(\\S+)', spec).group(1)
+rel = re.search(r'(?m)^Release:\\s*(\\S+)', spec).group(1).split('%')[0]
+entry = re.search(r'(?m)^\\*\\s+\\w+\\s+\\w+\\s+\\d+\\s+\\d+\\s+.+?\\s+-\\s+(\\S+)\\s*$', spec)
+assert entry, 'no %changelog entry'
+assert entry.group(1) == ver + '-' + rel, (
+    'top changelog entry is %s but the spec builds %s-%s' % (entry.group(1), ver, rel))
+"
 done
 
 echo "== omarchy-screensaver binary path =="

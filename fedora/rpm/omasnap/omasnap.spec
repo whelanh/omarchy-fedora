@@ -7,7 +7,7 @@
 # CMake only requires Qt >= 6.8.
 Name:           omasnap
 Version:        1.26.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Native Wayland screenshot and annotation editor for Omarchy
 
 License:        MIT
