@@ -212,7 +212,7 @@ open as `file://` web apps.
 |---------|---------|-------|
 | aether | v4.33.0 | Go/Wails, repacked release binary |
 | cliamp | v2.4.1 | Go/CGO, repacked release binary |
-| fantasi | v0.1.5 | Qt6/CMake local image model app |
+| fantasi | v0.1.7 | Qt6/CMake local image model app |
 | flowtunes | v0.2.0 | Qt6/CMake local music app (GStreamer MP3 plugins) |
 | omarchy-folio | v0.6.1 | Qt6/CMake file manager (Files); replaces Nautilus, and its Open/Save dialogs |
 | herdr | v0.9.5 | Rust, repacked release binary (herdrdev/herdr) |
@@ -226,8 +226,8 @@ open as `file://` web apps.
 | omarchy-themes-intros | v2026.11.19 | noarch theme intro videos (built from the release tag) |
 | omarchy-themes-loops | v2026.11.19 | noarch theme live background loops |
 | omasnap | v1.26.2 | built from source (supersedes tensaku) |
-| owe | v0.2.17 | meson/C wallpaper engine (mpv + ffmpeg-free) |
-| owe-lockfeed | v0.2.17 | Qt6 QML lock-screen feed module |
+| owe | v0.2.18 | meson/C wallpaper engine (mpv + ffmpeg-free) |
+| owe-lockfeed | v0.2.18 | Qt6 QML lock-screen feed module |
 | plain | v0.4.1 | Qt6/CMake text editor for config files |
 | qtengine | v0.2.4 | Qt6 platform theme (replaces `gtk3`); AUR-only, first-party |
 | try (tobi-try) | v1.10.1 | Ruby gem |
