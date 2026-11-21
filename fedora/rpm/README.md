@@ -52,6 +52,7 @@ FEDORA=1 bash fedora/rpm/build-in-container.sh omasnap
 |---------|------|-------|---------|--------|
 | aether | omacom/aether | prebuilt-repack | MIT | verified |
 | cliamp | bjarneo/cliamp | prebuilt-repack | MIT | verified |
+| flowtunes | omacom/flowtunes | Qt6 / CMake | MIT | verified |
 | disktree-bin | tobi/disktree | prebuilt-repack | MIT | verified |
 | elsewhen | omacom/elsewhen | noarch-repack | MIT | retired |
 | omarchy-folio | omacom/folio | Qt6 / CMake | MIT | verified |

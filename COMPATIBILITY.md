@@ -117,23 +117,25 @@ definition, as Google ships no `.repo`), swap `chromium` for
 only for machines without Chrome.
 
 ### First-party Omarchy binaries (FIRST_PARTY, COPR `whelanh/omarchy`)
-29 Omarchy packages (`aether`, `cliamp`, `disktree-bin`, `gliff`,
-`herdr`, `hype`, `hyprland-preview-share-picker`, `monologue`, `omacalc`,
-`omacut`, `omapresent`, `omaview`, `omarchy-emacs`, `omarchy-folio`,
-`omarchy-hyprland-titlebars`, `omarchy-local-ai`, `omarchy-screensaver`,
-`omawrite`, `omasnap`,
-`openai-codex-desktop`, `owe`, `owe-lockfeed`, `plain`, `qtengine`, `signed`,
-`superwhisper-bin`, `tobi-try → try`, `ttfx`, `voxtype-bin`) are
+33 Omarchy packages (`aether`, `cliamp`, `disktree-bin`, `fantasi`,
+`flowtunes`, `gliff`, `herdr`, `hype`, `hyprland-preview-share-picker`,
+`monologue`, `omacalc`, `omacut`, `omapresent`, `omaview`, `omarchy-emacs`,
+`omarchy-folio`, `omarchy-hyprland-titlebars`, `omarchy-local-ai`,
+`omarchy-screensaver`, `omarchy-themes-intros`, `omarchy-themes-loops`,
+`omawrite`, `omasnap`, `openai-codex-desktop`, `owe`, `owe-lockfeed`, `plain`,
+`qtengine`, `signed`, `superwhisper-bin`, `tobi-try → try`, `ttfx`,
+`voxtype-bin`) are
 source-built or repacked as Fedora RPMs. Specs live in `fedora/rpm/` (one SPEC
 per package) with a `manifest.yaml` (repo, build system, license, status) and
-publish tooling in `fedora/rpm/copr/`. 26 of them are installed by the default
+publish tooling in `fedora/rpm/copr/`. 30 of them are installed by the default
 first-party set; `omarchy-emacs`, `openai-codex-desktop` and `voxtype-bin` are
-published for on-demand install from Omarchy's Install menu. Three former
+published for on-demand install from Omarchy's Install menu. Five former
 packages are now **retired**: `elsewhen` (`status: retired`; upstream moved it
 in-tree as `omarchy.elsewhen`), `openai-codex-bin` (upstream installs the Codex
 CLI through mise, and `omarchy-upgrade-to-quattro` removes the old pacman
-package), and `tensaku` (upstream replaced the screenshot annotator with
-`omasnap`).
+package), `tensaku` (upstream replaced the screenshot annotator with
+`omasnap`), and `cards`/`checkmate` (upstream replaced both desktop games with
+web pages inside Game Vibes).
 The installer no longer installs any of them and `omarchy update` prunes them.
 The `elsewhen` spec is kept only as a reference for the Fedora-native migration
 that renames/dedups existing installs (`fedora/migrations/*-elsewhen-retire.sh`);
@@ -211,6 +213,7 @@ open as `file://` web apps.
 | aether | v4.33.0 | Go/Wails, repacked release binary |
 | cliamp | v2.4.1 | Go/CGO, repacked release binary |
 | fantasi | v0.1.5 | Qt6/CMake local image model app |
+| flowtunes | v0.2.0 | Qt6/CMake local music app (GStreamer MP3 plugins) |
 | omarchy-folio | v0.6.1 | Qt6/CMake file manager (Files); replaces Nautilus, and its Open/Save dialogs |
 | herdr | v0.9.5 | Rust, repacked release binary (herdrdev/herdr) |
 | hype | v0.7.1 | Qt6/CMake Markdown presentation editor |

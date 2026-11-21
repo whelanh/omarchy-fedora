@@ -53,6 +53,12 @@ packages:
     repository: whelanh/omarchy
     rpm: fedora/rpm/fantasi/fantasi.spec
     note: Omarchy's local image model app; Qt6/CMake. Added to omarchy-base.packages (installed by default), so it is part of the default first-party set.
+  flowtunes:
+    package: flowtunes
+    source: copr
+    repository: whelanh/omarchy
+    rpm: fedora/rpm/flowtunes/flowtunes.spec
+    note: Endless music in the genre you pick, made with Omarchy's local music model (omarchy-local-ai); Qt6/CMake. Added to omarchy-base.packages (upstream d7d69f63d), so it is part of the default first-party set. Fedora's qt6-qtmultimedia uses GStreamer, so the RPM requires the MP3 decode and audio plugins.
   gliff:
     package: gliff
     source: copr

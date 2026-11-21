@@ -239,7 +239,21 @@ for path in specs:
         if re.search(r'(?m)^BuildRequires:.*ffmpeg-free-devel', s):
             pass  # build-time only: COPR builds plain Fedora, where that exists
 assert not bad, 'hard package dependency on ffmpeg-free: %r' % bad
-assert checked == 8, ('expected the eight ffmpeg shell-out packages', checked)
+assert checked == 9, ('expected the nine ffmpeg shell-out packages', checked)
+"
+# Arch's qt6-multimedia links FFmpeg directly, so its PKGBUILD needs no
+# GStreamer plugins. Fedora builds the GStreamer backend, and the MP3s Flowtunes
+# writes are decoded by gstreamer1-plugins-good (mpg123) with the audio sink
+# there too, so the RPM must pull them in explicitly.
+t "flowtunes requires Fedora's GStreamer MP3 and audio plugins" python3 -c "
+spec = open('fedora/rpm/flowtunes/flowtunes.spec').read()
+for line in ('Requires:       gstreamer1-plugins-base',
+             'Requires:       gstreamer1-plugins-good',
+             'Requires:       qt6-qtmultimedia',
+             'Requires:       /usr/bin/ffmpeg',
+             'BuildRequires:  qt6-qtshadertools-devel'):
+    assert line in spec, 'missing ' + line
+assert '--target %{name}' in spec, 'the tests are upstream CI: build only the app target'
 "
 # A base-manifest entry whose equivalent is installed must not be forced: dnf
 # reports a hard conflict and the whole backfill fails (see the ffmpeg case

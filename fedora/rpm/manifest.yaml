@@ -69,6 +69,16 @@ packages:
     status: verified
     version: 0.1.5
     note: Omarchy's local image model app (Qt6/CMake); added to omarchy-base.packages (installed by default). Needs qt6-qtshadertools-devel to build (ShaderTools). Container-built OK.
+  flowtunes:
+    repo: https://github.com/omacom/flowtunes
+    language: cpp
+    build: cmake
+    binary: flowtunes
+    license: MIT
+    deps: [ffmpeg-free, gstreamer1-plugins-base, gstreamer1-plugins-good, hicolor-icon-theme, qt6-qtbase, qt6-qtdeclarative, qt6-qtmultimedia, qt6-qtsvg, qt6-qtwayland]
+    status: verified
+    version: 0.2.0
+    note: Endless music in the genre you pick, made with Omarchy's local music model (omarchy-local-ai); Qt6/CMake with ShaderTools. Added to omarchy-base.packages in d7d69f63d (installed by default) and installed on existing machines by upstream migration 1795191169. Fedora's qt6-qtmultimedia uses the GStreamer backend, so it requires gstreamer1-plugins-good for MP3 decode (mpg123) and the audio sink.
   gliff:
     repo: https://github.com/omacom/gliff
     language: rust

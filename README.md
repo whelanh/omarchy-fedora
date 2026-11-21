@@ -102,7 +102,7 @@ systemctl reboot
 The installer is **idempotent** — running it again is safe.
 
 > Note: Omarchy's first-party binaries and plugins (aether, cliamp,
-> disktree-bin, fantasi,
+> disktree-bin, fantasi, flowtunes,
 > gliff, herdr, hype, hyprland-preview-share-picker, monologue,
 > omacalc, omacut, omapresent, omarchy-folio, omarchy-hyprland-titlebars,
 > omarchy-local-ai, omarchy-screensaver, omarchy-themes-intros,

@@ -182,7 +182,7 @@ install_repos() {
   # gpu-screen-recorder is part of the desktop; enable its COPR.
   omarchy_fedora_enable_optional_coprs brycensranch/gpu-screen-recorder-git \
     || die "failed to enable gpu-screen-recorder COPR"
-  # First-party Omarchy packages (aether, cliamp, disktree-bin, fantasi, gliff,
+  # First-party Omarchy packages (aether, cliamp, disktree-bin, fantasi, flowtunes, gliff,
   # herdr, hype, hyprland-preview-share-picker, monologue, omacalc, omacut,
   # omapresent, omaview, omarchy-folio, omarchy-hyprland-titlebars,
   # omarchy-local-ai, omarchy-screensaver, omarchy-themes-intros,
@@ -549,8 +549,8 @@ install_omarchy_tree() {
     sudo chown -R root:root "$dest"
   fi
   log "Omarchy tree installed to $dest"
-  log "NOTE: the 29 first-party packages (aether, cliamp, disktree-bin," \
-       "fantasi, gliff, herdr, hype, hyprland-preview-share-picker," \
+  log "NOTE: the 30 first-party packages (aether, cliamp, disktree-bin," \
+       "fantasi, flowtunes, gliff, herdr, hype, hyprland-preview-share-picker," \
        "monologue, omacalc, omacut, omapresent, omaview, omarchy-folio," \
        "omarchy-hyprland-titlebars, omarchy-local-ai, omarchy-screensaver," \
        "omarchy-themes-intros, omarchy-themes-loops," \
