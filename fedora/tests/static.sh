@@ -241,6 +241,17 @@ for path in specs:
 assert not bad, 'hard package dependency on ffmpeg-free: %r' % bad
 assert checked == 9, ('expected the nine ffmpeg shell-out packages', checked)
 "
+# 0.7.1 requires fontconfig through pkg-config, which Fedora splits out of the
+# base package into fontconfig-devel; the build failed in every chroot without
+# it. It also added BUILD_TESTING, the switch upstream offers packagers, and
+# promoted qt6-imageformats from an optdepend to a dependency.
+t "folio has upstream 0.7.1's fontconfig build requirement" python3 -c "
+spec = open('fedora/rpm/omarchy-folio/omarchy-folio.spec').read()
+for line in ('BuildRequires:  fontconfig-devel',
+             'Requires:       qt6-qtimageformats',
+             '-DBUILD_TESTING=OFF'):
+    assert line in spec, 'missing ' + line
+"
 # Arch's qt6-multimedia links FFmpeg directly, so its PKGBUILD needs no
 # GStreamer plugins. Fedora builds the GStreamer backend, and the MP3s Flowtunes
 # writes are decoded by gstreamer1-plugins-good (mpg123) with the audio sink

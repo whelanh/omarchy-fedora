@@ -14,17 +14,19 @@
 # Obsoletes: folio < 1 replaces only our own earlier 0.4.0 COPR build, never
 # Fedora's 26.x package (which this must not touch).
 #
-# Checked against upstream v0.5.0: bin/build drives CMake, QML is compiled into
+# Checked against upstream v0.7.1: bin/build drives CMake, QML is compiled into
 # the binary through src/resources.qrc, and the desktop entry and icon ship
 # in-tree under share/ (v0.2.0 had them under pkgbuild/). The only linked
-# libraries beyond Qt are glib/gio (pkgconfig gio-2.0, gio-unix-2.0) and zlib;
-# archives are made by exec'ing bsdtar (Fedora's own package), and 0.5.0 added
-# the xdg-desktop-portal FileChooser backend and the bundled plugins.
+# libraries beyond Qt are glib/gio (pkgconfig gio-2.0, gio-unix-2.0), zlib and
+# - since 0.7.1 - fontconfig (pkgconfig fontconfig, for font metadata in
+# previews; Fedora splits the .pc out into fontconfig-devel). Archives are made
+# by exec'ing bsdtar (Fedora's own package), and 0.5.0 added the
+# xdg-desktop-portal FileChooser backend and the bundled plugins.
 %global debug_package %{nil}
 
 Name:           omarchy-folio
-Version:        0.6.1
-Release:        1%{?dist}
+Version:        0.7.1
+Release:        2%{?dist}
 Summary:        Files: Omarchy's quiet, keyboard-first file manager
 
 License:        MIT
@@ -35,6 +37,7 @@ Obsoletes:      folio < 1
 BuildRequires:  cmake
 BuildRequires:  gcc-c++
 BuildRequires:  make
+BuildRequires:  fontconfig-devel
 BuildRequires:  glib2-devel
 BuildRequires:  zlib-devel
 BuildRequires:  qt6-qtbase-devel
@@ -44,6 +47,7 @@ Requires:       bsdtar
 Requires:       glib2
 Requires:       hicolor-icon-theme
 Requires:       qt6-qtbase
+Requires:       qt6-qtimageformats
 Requires:       qt6-qtdeclarative
 Requires:       qt6-qtmultimedia
 Requires:       qt6-qtsvg
@@ -57,7 +61,6 @@ Recommends:     glycin-loaders
 Recommends:     gvfs
 Recommends:     jq
 Recommends:     poppler-utils
-Recommends:     qt6-qtimageformats
 Recommends:     qt6-qtpdf
 Recommends:     xdg-terminal-exec
 Suggests:       dropbox-cli
@@ -78,11 +81,10 @@ plugins, the bundled Tailscale, Dropbox and LocalSend ones included.
 %autosetup -n folio-%{version}
 
 %build
-# Build the app target, not upstream's folio_tests: 0.5.0's tests call
-# QDragEnterEvent's QPointF overload, which Qt 6.11 (Fedora 44/45) does not
-# have, and the tests are upstream CI's job. The same reason omacut and
-# omaview build only their app target.
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+# 0.7.1 added BUILD_TESTING, the switch upstream offers packagers so the suite
+# is configured out (it needs Qt Test and is upstream CI's job), and only the
+# app target is built. Same reason omacut and omaview build only their target.
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF
 cmake --build build --target folio -j"$(nproc)"
 
 %install
@@ -120,6 +122,15 @@ install -Dm644 docs/plugins.md %{buildroot}%{_datadir}/doc/%{name}/plugins.md
 %{_datadir}/doc/%{name}/plugins.md
 
 %changelog
+* Sun Nov 22 2026 whelanh <brickhousedevelopers@gmail.com> - 0.7.1-2
+- Follow upstream 0.7.1's build: it requires fontconfig through pkg-config
+  (font metadata in previews), which Fedora ships in fontconfig-devel, and
+  configure with BUILD_TESTING=OFF, the switch 0.7.1 added for packagers.
+  Promote qt6-qtimageformats to a hard requirement, as upstream's package did.
+
+* Sun Nov 22 2026 whelanh <brickhousedevelopers@gmail.com> - 0.7.1-1
+- Automatic update to upstream v0.7.1
+
 * Wed Nov 18 2026 whelanh <brickhousedevelopers@gmail.com> - 0.6.1-1
 - Automatic update to upstream v0.6.1
 

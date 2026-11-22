@@ -11,7 +11,7 @@
 %global debug_package %{nil}
 
 Name:           omarchy-themes-intros
-Version:        2026.11.19
+Version:        2026.11.21
 Release:        1%{?dist}
 Summary:        Background intro videos for the Omarchy themes
 
@@ -41,6 +41,9 @@ done
 %{_datadir}/omarchy/themes/*/backgrounds/intros/
 
 %changelog
+* Sun Nov 22 2026 whelanh <brickhousedevelopers@gmail.com> - 2026.11.21-1
+- Automatic update to upstream v2026.11.21
+
 * Fri Nov 20 2026 whelanh <brickhousedevelopers@gmail.com> - 2026.11.19-1
 - Update to 2026.11.19: adds the Starship (Starbase) intro. Build from the
   release tag instead of a pinned commit so the version and the videos can
