@@ -1,17 +1,17 @@
 # whelanh/omarchy COPR publishing
 
-This directory holds the tooling that publishes the 33 first-party Omarchy
+This directory holds the tooling that publishes the 34 first-party Omarchy
 RPMs (specs in `fedora/rpm/<pkg>/`) to the **`whelanh/omarchy`** COPR, so a
 stock Fedora install gets them with a plain `dnf install` — no local builds.
 
-## The 33 packages
+## The 34 packages
 
 aether, cliamp, disktree-bin, fantasi, flowtunes, gliff, herdr, hype,
 hyprland-preview-share-picker, monologue, omacalc, omacut, omapresent, omaview,
 omarchy-emacs, omarchy-hyprland-titlebars, omarchy-local-ai,
 omarchy-screensaver, omarchy-themes-intros, omarchy-themes-loops, omawrite,
 omasnap, openai-codex-desktop, owe,
-owe-lockfeed, plain, qtengine, signed, superwhisper-bin, try (tobi-try), ttfx,
+owe-lockfeed, pi-coding-agent, plain, qtengine, signed, superwhisper-bin, try (tobi-try), ttfx,
 voxtype-bin. All are `status: verified` in
 `fedora/rpm/manifest.yaml` and built green end-to-end on `fedora:rawhide`
 via `fedora/rpm/build-rpm-in-ci.sh`. (`elsewhen` and `openai-codex-bin` are
@@ -132,7 +132,7 @@ sudo dnf install aether cliamp disktree-bin fantasi flowtunes gliff herdr hype \
                  omapresent omaview omarchy-folio omarchy-hyprland-titlebars \
                  omarchy-local-ai omarchy-screensaver omarchy-themes-intros \
                  omarchy-themes-loops omawrite omasnap owe owe-lockfeed \
-                 plain qtengine signed superwhisper-bin try ttfx
+                 pi-coding-agent plain qtengine signed superwhisper-bin try ttfx
 ```
 
 `cards` and `checkmate` were retired when upstream replaced those desktop apps

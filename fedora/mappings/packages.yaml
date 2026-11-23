@@ -173,6 +173,12 @@ packages:
     repository: whelanh/omarchy
     rpm: fedora/rpm/owe-lockfeed/owe-lockfeed.spec
     note: Qt6 QML module Owe.LockFeed for the lock screen; same omacom/owe source as `owe`, no AUR counterpart.
+  pi-coding-agent:
+    package: pi-coding-agent
+    source: copr
+    repository: whelanh/omarchy
+    rpm: fedora/rpm/pi-coding-agent/pi-coding-agent.spec
+    note: Pi, Omarchy's terminal coding agent harness for local models; repack of upstream's Bun release. Upstream 19736 moved it out of mise into omarchy-base.packages, so it is part of the default first-party set.
   plain:
     package: plain
     source: copr
@@ -313,6 +319,7 @@ packages:
   inxi:                  { package: inxi, source: fedora }
   jq:                    { package: jq, source: fedora }
   kdenlive:              { package: kdenlive, source: fedora }
+  kmscon:                { package: kmscon, source: fedora, note: "Fedora ships the console emulator; its pango font engine is the separate kmscon-pango package, installed from base.txt (upstream asks for --font-engine=pango)" }
   lazydocker:
     package: lazydocker
     source: copr
@@ -493,9 +500,13 @@ packages:
     source: substitute
     note: Noto Sans; Fedora package name
   noto-fonts-cjk:
-    package: google-noto-sans-cjk-fonts
+    package: null
+    source: drop
+    note: Upstream replaced it with noto-fonts-cjk-vf (#19756). Kept as a mapping so machines installed before the switch keep the per-weight fonts, as on Arch, but new installs get the variable build.
+  noto-fonts-cjk-vf:
+    package: google-noto-sans-cjk-vf-fonts
     source: substitute
-    note: Fedora CJK font package name
+    note: Noto's variable CJK build (Sans, Mono, Serif). Fedora splits the three families; base.txt installs the Mono and Serif companions too.
   noto-fonts-emoji:
     package: google-noto-color-emoji-fonts
     source: substitute
@@ -746,6 +757,7 @@ packages:
   linux-ptl:             { package: null, source: unavailable, note: patched kernel; use stock Fedora kernel }
   linux-ptl-headers:     { package: null, source: unavailable, note: patched kernel headers }
   macbook12-spi-driver-dkms: { package: null, source: unavailable, note: Apple Mac specific }
+  samsung-galaxy-book4-edge-14-support: { package: null, source: unavailable, note: Samsung Galaxy Book4 Edge (Snapdragon X); the port is x86_64-only }
   lib32-nvidia-580xx-utils:  { package: null, source: unavailable, note: 32-bit compat not standard on Fedora }
   lib32-nvidia-utils: { package: null, source: unavailable, note: 32-bit compat not standard on Fedora }
   tuxedo-drivers-nocompatcheck-dkms: { package: null, source: unavailable, note: Tuxedo hardware specific }

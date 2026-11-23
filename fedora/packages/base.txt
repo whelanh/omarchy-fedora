@@ -148,13 +148,27 @@ zoxide
 fontawesome-fonts-all
 fontawesome-fonts-web
 google-noto-color-emoji-fonts
-google-noto-sans-cjk-fonts
+# Upstream switched to Noto's variable CJK build (noto-fonts-cjk-vf, #19756):
+# one file per family instead of one per weight, 116 MB instead of 299 MB.
+# Upstream's single package carries Sans, Mono and Serif; Fedora ships them as
+# three, and kmscon draws CJK in the Mono family ("Noto Sans Mono CJK SC").
+# Machines installed before this keep google-noto-sans-cjk-fonts, as on Arch.
+google-noto-sans-cjk-vf-fonts
+google-noto-sans-mono-cjk-vf-fonts
+google-noto-serif-cjk-vf-fonts
 google-noto-sans-fonts
 jetbrains-mono-fonts
 # Console fonts for setup (Arch: terminus-font). Fedora splits the Arch
 # package; -console ships the PSF files console-font.sh reads (desktop OTB
 # fonts live in terminus-fonts, which nothing here uses).
 terminus-fonts-console
+# kmscon draws the installer and the first-boot owner setup (upstream c1e355393,
+# install/provisioning/kmscon.sh): real fonts instead of the console's bitmap,
+# in Chinese, Japanese and Korean too. Upstream's kmscon is one build; Fedora
+# splits the font engines out, and that script asks for --font-engine=pango, so
+# kmscon-pango is a hard companion, not an optional extra.
+kmscon
+kmscon-pango
 
 # development
 lua

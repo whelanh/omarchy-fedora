@@ -117,17 +117,18 @@ definition, as Google ships no `.repo`), swap `chromium` for
 only for machines without Chrome.
 
 ### First-party Omarchy binaries (FIRST_PARTY, COPR `whelanh/omarchy`)
-33 Omarchy packages (`aether`, `cliamp`, `disktree-bin`, `fantasi`,
+34 Omarchy packages (`aether`, `cliamp`, `disktree-bin`, `fantasi`,
 `flowtunes`, `gliff`, `herdr`, `hype`, `hyprland-preview-share-picker`,
 `monologue`, `omacalc`, `omacut`, `omapresent`, `omaview`, `omarchy-emacs`,
 `omarchy-folio`, `omarchy-hyprland-titlebars`, `omarchy-local-ai`,
 `omarchy-screensaver`, `omarchy-themes-intros`, `omarchy-themes-loops`,
-`omawrite`, `omasnap`, `openai-codex-desktop`, `owe`, `owe-lockfeed`, `plain`,
+`omawrite`, `omasnap`, `openai-codex-desktop`, `owe`, `owe-lockfeed`,
+`pi-coding-agent`, `plain`,
 `qtengine`, `signed`, `superwhisper-bin`, `tobi-try → try`, `ttfx`,
 `voxtype-bin`) are
 source-built or repacked as Fedora RPMs. Specs live in `fedora/rpm/` (one SPEC
 per package) with a `manifest.yaml` (repo, build system, license, status) and
-publish tooling in `fedora/rpm/copr/`. 30 of them are installed by the default
+publish tooling in `fedora/rpm/copr/`. 31 of them are installed by the default
 first-party set; `omarchy-emacs`, `openai-codex-desktop` and `voxtype-bin` are
 published for on-demand install from Omarchy's Install menu. Five former
 packages are now **retired**: `elsewhen` (`status: retired`; upstream moved it
@@ -228,6 +229,7 @@ open as `file://` web apps.
 | omasnap | v1.26.2 | built from source (supersedes tensaku) |
 | owe | v0.2.18 | meson/C wallpaper engine (mpv + ffmpeg-free) |
 | owe-lockfeed | v0.2.18 | Qt6 QML lock-screen feed module |
+| pi-coding-agent | v1.6.0 | Bun standalone binary, repacked from the upstream release |
 | plain | v0.4.1 | Qt6/CMake text editor for config files |
 | qtengine | v0.2.4 | Qt6 platform theme (replaces `gtk3`); AUR-only, first-party |
 | try (tobi-try) | v1.10.1 | Ruby gem |

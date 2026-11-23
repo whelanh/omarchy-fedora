@@ -300,6 +300,16 @@ packages:
     status: verified
     version: 0.2.18
     note: Qt6 QML module Owe.LockFeed from the same omacom/owe tag archive as `owe`; this is the package Omarchy splits out of the AUR owe build. Container-built OK.
+  pi-coding-agent:
+    repo: https://github.com/earendil-works/pi
+    language: binary
+    build: repack-tarball (Bun standalone executable + JS assets)
+    binary: pi
+    license: MIT
+    deps: [glibc]
+    status: verified
+    version: 1.6.0
+    note: Pi, the terminal coding agent Omarchy uses to open local models; upstream 19736 replaced its mise declaration with omarchy-base.packages, so the RPM is installed by default. Repacked from pi-linux-x64.tar.gz into /usr/lib64/pi-coding-agent with a /usr/bin/pi wrapper that sets PI_SKIP_VERSION_CHECK=1 (the package updates it). Strip is disabled because the executable carries its JavaScript appended; the migration drops the old mise wrapper and any mise-installed pi.
   plain:
     repo: https://github.com/omacom/plain
     language: cpp

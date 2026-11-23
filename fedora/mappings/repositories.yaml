@@ -166,6 +166,7 @@ repositories:
       - openai-codex-desktop
       - owe
       - owe-lockfeed
+      - pi-coding-agent
       - plain
       - qtengine
       - signed

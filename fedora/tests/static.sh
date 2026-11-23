@@ -863,6 +863,52 @@ for game in ('cards', 'checkmate'):
 launcher = Path('upstream/applications/Game Vibes.desktop').read_text()
 assert 'Exec=omarchy-games-vibes-launch' in launcher, launcher
 "
+echo "== Pi ships as a package, not a mise tool (upstream 19736) =="
+# Upstream moved Pi out of its mise declarations into omarchy-base.packages as
+# pi-coding-agent. The RPM is a repack of a Bun standalone executable with the
+# JavaScript appended: stripping rewrites it into something Bun cannot start,
+# which is why Fedora's brp-strip has to be pointed away from it, and why the
+# release tarball is used as-is instead of building anything.
+t "pi-coding-agent repacks the Bun release without stripping it" python3 -c "
+spec = open('fedora/rpm/pi-coding-agent/pi-coding-agent.spec').read()
+for line in ('%global __strip /bin/true',
+             'PI_SKIP_VERSION_CHECK=1',
+             'pi-linux-x64.tar.gz',
+             'BuildArch:      x86_64',
+             '%{_libdir}/%{name}'):
+    assert line in spec, 'missing ' + line
+"
+t "pi-coding-agent resolves from the COPR and its mise cleanup exists" bash -c '
+  python3 fedora/scripts/lib/resolve.py --copr whelanh/omarchy | grep -qx pi-coding-agent
+  ls fedora/migrations/*-pi-coding-agent.sh >/dev/null
+'
+echo "== kmscon, the Noto variable CJK fonts (upstream c1e355393, 8b8d0942a) =="
+# Fedora ships kmscon, but its pango font engine is a separate subpackage and
+# upstream's setup script asks for --font-engine=pango. Upstream's Noto CJK
+# package carries three families; Fedora ships them as three packages, and
+# kmscon draws CJK in the Mono one.
+t "kmscon and its pango engine are installed" python3 -c "
+import yaml
+pkgs = yaml.safe_load(open('fedora/mappings/packages.yaml'))['packages']
+entry = pkgs['kmscon']
+assert entry.get('source') == 'fedora' and entry.get('package') == 'kmscon', entry
+base = {l.split('#')[0].strip() for l in open('fedora/packages/base.txt')}
+for name in ('kmscon', 'kmscon-pango'):
+    assert name in base, name
+"
+t "noto CJK uses the variable builds" python3 -c "
+import yaml
+pkgs = yaml.safe_load(open('fedora/mappings/packages.yaml'))['packages']
+assert pkgs['noto-fonts-cjk']['source'] == 'drop', pkgs['noto-fonts-cjk']
+entry = pkgs['noto-fonts-cjk-vf']
+assert entry.get('package') == 'google-noto-sans-cjk-vf-fonts', entry
+base = {l.split('#')[0].strip() for l in open('fedora/packages/base.txt')}
+for name in ('google-noto-sans-cjk-vf-fonts',
+             'google-noto-sans-mono-cjk-vf-fonts',
+             'google-noto-serif-cjk-vf-fonts'):
+    assert name in base, name
+"
+
 # Upstream 00147cf6d (#18667, 2026-11-12) changed the *default* dock pins without
 # a migration, so installs that copied the old list into ~/.config keep it. The
 # port's 'cp -a -n' seeding freezes it at install time, which is why a machine
