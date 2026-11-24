@@ -7,8 +7,8 @@
 %global debug_package %{nil}
 
 Name:           monologue
-Version:        0.4.0
-Release:        3%{?dist}
+Version:        0.4.1
+Release:        1%{?dist}
 Summary:        Simple, theme-synced webcam recorder for Omarchy
 
 License:        MIT
@@ -60,6 +60,9 @@ install -Dm644 pkgbuild/monologue.desktop %{buildroot}%{_datadir}/applications/m
 %{_datadir}/applications/monologue.desktop
 
 %changelog
+* Tue Nov 24 2026 whelanh <brickhousedevelopers@gmail.com> - 0.4.1-1
+- Automatic update to upstream v0.4.1
+
 * Sun Nov 15 2026 whelanh <brickhousedevelopers@gmail.com> - 0.4.0-3
 - Require /usr/bin/ffmpeg and /usr/bin/ffprobe instead of the ffmpeg-free
   package: RPM Fusion's full ffmpeg provides the files and Conflicts with

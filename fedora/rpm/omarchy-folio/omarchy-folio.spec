@@ -25,8 +25,8 @@
 %global debug_package %{nil}
 
 Name:           omarchy-folio
-Version:        0.7.1
-Release:        2%{?dist}
+Version:        0.7.3
+Release:        1%{?dist}
 Summary:        Files: Omarchy's quiet, keyboard-first file manager
 
 License:        MIT
@@ -122,6 +122,9 @@ install -Dm644 docs/plugins.md %{buildroot}%{_datadir}/doc/%{name}/plugins.md
 %{_datadir}/doc/%{name}/plugins.md
 
 %changelog
+* Tue Nov 24 2026 whelanh <brickhousedevelopers@gmail.com> - 0.7.3-1
+- Automatic update to upstream v0.7.3
+
 * Sun Nov 22 2026 whelanh <brickhousedevelopers@gmail.com> - 0.7.1-2
 - Follow upstream 0.7.1's build: it requires fontconfig through pkg-config
   (font metadata in previews), which Fedora ships in fontconfig-devel, and

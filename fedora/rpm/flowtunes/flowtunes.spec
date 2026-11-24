@@ -11,7 +11,7 @@
 %global debug_package %{nil}
 
 Name:           flowtunes
-Version:        0.3.0
+Version:        0.4.0
 Release:        1%{?dist}
 Summary:        Endless music in the genre you pick
 
@@ -68,6 +68,9 @@ install -Dm644 share/%{name}.svg \
 %{_datadir}/icons/hicolor/scalable/apps/flowtunes.svg
 
 %changelog
+* Tue Nov 24 2026 whelanh <brickhousedevelopers@gmail.com> - 0.4.0-1
+- Automatic update to upstream v0.4.0
+
 * Mon Nov 23 2026 whelanh <brickhousedevelopers@gmail.com> - 0.3.0-1
 - Automatic update to upstream v0.3.0
 

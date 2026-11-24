@@ -14,7 +14,7 @@
 %global debug_package %{nil}
 
 Name:           plain
-Version:        0.4.1
+Version:        0.4.2
 Release:        1%{?dist}
 Summary:        Omarchy's text editor for config files
 
@@ -60,6 +60,9 @@ install -Dm644 pkgbuild/plain.desktop \
 %{_datadir}/applications/plain.desktop
 
 %changelog
+* Tue Nov 24 2026 whelanh <brickhousedevelopers@gmail.com> - 0.4.2-1
+- Automatic update to upstream v0.4.2
+
 * Tue Nov 17 2026 whelanh <brickhousedevelopers@gmail.com> - 0.4.1-1
 - Automatic update to upstream v0.4.1
 

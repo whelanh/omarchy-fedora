@@ -4,8 +4,8 @@
 %global debug_package %{nil}
 
 Name:           omacut
-Version:        0.8.3
-Release:        3%{?dist}
+Version:        0.8.4
+Release:        1%{?dist}
 Summary:        Dead-simple video length trimmer built with Qt Quick and ffmpeg
 
 License:        MIT
@@ -56,6 +56,9 @@ install -Dm644 pkgbuild/omacut.desktop %{buildroot}%{_datadir}/applications/omac
 %{_datadir}/applications/omacut.desktop
 
 %changelog
+* Tue Nov 24 2026 whelanh <brickhousedevelopers@gmail.com> - 0.8.4-1
+- Automatic update to upstream v0.8.4
+
 * Sun Nov 15 2026 whelanh <brickhousedevelopers@gmail.com> - 0.8.3-3
 - Build the app target instead of upstream's ./bin/build: v0.8.3's tests pass
   a QPointF to QDragEnterEvent, which takes QPoint in Qt 6.11 (Fedora 45), so

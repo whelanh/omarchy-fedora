@@ -67,7 +67,7 @@ packages:
     license: MIT
     deps: [ffmpeg-free, hicolor-icon-theme, qt6-qtbase, qt6-qtdeclarative, qt6-qtmultimedia, qt6-qtsvg, qt6-qtwayland, xdg-desktop-portal]
     status: verified
-    version: 0.2.0
+    version: 0.3.0
     note: Omarchy's local image model app (Qt6/CMake); added to omarchy-base.packages (installed by default). Needs qt6-qtshadertools-devel to build (ShaderTools). Container-built OK.
   flowtunes:
     repo: https://github.com/omacom/flowtunes
@@ -77,7 +77,7 @@ packages:
     license: MIT
     deps: [ffmpeg-free, gstreamer1-plugins-base, gstreamer1-plugins-good, hicolor-icon-theme, qt6-qtbase, qt6-qtdeclarative, qt6-qtmultimedia, qt6-qtsvg, qt6-qtwayland]
     status: verified
-    version: 0.3.0
+    version: 0.4.0
     note: Endless music in the genre you pick, made with Omarchy's local music model (omarchy-local-ai); Qt6/CMake with ShaderTools. Added to omarchy-base.packages in d7d69f63d (installed by default) and installed on existing machines by upstream migration 1795191169. Fedora's qt6-qtmultimedia uses the GStreamer backend, so it requires gstreamer1-plugins-good for MP3 decode (mpg123) and the audio sink.
   gliff:
     repo: https://github.com/omacom/gliff
@@ -97,7 +97,7 @@ packages:
     license: MIT
     deps: [bsdtar, fontconfig, glib2, zlib, qt6-qtbase, qt6-qtdeclarative, qt6-qtimageformats, qt6-qtmultimedia, qt6-qtsvg, qt6-qtwayland, hicolor-icon-theme, xdg-utils]
     status: verified
-    version: 0.7.1
+    version: 0.7.3
     note: >
       Files: Omarchy's file manager and the inode/directory handler, replacing
       Nautilus (upstream migration 1794330979.sh). Qt6/CMake, QML compiled into
@@ -150,7 +150,7 @@ packages:
     license: MIT
     deps: [qt6-qtbase, qt6-qtdeclarative, qt6-qtmultimedia, pulseaudio-libs, turbojpeg, /usr/bin/ffmpeg, /usr/bin/ffprobe, xdg-desktop-portal]
     status: verified
-    version: 0.4.0
+    version: 0.4.1
     note: Theme-synced webcam recorder with a built-in trim/cut editor; Qt6/CMake with libpulse for metering and libturbojpeg for editor thumbnails (v0.4.0+), shells out to ffmpeg/ffprobe. Container-built OK.
   omacalc:
     repo: https://github.com/omacom/omacalc
@@ -170,7 +170,7 @@ packages:
     license: MIT
     deps: [qt6-base, qt6-declarative, qt6-multimedia, /usr/bin/ffmpeg, /usr/bin/ffprobe]
     status: verified
-    version: 0.8.3
+    version: 0.8.4
     note: Built in Fedora Rawhide container (v0.5.0); Qt6 trimmer, needs qt6-qtmultimedia-devel.
   omapresent:
     repo: https://github.com/jethrojones/omapresent
@@ -243,7 +243,7 @@ packages:
     license: MIT
     deps: [qt6-base, qt6-declarative, qt6-quickcontrols2, xdg-desktop-portal]
     status: verified
-    version: 0.7.6
+    version: 0.7.7
     note: Built in Fedora Rawhide container (v0.5.0); Qt6 markdown editor.
   omasnap:
     repo: https://github.com/tobi/omasnap
@@ -253,7 +253,7 @@ packages:
     license: MIT
     deps: [hyprland, layer-shell-qt, wl-clipboard, qt6-qtbase, xdg-utils]
     status: verified
-    version: 1.26.2
+    version: 1.26.3
     note: Built from upstream source (the Arch release binaries link against Qt 6.12, which Fedora does not ship); screenshot/annotation editor that supersedes tensaku. Ships its own SVG icon, packaged since 1.26.2-2. Container-built OK.
   omaview:
     repo: https://github.com/omacom/omaview
@@ -263,7 +263,7 @@ packages:
     license: MIT
     deps: [qt6-qtbase, qt6-qtdeclarative, qt6-qtmultimedia, qt6-qtimageformats, qt6-qtsvg, qt6-qtwayland, wl-clipboard, /usr/bin/ffmpeg, xdg-desktop-portal]
     status: verified
-    version: 0.1.1
+    version: 0.1.2
     note: Omarchy's picture viewer and media player, which replaces imv and mpv in omarchy-base.packages (upstream 9599f7661); Qt6/CMake, links the Wayland client for idle inhibition and uses Qt 6's built-in FFmpeg multimedia backend. Needs qt6-qtbase-private-devel to build; kf6-kimageformats is a Recommends for HEIC/AVIF/JPEG XL. Container-built OK.
   openai-codex-desktop:
     repo: https://chatgpt.com/codex/
@@ -273,7 +273,7 @@ packages:
     license: LicenseRef-proprietary
     deps: [gtk3, mesa-libEGL, mesa-libgbm, nss, xdg-utils]
     status: verified
-    version: 26.1117.41037
+    version: 26.1120.41243
     # OpenAI ships no GitHub release for the desktop app, so the version is
     # tracked from the omacom/omarchy-pkgs PKGBUILD's pkgver= (same value the
     # Arch package builds from). Deliberately Omarchy's published version, even
@@ -318,7 +318,7 @@ packages:
     license: MIT
     deps: [qt6-qtbase, qt6-qtdeclarative, qt6-qtwayland, hicolor-icon-theme, xdg-desktop-portal]
     status: verified
-    version: 0.4.1
+    version: 0.4.2
     note: >
       Omarchy's text editor for config files, the handler for text/plain and the
       "plain" editor choice (bin/omarchy-default-editor). Qt6/CMake via
@@ -368,7 +368,7 @@ packages:
     license: MIT
     deps: [python3, systemd]
     status: verified
-    version: 0.12.1
+    version: 0.13.0
     note: Local model engine and its curated recipe catalog, installed as one tree under /usr/share/omarchy-local-ai with /usr/bin/omarchy-local-ai symlinked into it (the engine reads the catalog beside itself). %check runs upstream's `validate .` offline. The containers that run models use podman + crun, which are base packages since upstream 0c6dc2038.
   omarchy-screensaver:
     repo: https://github.com/omacom/omarchy-screensaver
