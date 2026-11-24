@@ -11,7 +11,7 @@
 %global debug_package %{nil}
 
 Name:           omarchy-local-ai
-Version:        0.10.0
+Version:        0.12.1
 Release:        1%{?dist}
 Summary:        Run open models locally for Omarchy's coding agents
 
@@ -71,6 +71,9 @@ ln -s ../share/%{name}/omarchy-local-ai %{buildroot}%{_bindir}/omarchy-local-ai
 %{_datadir}/%{name}
 
 %changelog
+* Mon Nov 23 2026 whelanh <brickhousedevelopers@gmail.com> - 0.12.1-1
+- Automatic update to upstream v0.12.1
+
 * Sun Nov 22 2026 whelanh <brickhousedevelopers@gmail.com> - 0.10.0-1
 - Automatic update to upstream v0.10.0
 

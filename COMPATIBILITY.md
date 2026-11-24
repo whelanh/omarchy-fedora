@@ -213,8 +213,8 @@ open as `file://` web apps.
 |---------|---------|-------|
 | aether | v4.33.0 | Go/Wails, repacked release binary |
 | cliamp | v2.4.1 | Go/CGO, repacked release binary |
-| fantasi | v0.1.7 | Qt6/CMake local image model app |
-| flowtunes | v0.2.0 | Qt6/CMake local music app (GStreamer MP3 plugins) |
+| fantasi | v0.2.0 | Qt6/CMake local image model app |
+| flowtunes | v0.3.0 | Qt6/CMake local music app (GStreamer MP3 plugins) |
 | omarchy-folio | v0.7.1 | Qt6/CMake file manager (Files); replaces Nautilus, and its Open/Save dialogs |
 | herdr | v0.9.5 | Rust, repacked release binary (herdrdev/herdr) |
 | hype | v0.7.1 | Qt6/CMake Markdown presentation editor |
@@ -224,8 +224,8 @@ open as `file://` web apps.
 | omacut | v0.8.3 | Qt6/CMake + ffmpeg |
 | omaview | v0.1.1 | Qt6/CMake picture viewer + media player (replaces imv/mpv) |
 | omawrite | v0.7.6 | Qt6/CMake |
-| omarchy-themes-intros | v2026.11.21 | noarch theme intro videos (built from the release tag) |
-| omarchy-themes-loops | v2026.11.19 | noarch theme live background loops |
+| omarchy-themes-intros | v2026.11.22 | noarch theme intro videos (built from the release tag) |
+| omarchy-themes-loops | v2026.11.22 | noarch theme live background loops |
 | omasnap | v1.26.2 | built from source (supersedes tensaku) |
 | owe | v0.2.18 | meson/C wallpaper engine (mpv + ffmpeg-free) |
 | owe-lockfeed | v0.2.18 | Qt6 QML lock-screen feed module |

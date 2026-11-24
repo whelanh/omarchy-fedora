@@ -11,7 +11,7 @@
 %global debug_package %{nil}
 
 Name:           flowtunes
-Version:        0.2.0
+Version:        0.3.0
 Release:        1%{?dist}
 Summary:        Endless music in the genre you pick
 
@@ -68,6 +68,9 @@ install -Dm644 share/%{name}.svg \
 %{_datadir}/icons/hicolor/scalable/apps/flowtunes.svg
 
 %changelog
+* Mon Nov 23 2026 whelanh <brickhousedevelopers@gmail.com> - 0.3.0-1
+- Automatic update to upstream v0.3.0
+
 * Sat Nov 21 2026 whelanh <brickhousedevelopers@gmail.com> - 0.2.0-1
 - Initial Fedora package (v0.2.0): Omarchy's local music app, installed by
   default from omarchy-base.packages (upstream d7d69f63d). Requires the

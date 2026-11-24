@@ -10,7 +10,7 @@
 %global debug_package %{nil}
 
 Name:           omarchy-themes-loops
-Version:        2026.11.19
+Version:        2026.11.22
 Release:        1%{?dist}
 Summary:        Live background loops for the Omarchy themes
 
@@ -40,6 +40,9 @@ done
 %{_datadir}/omarchy/themes/*/backgrounds/loops/
 
 %changelog
+* Mon Nov 23 2026 whelanh <brickhousedevelopers@gmail.com> - 2026.11.22-1
+- Automatic update to upstream v2026.11.22
+
 * Fri Nov 20 2026 whelanh <brickhousedevelopers@gmail.com> - 2026.11.19-1
 - Initial Fedora package: theme background loops, built from the v2026.11.19
   release tag

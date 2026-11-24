@@ -67,7 +67,7 @@ packages:
     license: MIT
     deps: [ffmpeg-free, hicolor-icon-theme, qt6-qtbase, qt6-qtdeclarative, qt6-qtmultimedia, qt6-qtsvg, qt6-qtwayland, xdg-desktop-portal]
     status: verified
-    version: 0.1.7
+    version: 0.2.0
     note: Omarchy's local image model app (Qt6/CMake); added to omarchy-base.packages (installed by default). Needs qt6-qtshadertools-devel to build (ShaderTools). Container-built OK.
   flowtunes:
     repo: https://github.com/omacom/flowtunes
@@ -77,7 +77,7 @@ packages:
     license: MIT
     deps: [ffmpeg-free, gstreamer1-plugins-base, gstreamer1-plugins-good, hicolor-icon-theme, qt6-qtbase, qt6-qtdeclarative, qt6-qtmultimedia, qt6-qtsvg, qt6-qtwayland]
     status: verified
-    version: 0.2.0
+    version: 0.3.0
     note: Endless music in the genre you pick, made with Omarchy's local music model (omarchy-local-ai); Qt6/CMake with ShaderTools. Added to omarchy-base.packages in d7d69f63d (installed by default) and installed on existing machines by upstream migration 1795191169. Fedora's qt6-qtmultimedia uses the GStreamer backend, so it requires gstreamer1-plugins-good for MP3 decode (mpg123) and the audio sink.
   gliff:
     repo: https://github.com/omacom/gliff
@@ -368,7 +368,7 @@ packages:
     license: MIT
     deps: [python3, systemd]
     status: verified
-    version: 0.10.0
+    version: 0.12.1
     note: Local model engine and its curated recipe catalog, installed as one tree under /usr/share/omarchy-local-ai with /usr/bin/omarchy-local-ai symlinked into it (the engine reads the catalog beside itself). %check runs upstream's `validate .` offline. The containers that run models use podman + crun, which are base packages since upstream 0c6dc2038.
   omarchy-screensaver:
     repo: https://github.com/omacom/omarchy-screensaver
@@ -388,7 +388,7 @@ packages:
     license: MIT
     deps: []
     status: verified
-    version: 2026.11.21
+    version: 2026.11.22
     note: Background intro videos for the Omarchy themes, built from the release tag (versioned by date, so the tag always matches the content). noarch data package (mp4 files under /usr/share/omarchy/themes/*/backgrounds/intros/). Container-built OK.
   omarchy-themes-loops:
     repo: https://github.com/omacom/omarchy-themes-loops
@@ -398,5 +398,5 @@ packages:
     license: MIT
     deps: []
     status: verified
-    version: 2026.11.19
+    version: 2026.11.22
     note: Live background loops for the Omarchy themes, built from the release tag (versioned by date). noarch data package (mp4 files under /usr/share/omarchy/themes/*/backgrounds/loops/); omarchy-theme-set copies them into the staged theme. Added to omarchy-base.packages (installed by default). Container-built OK.
