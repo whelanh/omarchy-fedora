@@ -213,24 +213,24 @@ open as `file://` web apps.
 |---------|---------|-------|
 | aether | v4.33.0 | Go/Wails, repacked release binary |
 | cliamp | v2.4.1 | Go/CGO, repacked release binary |
-| fantasi | v0.2.0 | Qt6/CMake local image model app |
-| flowtunes | v0.3.0 | Qt6/CMake local music app (GStreamer MP3 plugins) |
-| omarchy-folio | v0.7.1 | Qt6/CMake file manager (Files); replaces Nautilus, and its Open/Save dialogs |
+| fantasi | v0.3.0 | Qt6/CMake local image model app |
+| flowtunes | v0.4.0 | Qt6/CMake local music app (GStreamer MP3 plugins) |
+| omarchy-folio | v0.7.3 | Qt6/CMake file manager (Files); replaces Nautilus, and its Open/Save dialogs |
 | herdr | v0.9.5 | Rust, repacked release binary (herdrdev/herdr) |
 | hype | v0.7.1 | Qt6/CMake Markdown presentation editor |
 | hyprland-preview-share-picker | v0.3.1 | Rust/GTK4, source-built |
-| monologue | v0.4.0 | Qt6/CMake webcam recorder + libpulse/turbojpeg |
+| monologue | v0.4.1 | Qt6/CMake webcam recorder + libpulse/turbojpeg |
 | omacalc | v0.4.2 | Qt6/CMake |
-| omacut | v0.8.3 | Qt6/CMake + ffmpeg |
-| omaview | v0.1.1 | Qt6/CMake picture viewer + media player (replaces imv/mpv) |
-| omawrite | v0.7.6 | Qt6/CMake |
+| omacut | v0.8.4 | Qt6/CMake + ffmpeg |
+| omaview | v0.1.2 | Qt6/CMake picture viewer + media player (replaces imv/mpv) |
+| omawrite | v0.7.7 | Qt6/CMake |
 | omarchy-themes-intros | v2026.11.22 | noarch theme intro videos (built from the release tag) |
 | omarchy-themes-loops | v2026.11.22 | noarch theme live background loops |
-| omasnap | v1.26.2 | built from source (supersedes tensaku) |
+| omasnap | v1.26.3 | built from source (supersedes tensaku) |
 | owe | v0.2.18 | meson/C wallpaper engine (mpv + ffmpeg-free) |
 | owe-lockfeed | v0.2.18 | Qt6 QML lock-screen feed module |
 | pi-coding-agent | v1.6.0 | Bun standalone binary, repacked from the upstream release |
-| plain | v0.4.1 | Qt6/CMake text editor for config files |
+| plain | v0.4.2 | Qt6/CMake text editor for config files |
 | qtengine | v0.2.4 | Qt6 platform theme (replaces `gtk3`); AUR-only, first-party |
 | try (tobi-try) | v1.10.1 | Ruby gem |
 | ttfx | v0.5.1 | pure Rust/cargo |
