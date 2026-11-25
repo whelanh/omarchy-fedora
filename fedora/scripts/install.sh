@@ -842,9 +842,9 @@ install_omarchy_lock_pam() {
   local lock_user
   lock_user="$(resolve_target_user)"
   if (( EUID == 0 )); then
-    OMARCHY_INSTALL_USER="$lock_user" omarchy-apply-lock
+    OMARCHY_PATH=/usr/share/omarchy OMARCHY_INSTALL_USER="$lock_user" omarchy-apply-lock
   else
-    sudo OMARCHY_INSTALL_USER="$lock_user" omarchy-apply-lock
+    sudo OMARCHY_PATH=/usr/share/omarchy OMARCHY_INSTALL_USER="$lock_user" omarchy-apply-lock
   fi
 }
 
