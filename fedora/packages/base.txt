@@ -182,3 +182,12 @@ make
 @development-tools
 # JSON::PP for omarchy-menu-select's perl payload building (missing from dnf perl base)
 perl-JSON-PP
+
+# node + python tooling (upstream base packages `nodejs` and `uv`)
+# Fedora ships Node as versioned streams: nodejs22 + nodejs22-bin gives the
+# unversioned `node`, and nodejs22-npm-bin the unversioned `npm`. Fedora 44 has
+# no unversioned `nodejs` meta, so pin the LTS stream that exists on 44/45/rawhide.
+nodejs22
+nodejs22-bin
+nodejs22-npm-bin
+uv

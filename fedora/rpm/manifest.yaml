@@ -324,6 +324,22 @@ packages:
       "plain" editor choice (bin/omarchy-default-editor). Qt6/CMake via
       ./bin/build, QML compiled in, file picker through xdg-desktop-portal.
       Container-built OK.
+  playwright-cli:
+    repo: https://github.com/microsoft/playwright-cli
+    language: javascript
+    build: noarch-repack (npm @playwright/cli + pinned playwright deps vendored)
+    binary: playwright-cli
+    license: Apache-2.0
+    deps: [nodejs22-bin, chromium]
+    status: verified
+    version: 0.1.25
+    hold: "npm @playwright/cli pins playwright/playwright-core 1.66.0-alpha-2026-11-18; bump Version and %{pwver} in the spec together."
+    note: >
+      Microsoft's browser-automation CLI, published only to npm. The noarch RPM
+      vendors the cli plus its exact playwright/playwright-core alpha deps (the
+      COPR build is offline) and patches playwright-core to use /usr/bin/chromium
+      when Chrome is absent, mirroring Omarchy's PKGBUILD. Container-built OK on
+      Fedora 44/45/rawhide.
   qtengine:
     repo: https://github.com/kossLAN/qtengine
     language: cpp

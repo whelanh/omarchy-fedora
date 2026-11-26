@@ -168,6 +168,7 @@ repositories:
       - owe-lockfeed
       - pi-coding-agent
       - plain
+      - playwright-cli
       - qtengine
       - signed
       - superwhisper-bin

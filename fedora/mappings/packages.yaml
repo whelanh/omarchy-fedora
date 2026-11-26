@@ -185,6 +185,12 @@ packages:
     repository: whelanh/omarchy
     rpm: fedora/rpm/plain/plain.spec
     note: Omarchy's config/text file editor; the handler for text/plain and the "plain" editor choice (bin/omarchy-default-editor); Qt6/CMake + xdg-desktop-portal.
+  playwright-cli:
+    package: playwright-cli
+    source: copr
+    repository: whelanh/omarchy
+    rpm: fedora/rpm/playwright-cli/playwright-cli.spec
+    note: Microsoft @playwright/cli from npm; noarch RPM vendors its pinned playwright/playwright-core alpha deps so the offline COPR build resolves them.
   signed:
     package: signed
     source: copr
@@ -369,6 +375,10 @@ packages:
     package: neovim
     source: substitute
     note: Omarchy uses nvim (Neovim); Fedora package is neovim
+  nodejs:
+    package: nodejs22
+    source: fedora
+    note: Fedora ships Node as versioned streams; nodejs22 + nodejs22-bin/nodejs22-npm-bin give the unversioned node/npm (Fedora 44 has no `nodejs` meta). Node 22 is LTS and present on 44/45/rawhide.
   nss-mdns:              { package: nss-mdns, source: fedora }
   obs-studio:            { package: obs-studio, source: fedora }
   pamixer:               { package: pamixer, source: fedora }
@@ -460,6 +470,7 @@ packages:
   ufw:                   { package: ufw, source: fedora }
   unzip:                 { package: unzip, source: fedora }
   usbguard:              { package: usbguard, source: fedora }
+  uv:                    { package: uv, source: fedora }
   vi:
     package: vim-minimal
     source: substitute

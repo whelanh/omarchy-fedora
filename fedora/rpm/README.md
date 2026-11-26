@@ -6,7 +6,7 @@ in Fedora official/COPR repos. They map to `source: copr` entries in
 `fedora/mappings/packages.yaml` and are distributed via the
 `whelanh/omarchy` COPR.
 
-> **Status: 31 VERIFIED, 1 RETIRED, 0 BLOCKED.** Every `verified` package builds
+> **Status: 32 VERIFIED, 1 RETIRED, 0 BLOCKED.** Every `verified` package builds
 > cleanly in the
 > Fedora Rawhide container (`manifest.yaml` status `verified`), driven by
 > `build-rpm-in-ci.sh` — the same path the CI `rpm-build` job runs. `retired`
@@ -77,6 +77,7 @@ FEDORA=1 bash fedora/rpm/build-in-container.sh omasnap
 | pi-coding-agent | earendil-works/pi | repack-tarball | MIT | verified |
 | owe-lockfeed | omacom/owe | cmake (Qt6 qml-plugin) | MIT | verified |
 | plain | omacom/plain | Qt6 / CMake | MIT | verified |
+| playwright-cli | microsoft/playwright-cli | noarch-repack (npm + vendored deps) | Apache-2.0 | verified |
 | qtengine | kossLAN/qtengine | cmake (Qt6 only) | BSD-2-Clause | verified |
 | superwhisper-bin | superultrainc/… | vendor-repack (Minisign) | LicenseRef-proprietary AND MIT | verified |
 | tobi-try | tobi/try | Ruby gem | MIT | verified |

@@ -186,9 +186,10 @@ install_repos() {
   # herdr, hype, hyprland-preview-share-picker, monologue, omacalc, omacut,
   # omapresent, omaview, omarchy-folio, omarchy-hyprland-titlebars,
   # omarchy-local-ai, omarchy-screensaver, omarchy-themes-intros,
-  # omarchy-themes-loops, omawrite, omasnap, owe, owe-lockfeed, plain, qtengine,
-  # signed, superwhisper-bin, try, ttfx) live in the whelanh/omarchy COPR (see
-  # fedora/rpm/copr/README.md) and are installed by default. cards and checkmate
+  # omarchy-themes-loops, omawrite, omasnap, owe, owe-lockfeed, plain,
+  # playwright-cli, qtengine, signed, superwhisper-bin, try, ttfx) live in the
+  # whelanh/omarchy COPR (see fedora/rpm/copr/README.md) and are installed by
+  # default. cards and checkmate
   # are retired (upstream replaced them with games inside Game Vibes, 64c0b627c),
   # and omarchy-emacs, openai-codex-desktop and
   # voxtype-bin are published there too, but installed
