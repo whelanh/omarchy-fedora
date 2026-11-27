@@ -166,7 +166,7 @@ repositories:
       - openai-codex-desktop
       - owe
       - owe-lockfeed
-      - pi-coding-agent
+      - omarchy-pi-coding-agent
       - plain
       - playwright-cli
       - qtengine

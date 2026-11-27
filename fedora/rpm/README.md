@@ -74,7 +74,7 @@ FEDORA=1 bash fedora/rpm/build-in-container.sh omasnap
 | openai-codex-desktop | chatgpt.com/codex | Debian .deb repack | LicenseRef-proprietary | verified |
 | signed | omacom/signed | Qt6 / CMake | MIT | verified |
 | owe | omacom/owe | meson (C) | MIT | verified |
-| pi-coding-agent | earendil-works/pi | repack-tarball | MIT | verified |
+| omarchy-pi-coding-agent | earendil-works/pi | repack-tarball | MIT | verified |
 | owe-lockfeed | omacom/owe | cmake (Qt6 qml-plugin) | MIT | verified |
 | plain | omacom/plain | Qt6 / CMake | MIT | verified |
 | playwright-cli | microsoft/playwright-cli | noarch-repack (npm + vendored deps) | Apache-2.0 | verified |

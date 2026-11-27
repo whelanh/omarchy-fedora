@@ -11,7 +11,7 @@ hyprland-preview-share-picker, monologue, omacalc, omacut, omapresent, omaview,
 omarchy-emacs, omarchy-hyprland-titlebars, omarchy-local-ai,
 omarchy-screensaver, omarchy-themes-intros, omarchy-themes-loops, omawrite,
 omasnap, openai-codex-desktop, owe,
-owe-lockfeed, pi-coding-agent, plain, qtengine, signed, superwhisper-bin, try (tobi-try), ttfx,
+owe-lockfeed, omarchy-pi-coding-agent, plain, qtengine, signed, superwhisper-bin, try (tobi-try), ttfx,
 voxtype-bin. All are `status: verified` in
 `fedora/rpm/manifest.yaml` and built green end-to-end on `fedora:rawhide`
 via `fedora/rpm/build-rpm-in-ci.sh`. (`elsewhen` and `openai-codex-bin` are
@@ -132,7 +132,7 @@ sudo dnf install aether cliamp disktree-bin fantasi flowtunes gliff herdr hype \
                  omapresent omaview omarchy-folio omarchy-hyprland-titlebars \
                  omarchy-local-ai omarchy-screensaver omarchy-themes-intros \
                  omarchy-themes-loops omawrite omasnap owe owe-lockfeed \
-                 pi-coding-agent plain qtengine signed superwhisper-bin try ttfx
+                 omarchy-pi-coding-agent plain qtengine signed superwhisper-bin try ttfx
 ```
 
 `cards` and `checkmate` were retired when upstream replaced those desktop apps

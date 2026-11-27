@@ -318,7 +318,7 @@ omarchy_fedora_install_applications() {
 # hyprland-preview-share-picker, monologue, omacalc, omacut, omapresent,
 # omaview, omarchy-folio, omarchy-hyprland-titlebars, omarchy-local-ai,
 # omarchy-screensaver, omarchy-themes-intros, omarchy-themes-loops, omawrite,
-# omasnap, owe, owe-lockfeed, pi-coding-agent, plain, playwright-cli, qtengine,
+# omasnap, owe, owe-lockfeed, omarchy-pi-coding-agent, plain, playwright-cli,
 # signed, superwhisper-bin, try, ttfx).
 # cards and checkmate are retired: in 64c0b627c upstream replaced those desktop
 # apps with games inside Game Vibes and dropped them from omarchy-base.packages,

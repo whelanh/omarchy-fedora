@@ -25,7 +25,7 @@
 %global debug_package %{nil}
 
 Name:           omarchy-folio
-Version:        0.7.3
+Version:        0.7.5
 Release:        1%{?dist}
 Summary:        Files: Omarchy's quiet, keyboard-first file manager
 
@@ -122,6 +122,9 @@ install -Dm644 docs/plugins.md %{buildroot}%{_datadir}/doc/%{name}/plugins.md
 %{_datadir}/doc/%{name}/plugins.md
 
 %changelog
+* Fri Nov 27 2026 whelanh <brickhousedevelopers@gmail.com> - 0.7.5-1
+- Automatic update to upstream v0.7.5
+
 * Tue Nov 24 2026 whelanh <brickhousedevelopers@gmail.com> - 0.7.3-1
 - Automatic update to upstream v0.7.3
 

@@ -174,11 +174,11 @@ packages:
     rpm: fedora/rpm/owe-lockfeed/owe-lockfeed.spec
     note: Qt6 QML module Owe.LockFeed for the lock screen; same omacom/owe source as `owe`, no AUR counterpart.
   pi-coding-agent:
-    package: pi-coding-agent
+    package: omarchy-pi-coding-agent
     source: copr
     repository: whelanh/omarchy
-    rpm: fedora/rpm/pi-coding-agent/pi-coding-agent.spec
-    note: Pi, Omarchy's terminal coding agent harness for local models; repack of upstream's Bun release. Upstream 19736 moved it out of mise into omarchy-base.packages, so it is part of the default first-party set.
+    rpm: fedora/rpm/omarchy-pi-coding-agent/omarchy-pi-coding-agent.spec
+    note: Pi, Omarchy's terminal coding agent harness for local models; repack of upstream's Bun release. Upstream 19736 moved it out of mise into omarchy-base.packages, so it is part of the default first-party set. RPM named omarchy-pi-coding-agent because Fedora ships its own pi-coding-agent.
   plain:
     package: plain
     source: copr

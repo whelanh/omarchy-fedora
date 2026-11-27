@@ -338,6 +338,7 @@ assert 'elsewhen' in names, 'elsewhen must be listed for COPR deletion'
 assert 'openai-codex-bin' in names, 'openai-codex-bin must be listed for COPR deletion'
 assert 'tensaku' in names, 'tensaku must be listed for COPR deletion'
 assert 'folio' in names, 'the old folio COPR package must be deleted (renamed to omarchy-folio)'
+assert 'pi-coding-agent' in names, 'the old pi-coding-agent COPR package must be deleted (renamed to omarchy-pi-coding-agent)'
 "
 # A backtick inside a double-quoted 'python3 -c "..."' body is a shell command
 # substitution, not text: bash runs a program named after the word. That made
@@ -870,18 +871,25 @@ echo "== Pi ships as a package, not a mise tool (upstream 19736) =="
 # which is why Fedora's brp-strip has to be pointed away from it, and why the
 # release tarball is used as-is instead of building anything.
 t "pi-coding-agent repacks the Bun release without stripping it" python3 -c "
-spec = open('fedora/rpm/pi-coding-agent/pi-coding-agent.spec').read()
+spec = open('fedora/rpm/omarchy-pi-coding-agent/omarchy-pi-coding-agent.spec').read()
 for line in ('%global __strip /bin/true',
              'PI_SKIP_VERSION_CHECK=1',
              'pi-linux-x64.tar.gz',
              'BuildArch:      x86_64',
-             '%{_libdir}/%{name}'):
+             '%{_libdir}/pi-coding-agent'):
     assert line in spec, 'missing ' + line
 "
 t "pi-coding-agent resolves from the COPR and its mise cleanup exists" bash -c '
-  python3 fedora/scripts/lib/resolve.py --copr whelanh/omarchy | grep -qx pi-coding-agent
+  python3 fedora/scripts/lib/resolve.py --copr whelanh/omarchy | grep -qx omarchy-pi-coding-agent
   ls fedora/migrations/*-pi-coding-agent.sh >/dev/null
 '
+t "the Pi RPM is omarchy-pi-coding-agent, never the Fedora-owned name" python3 -c "
+import yaml
+pkgs = yaml.safe_load(open('fedora/mappings/packages.yaml'))['packages']
+e = pkgs['pi-coding-agent']
+assert e.get('package') == 'omarchy-pi-coding-agent', e
+assert e.get('rpm') == 'fedora/rpm/omarchy-pi-coding-agent/omarchy-pi-coding-agent.spec', e
+"
 echo "== kmscon, the Noto variable CJK fonts (upstream c1e355393, 8b8d0942a) =="
 # Fedora ships kmscon, but its pango font engine is a separate subpackage and
 # upstream's setup script asks for --font-engine=pango. Upstream's Noto CJK

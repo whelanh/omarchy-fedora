@@ -11,7 +11,7 @@
 %global debug_package %{nil}
 
 Name:           omarchy-themes-intros
-Version:        2026.11.22
+Version:        2026.11.24.1
 Release:        1%{?dist}
 Summary:        Background intro videos for the Omarchy themes
 
@@ -41,6 +41,9 @@ done
 %{_datadir}/omarchy/themes/*/backgrounds/intros/
 
 %changelog
+* Fri Nov 27 2026 whelanh <brickhousedevelopers@gmail.com> - 2026.11.24.1-1
+- Automatic update to upstream v2026.11.24.1
+
 * Mon Nov 23 2026 whelanh <brickhousedevelopers@gmail.com> - 2026.11.22-1
 - Automatic update to upstream v2026.11.22
 

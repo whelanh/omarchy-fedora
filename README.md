@@ -107,7 +107,7 @@ The installer is **idempotent** — running it again is safe.
 > omacalc, omacut, omapresent, omarchy-folio, omarchy-hyprland-titlebars,
 > omarchy-local-ai, omarchy-screensaver, omarchy-themes-intros,
 > omarchy-themes-loops, omawrite, omasnap, owe, owe-lockfeed,
-> pi-coding-agent, plain, qtengine, signed, superwhisper-bin, try, ttfx) are built as Fedora RPMs
+> omarchy-pi-coding-agent, plain, qtengine, signed, superwhisper-bin, try, ttfx) are built as Fedora RPMs
 > and installed from the `whelanh/omarchy` COPR by the installer (see
 > `fedora/rpm/copr/README.md`). Pass `--no-firstparty` to skip.
 > `omarchy-emacs`, `openai-codex-desktop` and `voxtype-bin` are published there

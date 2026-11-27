@@ -555,7 +555,7 @@ install_omarchy_tree() {
        "monologue, omacalc, omacut, omapresent, omaview, omarchy-folio," \
        "omarchy-hyprland-titlebars, omarchy-local-ai, omarchy-screensaver," \
        "omarchy-themes-intros, omarchy-themes-loops," \
-       "omawrite, omasnap, owe, owe-lockfeed, pi-coding-agent, plain, qtengine," \
+       "omawrite, omasnap, owe, owe-lockfeed, omarchy-pi-coding-agent, plain, qtengine," \
        "signed," \
        "superwhisper-bin, try, ttfx) are packaged" \
        "under fedora/rpm and installed from the whelanh/omarchy COPR (see" \
