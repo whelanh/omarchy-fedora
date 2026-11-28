@@ -19,6 +19,13 @@ python3-pyxdg
 xdg-desktop-portal-hyprland
 gtk4-layer-shell
 sddm
+# greetd's login stack: upstream migration 1795834060.sh replaces SDDM with
+# greetd (the port still configures SDDM for now, but install what upstream
+# expects so the switch can follow).
+greetd
+seatd
+sway
+wlroots
 # Qt6 runtime used by Omarchy and the first-party Qt6 apps
 qt6-qtbase
 qt6-qtdeclarative

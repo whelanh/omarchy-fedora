@@ -232,6 +232,10 @@ packages:
     note: Shipped in-tree by the base install; an RPM would file-conflict.
 
   # --- Fedora official (same or near-identical name) ---
+  adwaita-cursors:
+    package: adwaita-cursor-theme
+    source: substitute
+    note: Fedora names the Adwaita cursor theme adwaita-cursor-theme.
   alsa-utils:            { package: alsa-utils, source: fedora }
   avahi:                 { package: avahi, source: fedora }
   bash-completion:       { package: bash-completion, source: fedora }
@@ -302,6 +306,7 @@ packages:
       Google's signed direct RPM. Upstream made Chrome its default browser for
       new installs in b10da7e59 (chromium became optional); see
       COMPATIBILITY.md for the deliberate divergence.
+  greetd:                { package: greetd, source: fedora }
   grim:                  { package: grim, source: fedora }
   gum:                   { package: gum, source: fedora }
   gvfs-mtp:              { package: gvfs-mtp, source: fedora }
@@ -445,6 +450,7 @@ packages:
   rtkit:                 { package: rtkit, source: fedora }
   ruby:                  { package: ruby, source: fedora }
   sddm:                  { package: sddm, source: fedora }
+  seatd:                 { package: seatd, source: fedora }
   slurp:                 { package: slurp, source: fedora }
   socat:                 { package: socat, source: fedora }
   starship:
@@ -453,6 +459,7 @@ packages:
     repository: atim/starship
     note: not in official Fedora (was retired in 2019 due to Rust packaging rules); atim/starship COPR
   sushi:                 { package: sushi, source: fedora, note: RETIRED — Nautilus quick-previewer that went with nautilus since folio has its own preview }
+  sway:                  { package: sway, source: fedora }
   system-config-printer: { package: system-config-printer, source: fedora }
   tesseract:             { package: tesseract, source: fedora }
   tesseract-data-eng:
@@ -480,6 +487,10 @@ packages:
   wireless-regdb:        { package: wireless-regdb, source: fedora }
   wireplumber:           { package: wireplumber, source: fedora }
   wl-clipboard:          { package: wl-clipboard, source: fedora }
+  wlroots0.20:
+    package: wlroots
+    source: substitute
+    note: Fedora's wlroots is 0.20.x (no versioned wlroots0.20 package); it is what sway 1.12 builds against.
   wtype:                 { package: wtype, source: fedora }
   xdg-desktop-portal-gtk: { package: xdg-desktop-portal-gtk, source: fedora }
   xdg-user-dirs:         { package: xdg-user-dirs, source: fedora, note: omarchy-provision-user calls xdg-user-dirs-update to point TEMPLATES/DESKTOP/PUBLICSHARE at $HOME }
