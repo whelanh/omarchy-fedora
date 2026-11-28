@@ -939,6 +939,8 @@ pass "console font rejects non-VT paths"
 # takes its keyboard layout and font once, at its start. The password is typed
 # at boot in the layout of the console keymap, so kmscon must type that layout,
 # and setup must have kmscon started again when the keyboard step changes it.
+# A layout with no Latin letters is typed at boot in US, where the console's
+# keymap starts, so kmscon starts there too.
 
 kms=$tmp/kmscon
 mkdir -p "$kms/bin"
@@ -948,8 +950,18 @@ source "$ROOT/install/provisioning/kmscon.sh"
 [[ $(omarchy_keymap_xkb us) == "us pc105+inet - terminate:ctrl_alt_bksp" ]] || fail "a US keymap types US in kmscon" "$(omarchy_keymap_xkb us)"
 [[ $(omarchy_keymap_xkb de-latin1-nodeadkeys) == "de pc105 nodeadkeys terminate:ctrl_alt_bksp" ]] ||
   fail "kmscon types the layout systemd pairs with a keymap" "$(omarchy_keymap_xkb de-latin1-nodeadkeys)"
-[[ $(omarchy_keymap_xkb ua) == "ua,us - - grp:shifts_toggle,grp_led:scroll" && $(omarchy_keymap_xkb cz) == "cz,us - qwerty, grp:shifts_toggle,grp_led:scroll" ]] ||
-  fail "kmscon types the form's own layout for a keymap systemd lacks" "$(omarchy_keymap_xkb ua) / $(omarchy_keymap_xkb cz)"
+[[ $(omarchy_keymap_xkb cz) == "cz,us - qwerty, grp:shifts_toggle,grp_led:scroll" ]] ||
+  fail "kmscon types the form's own layout for a keymap systemd lacks" "$(omarchy_keymap_xkb cz)"
+[[ $(omarchy_keymap_xkb ua) == "us,ua - - grp:shifts_toggle,grp_led:scroll" &&
+  $(omarchy_keymap_xkb bg-cp1251) == "us,bg - ,phonetic grp:shifts_toggle,grp_led:scroll" ]] ||
+  fail "kmscon starts a non-Latin layout of the form's in US, its variant kept" "$(omarchy_keymap_xkb ua) / $(omarchy_keymap_xkb bg-cp1251)"
+[[ $(omarchy_keymap_xkb ru) == "us,ru pc105 - terminate:ctrl_alt_bksp,grp:shifts_toggle,grp_led:scroll" ]] ||
+  fail "kmscon starts systemd's non-Latin layout in US" "$(omarchy_keymap_xkb ru)"
+[[ $(omarchy_keymap_xkb ge) == "us,ge pc105 - terminate:ctrl_alt_bksp,grp:shifts_toggle" &&
+  $(omarchy_keymap_xkb il) == "us,il pc105 - terminate:ctrl_alt_bksp,grp:shifts_toggle" ]] ||
+  fail "a non-Latin layout without US or a toggle gains both" "$(omarchy_keymap_xkb ge) / $(omarchy_keymap_xkb il)"
+[[ $(omarchy_keymap_xkb sr-latin) == "us,rs pc105 ,latin terminate:ctrl_alt_bksp,grp:shifts_toggle" ]] ||
+  fail "Serbian Latin starts in US, as every prompt after kmscon does" "$(omarchy_keymap_xkb sr-latin)"
 [[ $(bash -c 'source "$1" && omarchy_keymap_xkb de_CH-latin1' bash "$ROOT/install/provisioning/kmscon.sh") == "ch - - -" ]] ||
   fail "kmscon.sh resolves extra keymaps when sourced on its own"
 [[ $(omarchy_keymap_xkb no-such-keymap) == "us - - -" ]] || fail "an unknown keymap types US" "$(omarchy_keymap_xkb no-such-keymap)"
@@ -989,6 +1001,12 @@ grep -qx 'OMARCHY_KMSCON=1' "$kms/env" && grep -qx 'OMARCHY_KMSCON_XKB=de pc105 
 PATH="$kms/bin:$PATH" omarchy_kmscon "$kms/log" us en "" /usr/bin/setup
 grep -qx -- '--palette-light-red=247, 118, 142' "$kms/args" || fail "without an OEM colour bright red is Tokyo Night's" "$(cat "$kms/args")"
 pass "kmscon is started under the keymap's layout, in the language's font and an OEM's colour"
+
+PATH="$kms/bin:$PATH" OMARCHY_KMSCON_FB_NAME=msmdrmfb omarchy_kmscon "$kms/log" us en "" /usr/bin/setup
+grep -qx -- '--no-drm' "$kms/args" || fail "msmdrmfb passes --no-drm to kmscon" "$(cat "$kms/args")"
+PATH="$kms/bin:$PATH" OMARCHY_KMSCON_FB_NAME=simpledrmdrmfb omarchy_kmscon "$kms/log" us en "" /usr/bin/setup
+! grep -qx -- '--no-drm' "$kms/args" || fail "non-msm framebuffer keeps DRM enabled" "$(cat "$kms/args")"
+pass "kmscon falls back to --no-drm on msmdrmfb and keeps DRM elsewhere"
 
 sed -n '/^keyboard_form() {/,/^}/p' "$ROOT/bin/omarchy-provision-owner" >"$kms/keyboard.sh"
 cat >"$kms/form.sh" <<SH
