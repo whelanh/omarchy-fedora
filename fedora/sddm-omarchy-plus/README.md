@@ -1,5 +1,12 @@
 # omarchy-plus — opt-in SDDM greeter with a session chooser
 
+> **The default login screen is greetd now.** Upstream 1795834060 replaced SDDM
+> with greetd's Quickshell login screen, which this repo ports. The chooser is
+> the opt-in alternative: `install.sh --with-session-chooser` (or
+> `fedora/scripts/enable-session-chooser.sh` on an existing install) switches
+> the display manager back to SDDM and selects this theme;
+> `--without-session-chooser` returns to greetd.
+
 Stock upstream Omarchy (`upstream/default/sddm/omarchy/Main.qml`) is deliberately
 minimal: logo, lock icon, password box. It reads the username from
 `/var/lib/sddm/state.conf` and logs into `sessionModel.lastIndex` (its uwsm

@@ -67,6 +67,12 @@ log() { printf '\033[1;34m[omarchy] %s\033[0m\n' "$*"; }
 warn() { printf '\033[1;33m[omarchy] %s\033[0m\n' "$*" >&2; }
 die()  { printf '\033[1;31m[omarchy] %s\033[0m\n' "$*" >&2; exit 1; }
 
+# Run a command as root, in place when already root. `omarchy update` runs this
+# script as the desktop user and escalates per command.
+as_root() {
+  if (( EUID == 0 )); then "$@"; else sudo "$@"; fi
+}
+
 # Resolve which account the desktop is being configured for: an explicit
 # --user wins, then the user who invoked sudo, then the first regular
 # (uid 1000+) account. Shared by every install step that needs a username.
@@ -79,6 +85,18 @@ resolve_target_user() {
     user="$(awk -F: '$3>=1000 && $3<60000 {print $1; exit}' /etc/passwd)"
   fi
   printf '%s\n' "$user"
+}
+
+# Which display manager this install uses: upstream's greetd + Omarchy login
+# screen by default, or SDDM when the user opted into the omarchy-plus session
+# chooser. In update mode with no explicit flag, the marker the chooser writes
+# is the preference, so an existing choice survives `omarchy update`.
+selected_display_manager() {
+  local want="$SESSION_CHOOSER"
+  if [ "$SESSION_CHOOSER_EXPLICIT" = 0 ] && [ "$UPDATE_MODE" = 1 ]; then
+    [ -f /var/lib/omarchy-fedora/session-chooser ] && want=1 || want=0
+  fi
+  if [ "$want" = 1 ]; then printf '%s\n' sddm.service; else printf '%s\n' greetd.service; fi
 }
 
 # Source the dnf abstraction + deps libraries.
@@ -314,6 +332,9 @@ restorecon_paths() {
     /usr/share/uwsm
     /etc/sddm.conf.d
     /usr/share/sddm
+    /etc/greetd
+    /etc/pam.d/omarchy-login
+    /var/lib/omarchy/login
     /etc/sysctl.d
     /etc/udev/rules.d
     /etc/dracut.conf.d
@@ -341,19 +362,13 @@ enable_services() {
     fi
   done
 
-  # Take over the display manager. Fedora Workstation/GNOME ships GDM enabled
-  # and owning the display-manager.service alias; `systemctl enable sddm`
-  # refuses to overwrite that alias ("File ... already exists and is a symlink
-  # to /usr/lib/systemd/system/gdm.service"), so a GNOME-based machine would
-  # stay on GDM and never show the Omarchy greeter (or its Omarchy session
-  # preselection). Fedora 44+ KDE defaults to Plasma Login Manager
-  # (plasmalogin.service, forked from SDDM but fixed to Breeze with no QML
-  # theme support), which owns the same alias and likewise blocks a plain
-  # `systemctl enable sddm` ("... symlink to .../plasmalogin.service").
-  # Disable the other DMs Fedora ships first, then force-enable SDDM so the
-  # alias lands on it (the --force is Fedora's own documented DM-switch
-  # mechanism: `systemctl enable --force sddm.service`).
-  _enable_display_manager sddm.service
+  # Take over the display manager: greetd (upstream's Omarchy login screen) by
+  # default, SDDM only when the omarchy-plus session chooser is opted into.
+  # Fedora Workstation/GNOME ships GDM enabled and owning the
+  # display-manager.service alias, and Fedora 44+ KDE ships plasmalogin;
+  # enable --force replaces whichever owns the alias, after disabling the
+  # others (Fedora's own documented DM-switch mechanism).
+  _enable_display_manager "$(selected_display_manager)"
 
   _systemctl_enable --now systemd-oomd >/dev/null 2>&1 || true
   # Bluetooth
@@ -375,7 +390,7 @@ _systemctl_disable() {
 # instead of failing with "already exists and is a symlink to ...".
 _enable_display_manager() {
   local target="$1" dm
-  for dm in gdm.service lightdm.service lxdm.service xdm.service plasmalogin.service; do
+  for dm in gdm.service lightdm.service lxdm.service xdm.service plasmalogin.service sddm.service greetd.service; do
     [ "$dm" = "$target" ] && continue
     if systemctl list-unit-files "$dm" >/dev/null 2>&1; then
       _systemctl_disable "$dm" || warn "could not disable $dm"
@@ -644,6 +659,10 @@ install_omarchy_session() {
 # this only lays the config and compositor file it depends on.
 install_omarchy_sddm_config() {
   [ "$COPY_OMARCHY" = 1 ] || return 0
+  [ "$(selected_display_manager)" = sddm.service ] || {
+    log "SDDM config: skipped (greetd is the login screen)"
+    return 0
+  }
   local conf_src="$UPSTREAM/etc/sddm.conf.d"
   local lua_src="$UPSTREAM/default/sddm/hyprland.lua"
 
@@ -686,6 +705,10 @@ install_omarchy_sddm_config() {
 # it through the normal runtime path afterwards.
 install_omarchy_sddm_theme() {
   [ "$COPY_OMARCHY" = 1 ] || return 0
+  [ "$(selected_display_manager)" = sddm.service ] || {
+    log "SDDM theme: skipped (greetd is the login screen)"
+    return 0
+  }
   local theme_src="$UPSTREAM/default/sddm/omarchy"
   [ -d "$theme_src" ] || { warn "no SDDM theme assets at $theme_src; greeter keeps its default theme"; return 0; }
 
@@ -757,6 +780,73 @@ install_omarchy_sddm_chooser() {
   fi
 }
 
+# Set up upstream's greetd login screen: the Quickshell greeter under Hyprland,
+# plus the session PAM service greetd names. Only used when SDDM is not selected
+# (the omarchy-plus session chooser keeps SDDM). Fedora's greetd package ships a
+# text `agreety` config and the `greetd` user, so point the config at that user
+# and give it the device groups a graphical greeter needs.
+install_greetd_login() {
+  [ "$COPY_OMARCHY" = 1 ] || return 0
+  [ "$(selected_display_manager)" = greetd.service ] || {
+    log "greetd: not selected (the session chooser keeps SDDM)"
+    return 0
+  }
+
+  local pam_src="$UPSTREAM/etc/pam.d/omarchy-login"
+  local syslogin=/usr/share/omarchy/bin/omarchy-system-login
+  local cfg=/etc/greetd/config.toml
+  local user
+  user="$(resolve_target_user)"
+
+  getent passwd greetd >/dev/null 2>&1 \
+    || { warn "greetd user missing (install greetd); skipping the login screen"; return 0; }
+  [ -f "$syslogin" ] \
+    || { warn "no omarchy-system-login at $syslogin; skipping the login screen"; return 0; }
+
+  log "== Configuring greetd + the Omarchy login screen =="
+
+  # The session service greetd reads from [general]: it sets the session type
+  # and desktop before pam_systemd records them.
+  if [ -f "$pam_src" ]; then
+    as_root install -Dm644 "$pam_src" /etc/pam.d/omarchy-login
+  else
+    warn "no omarchy-login PAM service at $pam_src; greetd will use its default"
+  fi
+
+  # A graphical greeter needs the seat's devices; Fedora's greetd user starts
+  # in its own group only.
+  local grp
+  for grp in video render input; do
+    getent group "$grp" >/dev/null 2>&1 || continue
+    as_root usermod -aG "$grp" greetd 2>/dev/null \
+      || warn "could not add greetd to the $grp group"
+  done
+
+  as_root mkdir -p /etc/greetd
+  if [ -f "$cfg" ] && grep -q 'omarchy/default/splash/greeter' "$cfg"; then
+    log "  greetd already points at the Omarchy greeter"
+  elif systemctl is-enabled --quiet sddm.service 2>/dev/null || [ -f /var/lib/sddm/state.conf ]; then
+    as_root bash "$syslogin" --from-sddm \
+      || { warn "omarchy-system-login failed; greetd keeps its default greeter"; return 0; }
+  elif [ -n "$user" ]; then
+    as_root bash "$syslogin" "$user" \
+      || { warn "omarchy-system-login failed; greetd keeps its default greeter"; return 0; }
+  else
+    as_root bash "$syslogin" --reset \
+      || { warn "omarchy-system-login failed; greetd keeps its default greeter"; return 0; }
+  fi
+
+  # Upstream's config names a `greeter` account; Fedora ships `greetd`.
+  if grep -q '^user = "greeter"$' "$cfg" 2>/dev/null; then
+    as_root sed -i 's/^user = "greeter"$/user = "greetd"/' "$cfg"
+  fi
+  as_root chmod 0644 "$cfg"
+
+  _systemctl_enable --force greetd.service || warn "could not enable greetd.service"
+  _systemctl_disable sddm.service 2>/dev/null || true
+  log "  the Omarchy login screen will show on the next boot"
+}
+
 # Seed SDDM's session memory so the first login lands in Omarchy. SDDM
 # preselects the session and user from /var/lib/sddm/state.conf ([Last]), and
 # upstream's Omarchy greeter theme (default/sddm/omarchy/Main.qml) has no
@@ -771,6 +861,7 @@ install_omarchy_sddm_chooser() {
 # Fedora port has no first-boot wizard to justify skipping the password).
 configure_sddm_login() {
   [ "$COPY_OMARCHY" = 1 ] || return 0
+  [ "$(selected_display_manager)" = sddm.service ] || return 0
 
   local user
   user="$(resolve_target_user)"
@@ -1610,6 +1701,7 @@ main() {
   install_snapper
   install_grub_btrfs
   install_omarchy_tree
+  install_greetd_login
   omarchy_fedora_install_app_icons
   install_omarchy_user_units
   install_omarchy_session

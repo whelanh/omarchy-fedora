@@ -26,6 +26,11 @@ rm -rf /usr/share/omarchy || true
 rm -rf /usr/share/sddm/themes/omarchy-plus || true
 rm -f /etc/sddm.conf.d/zz-omarchy-plus.conf || true
 rm -f /var/lib/omarchy-fedora/session-chooser || true
+rm -rf /etc/greetd || true
+rm -f /etc/pam.d/omarchy-login || true
+rm -rf /var/lib/omarchy/login || true
+rm -f /etc/systemd/system/display-manager.service || true
+systemctl disable greetd.service sddm.service >/dev/null 2>&1 || true
 rm -f /etc/sysctl.d/90-omarchy-file-watchers.conf /etc/sysctl.d/99-omarchy-sysctl.conf
 rm -f /etc/dracut.conf.d/50-omarchy.conf
 rm -f /etc/udev/rules.d/99-omarchy-framework16-qmk-hid.rules
@@ -33,7 +38,7 @@ systemctl daemon-reload >/dev/null 2>&1 || true
 
 log "Removing Fedora packages installed for Omarchy (desktop + applications)..."
 # Remove the Fedora desktop/app packages. Base system packages are left intact.
-omarchy_pkg_remove sddm hyprland quickshell hyprpicker hyprsunset \
+omarchy_pkg_remove greetd sddm hyprland quickshell hyprpicker hyprsunset \
   hyprland-guiutils uwsm gtk4-layer-shell fcitx5 fcitx5-gtk fcitx5-qt \
   xdg-desktop-portal-hyprland 2>/dev/null || true
 

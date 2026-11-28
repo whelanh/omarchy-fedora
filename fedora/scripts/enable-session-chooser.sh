@@ -57,9 +57,28 @@ stock_dir=/usr/share/sddm/themes/omarchy
 dropin=/etc/sddm.conf.d/zz-omarchy-plus.conf
 marker=/var/lib/omarchy-fedora/session-chooser
 sddm_conf=/etc/sddm.conf
+upstream="$OMARCHY_ROOT/upstream"
+conf_src="$upstream/etc/sddm.conf.d"
+lua_src="$upstream/default/sddm/hyprland.lua"
+stock_src="$upstream/default/sddm/omarchy"
 
 # --- preconditions --------------------------------------------------------
 [ -d "$plus_src" ] || die "no theme source at $plus_src (run this from the omarchy-fedora checkout)"
+
+# A default (greetd) install has no SDDM assets: publish the stock Omarchy
+# theme and its config from the vendored tree, exactly as
+# install.sh --with-session-chooser does, before the plus theme symlinks the
+# artwork. Idempotent when they are already there.
+if [ -d "$stock_src" ]; then
+  log "Installing the stock Omarchy SDDM theme + config from $stock_src"
+  mkdir -p "$stock_dir" /etc/sddm.conf.d /usr/share/sddm
+  cp -a "$stock_src"/. "$stock_dir"/
+  [ -d "$conf_src" ] && cp -a "$conf_src"/. /etc/sddm.conf.d/
+  [ -f "$lua_src" ] && cp -a "$lua_src" /usr/share/sddm/hyprland.lua
+  chown -R root:root "$stock_dir"
+  [ -d "$conf_src" ] && chown -R root:root /etc/sddm.conf.d
+  [ -f "$lua_src" ] && chown root:root /usr/share/sddm/hyprland.lua
+fi
 [ -d "$stock_dir" ] || die "stock omarchy SDDM theme missing at $stock_dir; run 'omarchy update' (or install.sh) first, then retry"
 
 # --- 1. publish the canonical omarchy-plus theme --------------------------
@@ -81,6 +100,13 @@ printf '[Theme]\nCurrent=omarchy-plus\n' > "$dropin"
 chown root:root "$dropin"
 mkdir -p /var/lib/omarchy-fedora
 printf 'plus\n' > "$marker"
+
+# --- 2b. make SDDM the display manager again ------------------------------
+# greetd (the Omarchy login screen) is the default; the chooser is an SDDM
+# theme, so take the display-manager alias back and stop greetd starting.
+log "Switching the display manager from greetd to SDDM"
+systemctl enable --force sddm.service || warn "could not enable sddm.service"
+systemctl disable greetd.service 2>/dev/null || true
 
 # --- 3. disable the leftover SDDM autologin -------------------------------
 # Autologin bypasses the greeter, so the chooser can't be reached at boot.
@@ -117,4 +143,4 @@ else
 fi
 
 log "Done. The session chooser appears at the next login; Omarchy is still preselected."
-log "Revert: sudo ./fedora/scripts/install.sh  (then restore ${sddm_conf}.omarchy-session-chooser.bak to re-enable autologin)"
+log "Revert: sudo ./fedora/scripts/install.sh --without-session-chooser  (returns to the greetd Omarchy login screen; restore ${sddm_conf}.omarchy-session-chooser.bak to re-enable autologin)"

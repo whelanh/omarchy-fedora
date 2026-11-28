@@ -343,22 +343,24 @@ Caveats:
    `increase-lockout-limit.sh` directly.
 5. **snapper boot-menu sync** — upstream uses `limine-snapper-sync`; on Fedora
    this needs a GRUB snapper plugin. Not yet wired.
-6. **Session/display manager** — SDDM is available on Fedora and used; the
-   installer installs the wayland-session entry, the Omarchy greeter config, and
-   preselects the Omarchy session for the installing user. On a **GNOME
-   Workstation** base, GDM owns the `display-manager.service` alias, and on
-   Fedora 44+ **KDE** the default is Plasma Login Manager
-   (`plasmalogin.service`, forked from SDDM but fixed to Breeze with no QML
-   theme support), so a plain `systemctl enable sddm` fails outright ("already
-   exists and is a symlink to .../plasmalogin.service") and the Omarchy greeter
-   never appears. The installer therefore disables GDM/LightDM/LXDM/XDM/PLM
-   before force-enabling SDDM (`systemctl enable --force`, Fedora's documented
-   DM-switch mechanism). The user keeps their GNOME/KDE session entries, but
-   GDM's session memory is ignored; SDDM's `[Last]` record is what decides the
-   default. An opt-in `omarchy-plus` SDDM theme variant (session chooser that
-   keeps the Omarchy look) is available via `install.sh --with-session-chooser`
-   for converted machines where locking the greeter to Omarchy-only is
-   undesirable; see `fedora/sddm-omarchy-plus/README.md`.
+6. **Session/display manager** — upstream 1795834060 replaced SDDM with
+   **greetd** and its Quickshell login screen, and Plymouth with the Omarchy
+   boot splash. The port follows the login half: greetd is the default display
+   manager, `omarchy-system-login` writes `/etc/greetd/config.toml`, and the
+   session PAM service is `/etc/pam.d/omarchy-login`. Fedora's greetd package
+   ships the text `agreety` greeter and the `greetd` user, so the installer
+   points the config at that user and adds it to `video`/`render`/`input` for
+   the graphical greeter. The upstream splash is an **mkinitcpio** hook, so the
+   port keeps Fedora's **Plymouth** (dracut) instead. On a **GNOME Workstation**
+   base GDM owns the `display-manager.service` alias, and on Fedora 44+ **KDE**
+   Plasma Login Manager (`plasmalogin.service`) does; the installer disables the
+   competing DMs and `systemctl enable --force`s the selected one. The opt-in
+   `omarchy-plus` **SDDM** theme (a session chooser that keeps the Omarchy look)
+   is still available via `install.sh --with-session-chooser`, which switches
+   the display manager back to SDDM; `--without-session-chooser` returns to
+   greetd. Update mode reads the `/var/lib/omarchy-fedora/session-chooser`
+   marker, so the choice survives updates. See
+   `fedora/sddm-omarchy-plus/README.md`.
 7. **Local models: podman is base, the NVIDIA toolkit is not packaged** —
    `omarchy-local-ai` runs its models in rootless podman containers. Upstream
    made `podman` and `crun` base packages (`0c6dc2038`) so setting up the first

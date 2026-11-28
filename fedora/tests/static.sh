@@ -1236,10 +1236,11 @@ assert 'no GRUB configuration found' not in src, 'message must describe the real
 
 echo "== Installer takes over the display manager (GDM / PLM bases) =="
 # On Fedora Workstation GDM owns display-manager.service, and on Fedora 44+
-# KDE Plasma Login Manager (plasmalogin.service) owns it, so 'systemctl enable
-# sddm' fails and the Omarchy greeter never appears. install.sh must disable the
-# other DMs first and force-enable SDDM.
-t "install.sh disables competing DMs before enabling SDDM" python3 -c "
+# KDE Plasma Login Manager (plasmalogin.service) owns it, so a plain
+# 'systemctl enable' fails and the Omarchy greeter never appears. install.sh
+# must disable the other DMs first and force-enable the selected one (greetd by
+# default, SDDM for the session chooser).
+t "install.sh disables competing DMs before enabling the selected DM" python3 -c "
 src = open('fedora/scripts/install.sh').read()
 assert '_enable_display_manager()' in src, 'missing _enable_display_manager helper'
 assert 'gdm.service' in src and '_systemctl_disable' in src, 'must disable GDM'
@@ -1307,9 +1308,43 @@ assert 'autologin.conf' in src and '/etc/sddm.conf' in src, 'must disable leftov
 assert 'ln -sfn' in src, 'artwork must be symlinked, not copied'
 "
 t "chooser migration is opt-in (not an automatic migration)" bash -c "! ls fedora/migrations/*session-chooser*.sh >/dev/null 2>&1"
+t "chooser switches the display manager back to SDDM" python3 -c "
+src = open('fedora/scripts/enable-session-chooser.sh').read()
+assert 'enable --force sddm.service' in src, 'must take the display-manager alias back'
+assert 'disable greetd.service' in src, 'must stop greetd starting'
+"
 t "chooser migration documented in the theme README" python3 -c "
 src = open('fedora/sddm-omarchy-plus/README.md').read()
 assert 'enable-session-chooser.sh' in src, 'README must document the migration'
+"
+
+echo "== Login stack: greetd by default, SDDM only for the session chooser =="
+# Upstream 1795834060 replaced SDDM with greetd + the Omarchy login screen.
+# The port defaults to greetd, keeps the opt-in omarchy-plus SDDM chooser, and
+# keeps Fedora's Plymouth: the upstream splash is an mkinitcpio hook, which
+# dracut cannot use.
+t "install.sh defaults to greetd and installs the login screen" python3 -c "
+src = open('fedora/scripts/install.sh').read()
+assert 'selected_display_manager()' in src, 'missing selected_display_manager helper'
+assert 'greetd.service' in src and 'sddm.service' in src, 'both display managers must be handled'
+assert 'install_greetd_login()' in src, 'missing greetd setup helper'
+assert src.count('install_greetd_login') >= 2, 'greetd setup must be defined and called'
+assert '/etc/pam.d/omarchy-login' in src, 'must install the session PAM service'
+assert 'omarchy-system-login' in src, 'must write greetd config via upstream'
+assert 'user = \"greeter\"' in src and 'user = \"greetd\"' in src, 'must point the greeter at Fedora greetd user'
+"
+t "greetd migration yields to the session chooser and switches the DM" python3 -c "
+import glob
+m = glob.glob('fedora/migrations/*-greetd-login.sh')
+assert len(m) == 1, m
+s = open(m[0]).read()
+assert '/var/lib/omarchy-fedora/session-chooser' in s, 'must leave SDDM when the chooser is enabled'
+assert 'omarchy-system-login' in s, 'must carry SDDM state into greetd'
+assert 'enable --force greetd.service' in s and 'disable sddm.service' in s, 'must switch the display manager'
+"
+t "boot splash stays Plymouth (upstream splash is mkinitcpio-only)" python3 -c "
+d = open('fedora/system/dracut/50-omarchy.conf').read()
+assert 'plymouth' in d, 'Plymouth must stay the initramfs splash'
 "
 
 echo "== Userspace update: squashed subtree + opt-in live pull =="
