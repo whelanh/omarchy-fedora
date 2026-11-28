@@ -22,8 +22,8 @@
 %global __strip /bin/true
 
 Name:           omarchy-pi-coding-agent
-Version:        1.6.1
-Release:        2%{?dist}
+Version:        1.7.0
+Release:        1%{?dist}
 Summary:        Pi, a terminal coding agent that works with any model provider
 
 License:        MIT
@@ -69,6 +69,9 @@ chmod 755 %{buildroot}%{_bindir}/pi
 %{_libdir}/pi-coding-agent
 
 %changelog
+* Sat Nov 28 2026 whelanh <brickhousedevelopers@gmail.com> - 1.7.0-1
+- Automatic update to upstream v1.7.0
+
 * Fri Nov 27 2026 whelanh <brickhousedevelopers@gmail.com> - 1.6.1-2
 - Rename the RPM to omarchy-pi-coding-agent: Fedora now ships its own
   pi-coding-agent (earendil-works/pi 1.1.0), so `dnf install pi-coding-agent`

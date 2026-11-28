@@ -229,7 +229,7 @@ open as `file://` web apps.
 | omasnap | v1.26.3 | built from source (supersedes tensaku) |
 | owe | v0.2.19 | meson/C wallpaper engine (mpv + ffmpeg-free) |
 | owe-lockfeed | v0.2.19 | Qt6 QML lock-screen feed module |
-| omarchy-pi-coding-agent | v1.6.1 | Bun standalone binary, repacked from the upstream release |
+| omarchy-pi-coding-agent | v1.7.0 | Bun standalone binary, repacked from the upstream release |
 | plain | v0.4.2 | Qt6/CMake text editor for config files |
 | qtengine | v0.2.4 | Qt6 platform theme (replaces `gtk3`); AUR-only, first-party |
 | try (tobi-try) | v1.10.1 | Ruby gem |

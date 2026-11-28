@@ -213,7 +213,7 @@ packages:
     license: MIT
     deps: [alsa-lib, curl, glibc, libgcc]
     status: verified
-    version: 1.3.1
+    version: 1.3.2
     note: Dictation backend for the SUPER+SPACE Install > AI > Dictation row (RPM name voxtype-bin, Provides voxtype); repacks only the Whisper (CPU/Vulkan) + OSD binaries, not upstream's ONNX/CUDA/MIGraphX payload. Opt-in, not in the default install set. Container-built OK.
   superwhisper-bin:
     repo: https://github.com/superultrainc/superwhisper-linux-releases
@@ -308,7 +308,7 @@ packages:
     license: MIT
     deps: [glibc]
     status: verified
-    version: 1.6.1
+    version: 1.7.0
     note: Pi, the terminal coding agent Omarchy uses to open local models; upstream 19736 replaced its mise declaration with omarchy-base.packages, so the RPM is installed by default. Repacked from pi-linux-x64.tar.gz into /usr/lib64/pi-coding-agent with a /usr/bin/pi wrapper that sets PI_SKIP_VERSION_CHECK=1 (the package updates it). Strip is disabled because the executable carries its JavaScript appended; the migration drops the old mise wrapper and any mise-installed pi. RPM named omarchy-pi-coding-agent because Fedora now ships its own pi-coding-agent; Obsoletes only our old 1.6.0/1.6.1.
   plain:
     repo: https://github.com/omacom/plain
@@ -384,7 +384,7 @@ packages:
     license: MIT
     deps: [python3, systemd]
     status: verified
-    version: 0.16.1
+    version: 0.18.0
     note: Local model engine and its curated recipe catalog, installed as one tree under /usr/share/omarchy-local-ai with /usr/bin/omarchy-local-ai symlinked into it (the engine reads the catalog beside itself). %check runs upstream's `validate .` offline. The containers that run models use podman + crun, which are base packages since upstream 0c6dc2038.
   omarchy-screensaver:
     repo: https://github.com/omacom/omarchy-screensaver
