@@ -467,6 +467,7 @@ packages:
     source: unavailable
     note: not packaged for Fedora (PyPI only); skip or install via pip/pipx if needed
   udiskie:               { package: udiskie, source: fedora }
+  udisks2:               { package: udisks2, source: fedora }
   ufw:                   { package: ufw, source: fedora }
   unzip:                 { package: unzip, source: fedora }
   usbguard:              { package: usbguard, source: fedora }

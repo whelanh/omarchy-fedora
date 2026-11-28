@@ -109,6 +109,7 @@ tldr
 tmux
 tree-sitter-cli
 udiskie
+udisks2
 ufw
 unzip
 vips
