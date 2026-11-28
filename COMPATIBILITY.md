@@ -213,13 +213,20 @@ open as `file://` web apps.
 |---------|---------|-------|
 | aether | v4.33.0 | Go/Wails, repacked release binary |
 | cliamp | v2.4.1 | Go/CGO, repacked release binary |
+| disktree-bin | v0.11.0 | Rust/GPUI disk-usage treemap; repacked release, Provides disktree |
 | fantasi | v0.3.0 | Qt6/CMake local image model app |
+| gliff | v0.4.3 | Hyprland remote desktop over SSH; Rust, crates vendored |
 | flowtunes | v0.4.0 | Qt6/CMake local music app (GStreamer MP3 plugins) |
 | omarchy-folio | v0.7.5 | Qt6/CMake file manager (Files); replaces Nautilus, and its Open/Save dialogs |
+| omarchy-emacs | v1.10.1 | noarch Emacs theme/font integration; opt-in |
+| omarchy-hyprland-titlebars | v0.4.0 | Hyprland plugin (hyprbars), built against nett00n/hyprland-devel |
+| omarchy-local-ai | v0.18.0 | noarch local-model engine + recipe catalog |
+| omarchy-screensaver | v1.3.1 | native Wayland screensaver (ttfx branding) |
 | herdr | v0.9.5 | Rust, repacked release binary (herdrdev/herdr) |
 | hype | v0.7.1 | Qt6/CMake Markdown presentation editor |
 | hyprland-preview-share-picker | v0.3.1 | Rust/GTK4, source-built |
 | monologue | v0.4.1 | Qt6/CMake webcam recorder + libpulse/turbojpeg |
+| omapresent | v0.1.3 | Qt6 + QtWebEngine Markdown presentations (successor to hype) |
 | omacalc | v0.4.2 | Qt6/CMake |
 | omacut | v0.8.4 | Qt6/CMake + ffmpeg |
 | omaview | v0.1.2 | Qt6/CMake picture viewer + media player (replaces imv/mpv) |
@@ -227,13 +234,18 @@ open as `file://` web apps.
 | omarchy-themes-intros | v2026.11.24.1 | noarch theme intro videos (built from the release tag) |
 | omarchy-themes-loops | v2026.11.22 | noarch theme live background loops |
 | omasnap | v1.26.3 | built from source (supersedes tensaku) |
+| openai-codex-desktop | v26.1120.50957 | ChatGPT desktop .deb repack; on-demand, proprietary |
 | owe | v0.2.19 | meson/C wallpaper engine (mpv + ffmpeg-free) |
 | owe-lockfeed | v0.2.19 | Qt6 QML lock-screen feed module |
 | omarchy-pi-coding-agent | v1.7.0 | Bun standalone binary, repacked from the upstream release |
 | plain | v0.4.2 | Qt6/CMake text editor for config files |
+| playwright-cli | v0.1.25 | Microsoft @playwright/cli; npm deps vendored, HELD on npm alpha pins |
 | qtengine | v0.2.4 | Qt6 platform theme (replaces `gtk3`); AUR-only, first-party |
+| signed | v0.3.2 | Qt6/CMake PDF signing app |
+| superwhisper-bin | v1.3.1 | proprietary Superwhisper dictation; vendor Minisign repack |
 | try (tobi-try) | v1.10.1 | Ruby gem |
 | ttfx | v0.5.1 | pure Rust/cargo |
+| voxtype-bin | v1.3.2 | Whisper/OSD dictation backend; opt-in |
 
 Dropped from RPM scope (were in the original 13): `asdcontrol` (archived
 upstream, Apple-display-only), `omarchy-nvim` (in-tree LazyVim cache
